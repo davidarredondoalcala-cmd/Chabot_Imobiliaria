@@ -13,20 +13,20 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: linear-gradient(135deg, #1e40af 0%, #2563eb 55%, #38bdf8 100%);
+  background: linear-gradient(135deg, #c2410c 0%, #ea580c 55%, #ff8800 100%);
   color: #ffffff;
-  border: 1.5px solid rgba(56, 189, 248, 0.7);
+  border: 1.5px solid rgba(255, 170, 51, 0.75);
   border-radius: 9999px;
   padding: 12px 18px;
-  box-shadow: 0 0 20px rgba(37, 99, 235, 0.6), 0 0 35px rgba(56, 189, 248, 0.35);
+  box-shadow: 0 0 20px rgba(234, 88, 12, 0.65), 0 0 35px rgba(255, 136, 0, 0.4);
   cursor: pointer;
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .hc-chat-trigger-btn:hover {
   transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 0 28px rgba(0, 240, 255, 0.75), 0 0 50px rgba(37, 99, 235, 0.5);
-  border-color: #00f0ff;
+  box-shadow: 0 0 28px rgba(255, 200, 60, 0.8), 0 0 50px rgba(234, 88, 12, 0.5);
+  border-color: #ffe082;
 }
 
 .hc-trigger-badge {
@@ -44,8 +44,8 @@
   background: var(--card, #ffffff);
   color: var(--tx, #14201d);
   border-radius: 20px;
-  border: 1.5px solid rgba(56, 189, 248, 0.45);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(37, 99, 235, 0.35);
+  border: 1.5px solid rgba(255, 136, 0, 0.45);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(234, 88, 12, 0.35);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -65,17 +65,17 @@
 
 /* Encabezado */
 .hc-chat-header {
-  background: linear-gradient(135deg, #050c20 0%, #0d2259 45%, #1d4ed8 85%, #2563eb 100%);
+  background: linear-gradient(135deg, #100702 0%, #240f04 45%, #ea580c 85%, #ff7700 100%);
   color: #ffffff;
   padding: 14px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1.5px solid rgba(56, 189, 248, 0.55);
+  border-bottom: 1.5px solid rgba(255, 170, 51, 0.65);
   cursor: pointer;
   user-select: none;
   transition: filter 0.18s ease, background 0.18s ease;
-  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 4px 20px rgba(234, 88, 12, 0.35);
 }
 
 .hc-chat-header:hover {
@@ -95,14 +95,14 @@
 .hc-bot-avatar-badge {
   width: 36px;
   height: 36px;
-  background: rgba(56, 189, 248, 0.2);
-  border: 1px solid rgba(56, 189, 248, 0.45);
+  background: rgba(255, 136, 0, 0.2);
+  border: 1px solid rgba(255, 136, 0, 0.45);
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #38bdf8;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+  color: #ffaa33;
+  box-shadow: 0 0 10px rgba(255, 136, 0, 0.35);
 }
 
 .hc-bot-info h3 {
@@ -123,10 +123,10 @@
 .hc-status-dot {
   width: 7px;
   height: 7px;
-  background: #00f0ff;
+  background: #ffe082;
   border-radius: 50%;
   display: inline-block;
-  box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+  box-shadow: 0 0 10px #ffe082, 0 0 20px #ffe082;
 }
 
 .hc-header-actions {
@@ -136,9 +136,9 @@
 }
 
 .hc-header-collapse-btn {
-  background: rgba(56, 189, 248, 0.2);
+  background: rgba(255, 136, 0, 0.2);
   color: #ffffff;
-  border: 1px solid rgba(56, 189, 248, 0.4);
+  border: 1px solid rgba(255, 170, 51, 0.4);
   border-radius: 8px;
   padding: 6px;
   display: flex;
@@ -148,8 +148,8 @@
 }
 
 .hc-chat-header:hover .hc-header-collapse-btn {
-  background: rgba(0, 240, 255, 0.3);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+  background: rgba(255, 170, 51, 0.35);
+  box-shadow: 0 0 12px rgba(255, 170, 51, 0.55);
   transform: translateY(1.5px);
 }
 
@@ -179,11 +179,11 @@
 .hc-resume-card {
   background: var(--card, #ffffff);
   border: 1px solid var(--bd, #cbdcf8);
-  border-left: 4px solid #38bdf8;
+  border-left: 4px solid #ffaa33;
   border-radius: 12px;
   padding: 12px 14px;
   margin-top: 10px;
-  box-shadow: 0 0 16px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 0 16px rgba(234, 88, 12, 0.25);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -194,7 +194,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #1d4ed8;
+  color: #ea580c;
   margin-bottom: 2px;
 }
 
@@ -202,22 +202,22 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #38bdf8 100%);
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #ffaa33 100%);
   color: #ffffff;
-  border: 1px solid rgba(56, 189, 248, 0.5);
+  border: 1px solid rgba(255, 170, 51, 0.6);
   border-radius: 10px;
   padding: 10px 12px;
   cursor: pointer;
   text-align: left;
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-  box-shadow: 0 0 14px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 0 14px rgba(234, 88, 12, 0.35);
   width: 100%;
 }
 
 .hc-resume-btn-primary:hover {
   transform: translateY(-1px);
-  border-color: #00f0ff;
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+  border-color: #ffe082;
+  box-shadow: 0 0 20px rgba(255, 170, 51, 0.65);
 }
 
 .hc-resume-btn-secondary {
@@ -237,8 +237,8 @@
 
 .hc-resume-btn-secondary:hover {
   background: #ffffff;
-  border-color: #38bdf8;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+  border-color: #ffaa33;
+  box-shadow: 0 0 12px rgba(255, 136, 0, 0.35);
   transform: translateY(-1px);
 }
 
@@ -675,22 +675,22 @@
     background: rgba(0, 0, 0, 0.4);
   }
   :root:not([data-theme="light"]) .hc-resume-card {
-    background: #0a142c;
-    border-color: rgba(56, 189, 248, 0.35);
-    border-left-color: #00f0ff;
-    box-shadow: 0 0 20px rgba(37, 99, 235, 0.35);
+    background: #140c06;
+    border-color: rgba(255, 136, 0, 0.4);
+    border-left-color: #ffe082;
+    box-shadow: 0 0 20px rgba(234, 88, 12, 0.35);
   }
   :root:not([data-theme="light"]) .hc-resume-card-title {
-    color: #38bdf8;
+    color: #ffaa33;
   }
   :root:not([data-theme="light"]) .hc-resume-btn-secondary {
-    background: #0f1d3d;
+    background: #1c1007;
     color: #f0f6ff;
-    border-color: rgba(56, 189, 248, 0.3);
+    border-color: rgba(255, 136, 0, 0.35);
   }
   :root:not([data-theme="light"]) .hc-resume-btn-secondary:hover {
-    background: #152752;
-    border-color: #00f0ff;
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+    background: #271609;
+    border-color: #ffe082;
+    box-shadow: 0 0 15px rgba(255, 170, 51, 0.45);
   }
 }

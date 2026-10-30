@@ -1,82 +1,82 @@
 /* ===== Habitat Capital — sistema visual =====
-   Paleta Azul Rey Neón con iluminación cian y azul eléctrico decorativo.
+   Paleta J.A.R.V.I.S. Iron Man — Naranja Holográfico Stark Industries.
    Tipografías: Bricolage Grotesque (títulos) y Figtree (texto), cargadas en layout.js */
 :root {
     box-sizing: border-box;
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    --bg: #f0f5ff;
+    --bg: #fffaf4;
     --card: #ffffff;
-    --tx: #0a1936;
-    --mut: #475569;
-    --bd: #cbdcf8;
-    --ac: #1d4ed8;
-    --ac2: #2563eb;
+    --tx: #261405;
+    --mut: #6b5647;
+    --bd: #f2ddcb;
+    --ac: #ea580c;
+    --ac2: #ff7700;
     --onac: #ffffff;
-    --amb: #0284c7;
+    --amb: #ffaa00;
     --red: #ef4444;
-    --st-sin-bg: #dbeafe;     --st-sin-tx: #1e40af;
+    --st-sin-bg: #ffedd5;     --st-sin-tx: #9a3412;
     --st-arr-bg: #d1fae5;     --st-arr-tx: #065f46;
-    --st-ven-bg: #e0e7ff;     --st-ven-tx: #3730a3;
-    --st-vdd-bg: #e2e8f0;     --st-vdd-tx: #334155;
-    --st-pv-bg: #fee2e2;      --st-pv-tx: #991b1b;
-    --sh: 0 2px 10px rgba(37, 99, 235, .08), 0 1px 3px rgba(30, 64, 175, .05);
-    --sh2: 0 10px 30px -5px rgba(29, 78, 216, .16), 0 4px 14px rgba(37, 99, 235, .1);
-    --ring: rgba(37, 99, 235, .32);
+    --st-ven-bg: #fee2e2;     --st-ven-tx: #991b1b;
+    --st-vdd-bg: #f3f4f6;     --st-vdd-tx: #374151;
+    --st-pv-bg: #ffedd5;      --st-pv-tx: #c2410c;
+    --sh: 0 2px 10px rgba(234, 88, 12, .08), 0 1px 3px rgba(194, 65, 12, .05);
+    --sh2: 0 10px 30px -5px rgba(234, 88, 12, .18), 0 4px 14px rgba(255, 119, 0, .12);
+    --ring: rgba(255, 119, 0, .35);
 
     /* Efecto Azul Rey con Iluminación Neón */
-    --gold: #2563eb;
-    --gold-light: #60a5fa;
-    --gold-bright: #00f0ff;
-    --gold-dark: #1e3a8a;
-    --gold-grad: linear-gradient(135deg, #1e40af 0%, #2563eb 45%, #38bdf8 80%, #00f0ff 100%);
-    --gold-shimmer: linear-gradient(90deg, #1e3a8a 0%, #2563eb 25%, #60a5fa 48%, #00f0ff 52%, #2563eb 75%, #1e3a8a 100%);
-    --gold-glow: rgba(37, 99, 235, 0.45);
-    --gold-border: rgba(56, 189, 248, 0.5);
+    --gold: #ff7700;
+    --gold-light: #ffaa33;
+    --gold-bright: #ffe082;
+    --gold-dark: #c2410c;
+    --gold-grad: linear-gradient(135deg, #c2410c 0%, #ea580c 40%, #ff7700 75%, #ffaa33 100%);
+    --gold-shimmer: linear-gradient(90deg, #c2410c 0%, #ff7700 25%, #ffaa33 48%, #ffe082 52%, #ff7700 75%, #c2410c 100%);
+    --gold-glow: rgba(255, 119, 0, 0.55);
+    --gold-border: rgba(255, 136, 0, 0.5);
 
     /* Logo adaptable modo claro */
-    --logo-bg: #e8f1ff;
-    --logo-border: rgba(37, 99, 235, 0.45);
-    --logo-stroke: #1d4ed8;
-    --logo-glow: rgba(37, 99, 235, 0.4);
+    --logo-bg: #fff0e0;
+    --logo-border: rgba(255, 119, 0, 0.55);
+    --logo-stroke: #ea580c;
+    --logo-glow: rgba(255, 119, 0, 0.45);
 }
 
 @media (prefers-color-scheme:dark) {
     :root:not([data-theme="light"]) {
         color-scheme: dark;
-        --bg: #050a18;
-        --card: #0a142c;
-        --tx: #f0f6ff;
-        --mut: #94a3b8;
-        --bd: #16274e;
-        --ac: #3b82f6;
-        --ac2: #60a5fa;
+        --bg: #080503;
+        --card: #130c06;
+        --tx: #fff5ec;
+        --mut: #a38c7b;
+        --bd: #2e1b0d;
+        --ac: #ff7700;
+        --ac2: #ffaa33;
         --onac: #ffffff;
         --red: #f87171;
-        --st-sin-bg: #172554;  --st-sin-tx: #bfdbfe;
+        --st-sin-bg: #2d1405;  --st-sin-tx: #fed7aa;
         --st-arr-bg: #064e3b;  --st-arr-tx: #a7f3d0;
-        --st-ven-bg: #1e1b4b;  --st-ven-tx: #c7d2fe;
-        --st-vdd-bg: #1e293b;  --st-vdd-tx: #cbd5e1;
-        --st-pv-bg: #450a0a;   --st-pv-tx: #fecaca;
-        --sh: 0 2px 10px rgba(0, 0, 0, .6), 0 0 15px rgba(37, 99, 235, .2);
-        --sh2: 0 10px 35px -5px rgba(0, 0, 0, .8), 0 0 25px rgba(37, 99, 235, .35);
-        --ring: rgba(56, 189, 248, .45);
+        --st-ven-bg: #3f1508;  --st-ven-tx: #fecaca;
+        --st-vdd-bg: #1f1813;  --st-vdd-tx: #d1d5db;
+        --st-pv-bg: #431407;   --st-pv-tx: #fed7aa;
+        --sh: 0 2px 10px rgba(0, 0, 0, .6), 0 0 15px rgba(255, 119, 0, .25);
+        --sh2: 0 10px 35px -5px rgba(0, 0, 0, .8), 0 0 25px rgba(255, 119, 0, .4);
+        --ring: rgba(255, 136, 0, .48);
 
         /* Efecto Azul Rey Neón para modo oscuro */
-        --gold: #38bdf8;
-        --gold-light: #bae6fd;
-        --gold-bright: #00f0ff;
-        --gold-dark: #1d4ed8;
-        --gold-grad: linear-gradient(135deg, #0f2b5c 0%, #1d4ed8 45%, #2563eb 75%, #38bdf8 100%);
-        --gold-shimmer: linear-gradient(90deg, #1d4ed8 0%, #2563eb 25%, #38bdf8 48%, #00f0ff 52%, #2563eb 75%, #1d4ed8 100%);
-        --gold-glow: rgba(56, 189, 248, 0.55);
-        --gold-border: rgba(56, 189, 248, 0.45);
+        --gold: #ff8800;
+        --gold-light: #ffbb66;
+        --gold-bright: #ffe082;
+        --gold-dark: #c2410c;
+        --gold-grad: linear-gradient(135deg, #9a3412 0%, #ea580c 40%, #ff7700 75%, #ffaa33 100%);
+        --gold-shimmer: linear-gradient(90deg, #c2410c 0%, #ff7700 25%, #ffaa33 48%, #ffe082 52%, #ff7700 75%, #c2410c 100%);
+        --gold-glow: rgba(255, 136, 0, 0.6);
+        --gold-border: rgba(255, 136, 0, 0.5);
 
         /* Logo adaptable modo oscuro */
-        --logo-bg: #0a1633;
-        --logo-border: rgba(56, 189, 248, 0.65);
-        --logo-stroke: #38bdf8;
-        --logo-glow: rgba(56, 189, 248, 0.6);
+        --logo-bg: #1a0f07;
+        --logo-border: rgba(255, 136, 0, 0.65);
+        --logo-stroke: #ff8800;
+        --logo-glow: rgba(255, 119, 0, 0.65);
     }
 }
 
@@ -577,9 +577,9 @@ input:focus, textarea:focus, select:focus { outline: 0; border-color: var(--ac);
 .login-fondo {
     position: fixed; inset: 0; z-index: -1; overflow: hidden;
     background:
-        radial-gradient(120% 90% at 15% 8%, rgba(37, 99, 235, .55), transparent 55%),
-        radial-gradient(100% 80% at 88% 92%, rgba(56, 189, 248, .4), transparent 60%),
-        linear-gradient(135deg, #040817 0%, #08132e 50%, #0e2254 100%);
+        radial-gradient(120% 90% at 15% 8%, rgba(234, 88, 12, .55), transparent 55%),
+        radial-gradient(100% 80% at 88% 92%, rgba(255, 136, 0, .4), transparent 60%),
+        linear-gradient(135deg, #090502 0%, #150903 50%, #291104 100%);
 }
 /* Sombras geométricas arquitectónicas */
 .login-fondo::before {
@@ -598,8 +598,8 @@ input:focus, textarea:focus, select:focus { outline: 0; border-color: var(--ac);
 }
 .login-card {
     position: relative; z-index: 1; width: min(430px, 100%); text-align: center; padding: 40px 34px 30px; margin: 0;
-    border: 1.5px solid rgba(56, 189, 248, 0.45);
-    box-shadow: 0 0 35px rgba(37, 99, 235, 0.35), 0 0 70px rgba(56, 189, 248, 0.15), var(--sh2);
+    border: 1.5px solid rgba(255, 136, 0, 0.5);
+    box-shadow: 0 0 35px rgba(234, 88, 12, 0.35), 0 0 70px rgba(255, 136, 0, 0.18), var(--sh2);
 }
 .login-marca { justify-content: center; margin-bottom: 18px }
 .login-marca h1 { color: var(--ac) }
@@ -1021,26 +1021,26 @@ input:focus, textarea:focus, select:focus { outline: 0; border-color: var(--ac);
 
 /* ---------- Paleta ---------- */
 :root {
-    --bg: #f0f5ff;
+    --bg: #fffaf4;
     --card: #ffffff;
-    --tx: #0a1936;
-    --mut: #475569;
-    --bd: #cbdcf8;
-    --ac: #1d4ed8;
-    --ac2: #2563eb;
+    --tx: #261405;
+    --mut: #6b5647;
+    --bd: #f2ddcb;
+    --ac: #ea580c;
+    --ac2: #ff7700;
     --onac: #ffffff;
-    --amb: #0284c7;
+    --amb: #ffaa00;
     --red: #ef4444;
-    --st-sin-bg: #dbeafe;  --st-sin-tx: #1e40af;
+    --st-sin-bg: #ffedd5;  --st-sin-tx: #9a3412;
     --st-arr-bg: #d1fae5;  --st-arr-tx: #065f46;
-    --st-ven-bg: #e0e7ff;  --st-ven-tx: #3730a3;
-    --st-vdd-bg: #e2e8f0;  --st-vdd-tx: #334155;
-    --st-pv-bg: #fee2e2;   --st-pv-tx: #991b1b;
-    --sh: 0 2px 10px rgba(37, 99, 235, .08), 0 8px 24px rgba(29, 78, 216, .1);
-    --sh2: 0 10px 30px -5px rgba(29, 78, 216, .18), 0 18px 40px rgba(37, 99, 235, .15);
-    --ring: rgba(37, 99, 235, .32);
-    --grad: linear-gradient(135deg, #1e40af 0%, #2563eb 52%, #38bdf8 100%);
-    --grad-amb: linear-gradient(135deg, #0284c7 0%, #00f0ff 100%);
+    --st-ven-bg: #fee2e2;  --st-ven-tx: #991b1b;
+    --st-vdd-bg: #f3f4f6;  --st-vdd-tx: #374151;
+    --st-pv-bg: #ffedd5;   --st-pv-tx: #c2410c;
+    --sh: 0 2px 10px rgba(234, 88, 12, .08), 0 8px 24px rgba(29, 78, 216, .1);
+    --sh2: 0 10px 30px -5px rgba(234, 88, 12, .18), 0 18px 40px rgba(255, 119, 0, .12);
+    --ring: rgba(255, 119, 0, .35);
+    --grad: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #ffaa33 100%);
+    --grad-amb: linear-gradient(135deg, #ea580c 0%, #ffaa00 100%);
     --glow: rgba(37, 99, 235, .45);
     --suave: cubic-bezier(.37, 0, .63, 1);     /* ritmo de respiración: entra y sale despacio */
     --ease: cubic-bezier(.22, .61, .36, 1);
@@ -1048,75 +1048,75 @@ input:focus, textarea:focus, select:focus { outline: 0; border-color: var(--ac);
     --resp: 4s;                                 /* duración de un "respiro" completo */
 
     /* Logo adaptable modo claro */
-    --logo-bg: #e8f1ff;
-    --logo-border: rgba(37, 99, 235, 0.45);
-    --logo-stroke: #1d4ed8;
-    --logo-glow: rgba(37, 99, 235, 0.4);
+    --logo-bg: #fff0e0;
+    --logo-border: rgba(255, 119, 0, 0.55);
+    --logo-stroke: #ea580c;
+    --logo-glow: rgba(255, 119, 0, 0.45);
 }
 @media (prefers-color-scheme:dark) {
     :root:not([data-theme="light"]) {
-        --bg: #050a18; --card: #0a142c; --tx: #f0f6ff; --mut: #94a3b8; --bd: #16274e;
-        --ac: #3b82f6; --ac2: #60a5fa; --onac: #ffffff; --red: #f87171;
-        --st-sin-bg: #172554; --st-sin-tx: #bfdbfe;
+        --bg: #080503; --card: #130c06; --tx: #fff5ec; --mut: #a38c7b; --bd: #2e1b0d;
+        --ac: #ff7700; --ac2: #ffaa33; --onac: #ffffff; --red: #f87171;
+        --st-sin-bg: #2d1405; --st-sin-tx: #fed7aa;
         --st-arr-bg: #064e3b; --st-arr-tx: #a7f3d0;
-        --st-ven-bg: #1e1b4b; --st-ven-tx: #c7d2fe;
-        --st-vdd-bg: #1e293b; --st-vdd-tx: #cbd5e1;
-        --st-pv-bg: #450a0a;  --st-pv-tx: #fecaca;
-        --sh: 0 2px 10px rgba(0, 0, 0, .6), 0 8px 24px rgba(37, 99, 235, .25);
-        --sh2: 0 10px 35px -5px rgba(0, 0, 0, .8), 0 18px 40px rgba(37, 99, 235, .4);
-        --ring: rgba(56, 189, 248, .45);
-        --grad: linear-gradient(135deg, #1e40af 0%, #2563eb 55%, #38bdf8 100%);
-        --glow: rgba(56, 189, 248, .55);
+        --st-ven-bg: #3f1508; --st-ven-tx: #fecaca;
+        --st-vdd-bg: #1f1813; --st-vdd-tx: #d1d5db;
+        --st-pv-bg: #431407;  --st-pv-tx: #fed7aa;
+        --sh: 0 2px 10px rgba(0, 0, 0, .6), 0 8px 24px rgba(255, 119, 0, .25);
+        --sh2: 0 10px 35px -5px rgba(0, 0, 0, .8), 0 18px 40px rgba(255, 119, 0, .4);
+        --ring: rgba(255, 136, 0, .48);
+        --grad: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #ffaa33 100%);
+        --glow: rgba(255, 136, 0, .6);
 
         /* Logo adaptable modo oscuro */
-        --logo-bg: #0a1633;
-        --logo-border: rgba(56, 189, 248, 0.65);
-        --logo-stroke: #38bdf8;
-        --logo-glow: rgba(56, 189, 248, 0.6);
+        --logo-bg: #1a0f07;
+        --logo-border: rgba(255, 136, 0, 0.65);
+        --logo-stroke: #ff8800;
+        --logo-glow: rgba(255, 119, 0, 0.65);
     }
 }
 /* El botón de tema pone data-theme="dark" aunque el sistema esté en claro:
    este bloque hace que ese modo oscuro funcione siempre. */
 :root[data-theme="dark"] {
     color-scheme: dark;
-    --bg: #050a18; --card: #0a142c; --tx: #f0f6ff; --mut: #94a3b8; --bd: #16274e;
-    --ac: #3b82f6; --ac2: #60a5fa; --onac: #ffffff; --red: #f87171;
-    --st-sin-bg: #172554; --st-sin-tx: #bfdbfe;
+    --bg: #080503; --card: #130c06; --tx: #fff5ec; --mut: #a38c7b; --bd: #2e1b0d;
+    --ac: #ff7700; --ac2: #ffaa33; --onac: #ffffff; --red: #f87171;
+    --st-sin-bg: #2d1405; --st-sin-tx: #fed7aa;
     --st-arr-bg: #064e3b; --st-arr-tx: #a7f3d0;
-    --st-ven-bg: #1e1b4b; --st-ven-tx: #c7d2fe;
-    --st-vdd-bg: #1e293b; --st-vdd-tx: #cbd5e1;
-    --st-pv-bg: #450a0a;  --st-pv-tx: #fecaca;
-    --sh: 0 2px 10px rgba(0, 0, 0, .6), 0 8px 24px rgba(37, 99, 235, .25);
-    --sh2: 0 10px 35px -5px rgba(0, 0, 0, .8), 0 18px 40px rgba(37, 99, 235, .4);
-    --ring: rgba(56, 189, 248, .45);
-    --grad: linear-gradient(135deg, #1e40af 0%, #2563eb 55%, #38bdf8 100%);
-    --glow: rgba(56, 189, 248, .55);
-    --gold: #38bdf8;
-    --gold-light: #bae6fd;
-    --gold-bright: #00f0ff;
-    --gold-dark: #1d4ed8;
-    --gold-grad: linear-gradient(135deg, #0f2b5c 0%, #1d4ed8 45%, #2563eb 75%, #38bdf8 100%);
-    --gold-shimmer: linear-gradient(90deg, #1d4ed8 0%, #2563eb 25%, #38bdf8 48%, #00f0ff 52%, #2563eb 75%, #1d4ed8 100%);
-    --gold-glow: rgba(56, 189, 248, 0.55);
-    --gold-border: rgba(56, 189, 248, 0.45);
+    --st-ven-bg: #3f1508; --st-ven-tx: #fecaca;
+    --st-vdd-bg: #1f1813; --st-vdd-tx: #d1d5db;
+    --st-pv-bg: #431407;  --st-pv-tx: #fed7aa;
+    --sh: 0 2px 10px rgba(0, 0, 0, .6), 0 8px 24px rgba(255, 119, 0, .25);
+    --sh2: 0 10px 35px -5px rgba(0, 0, 0, .8), 0 18px 40px rgba(255, 119, 0, .4);
+    --ring: rgba(255, 136, 0, .48);
+    --grad: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #ffaa33 100%);
+    --glow: rgba(255, 136, 0, .6);
+    --gold: #ff8800;
+    --gold-light: #ffbb66;
+    --gold-bright: #ffe082;
+    --gold-dark: #c2410c;
+    --gold-grad: linear-gradient(135deg, #9a3412 0%, #ea580c 40%, #ff7700 75%, #ffaa33 100%);
+    --gold-shimmer: linear-gradient(90deg, #c2410c 0%, #ff7700 25%, #ffaa33 48%, #ffe082 52%, #ff7700 75%, #c2410c 100%);
+    --gold-glow: rgba(255, 136, 0, 0.6);
+    --gold-border: rgba(255, 136, 0, 0.5);
 
     /* Logo adaptable modo oscuro */
-    --logo-bg: #0a1633;
-    --logo-border: rgba(56, 189, 248, 0.65);
-    --logo-stroke: #38bdf8;
-    --logo-glow: rgba(56, 189, 248, 0.6);
+    --logo-bg: #1a0f07;
+    --logo-border: rgba(255, 136, 0, 0.65);
+    --logo-stroke: #ff8800;
+    --logo-glow: rgba(255, 119, 0, 0.65);
 }
 
 html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 100px) }
 body {
     min-height: 100vh;
     background:
-        radial-gradient(1000px 600px at 90% -5%, rgba(37, 99, 235, 0.2), transparent 65%),
-        radial-gradient(900px 650px at -5% 10%, rgba(56, 189, 248, 0.18), transparent 60%),
-        radial-gradient(800px 800px at 50% 90%, rgba(29, 78, 216, 0.14), transparent 70%),
+        radial-gradient(1000px 600px at 90% -5%, rgba(234, 88, 12, 0.22), transparent 65%),
+        radial-gradient(900px 650px at -5% 10%, rgba(255, 136, 0, 0.18), transparent 60%),
+        radial-gradient(800px 800px at 50% 90%, rgba(194, 65, 12, 0.15), transparent 70%),
         var(--bg);
 }
-::selection { background: rgba(56, 189, 248, 0.4); color: #ffffff; }
+::selection { background: rgba(255, 136, 0, 0.4); color: #ffffff; }
 
 /* ---------- Animaciones base (lentas, como una respiración) ---------- */
 @keyframes subir { from { opacity: 0; transform: translateY(18px) } to { opacity: 1; transform: none } }
@@ -1148,8 +1148,8 @@ header {
     background: color-mix(in srgb, var(--card) 84%, transparent);
     -webkit-backdrop-filter: saturate(1.5) blur(14px);
     backdrop-filter: saturate(1.5) blur(14px);
-    border-bottom: 1px solid rgba(56, 189, 248, 0.35);
-    box-shadow: 0 4px 25px rgba(29, 78, 216, 0.25), 0 0 15px rgba(56, 189, 248, 0.15);
+    border-bottom: 1px solid rgba(255, 136, 0, 0.35);
+    box-shadow: 0 4px 25px rgba(234, 88, 12, 0.25), 0 0 15px rgba(255, 136, 0, 0.18);
 }
 header .marca {
     display: inline-flex;
@@ -1206,7 +1206,7 @@ header h1 {
     -webkit-background-clip: text; background-clip: text;
     color: transparent; -webkit-text-fill-color: transparent;
     animation: brillo 14s linear infinite;
-    filter: drop-shadow(0 0 14px rgba(56, 189, 248, 0.65));
+    filter: drop-shadow(0 0 14px rgba(255, 136, 0, 0.7));
 }
 @media(max-width:900px) { header .header-der p { display: none } }
 @media(max-width:600px) {
@@ -1290,8 +1290,8 @@ button.tema-btn:hover:not(:disabled) { transform: rotate(-14deg) scale(1.08) }
 .item { border-radius: 18px; transition: transform .7s var(--suave), box-shadow .7s var(--suave), border-color .5s var(--suave) }
 .item:hover:not(.estatica) {
     transform: translateY(-8px);
-    box-shadow: 0 0 25px rgba(56, 189, 248, 0.45), 0 0 50px rgba(37, 99, 235, 0.25), var(--sh2);
-    border-color: #38bdf8;
+    box-shadow: 0 0 25px rgba(255, 136, 0, 0.5), 0 0 50px rgba(234, 88, 12, 0.25), var(--sh2);
+    border-color: #ffaa33;
 }
 .item:active:not(.estatica) { transform: translateY(-3px) scale(.99); transition-duration: .2s }
 .item .thumb > svg, .item .foto-thumb { transition: transform 1.4s var(--ease) }
@@ -1299,34 +1299,34 @@ button.tema-btn:hover:not(:disabled) { transform: rotate(-14deg) scale(1.08) }
 .item .tag.grande { transition: transform .8s var(--suave) }
 .item:hover .tag.grande { transform: scale(1.08) }
 .nom { transition: color .6s var(--suave) }
-.item:hover .nom { color: #38bdf8; text-shadow: 0 0 12px rgba(56, 189, 248, 0.4) }
+.item:hover .nom { color: #ffaa33; text-shadow: 0 0 12px rgba(255, 136, 0, 0.4) }
 
 /* Fotos y fondos de las tarjetas con la paleta Azul Rey Neón */
-.thumb, .foto-picker { background: linear-gradient(180deg, #071536, #1d4ed8) }
-.thumb.Apartamento, .foto-picker.Apartamento { background: linear-gradient(180deg, #050e24, #12347a) }
+.thumb, .foto-picker { background: linear-gradient(180deg, #1c0e04, #ea580c) }
+.thumb.Apartamento, .foto-picker.Apartamento { background: linear-gradient(180deg, #140902, #c2410c) }
 
 /* ---------- Portada con tonos Azul Rey Profundo e Iluminación Neón ---------- */
 .portada {
     border-radius: 28px;
     padding: 46px 46px 40px;
-    background: linear-gradient(135deg, #030713 0%, #0a1738 32%, #112a68 68%, #1d4ed8 100%);
+    background: linear-gradient(135deg, #090502 0%, #1a0b04 30%, #3d1604 65%, #ea580c 100%);
     background-size: 220% 220%;
     animation: aurora 34s ease-in-out infinite, subir 1s var(--ease) both;
-    box-shadow: 0 30px 60px -25px rgba(3, 7, 18, .9), 0 0 35px rgba(37, 99, 235, .35), inset 0 0 30px rgba(56, 189, 248, .15);
-    border: 1.5px solid rgba(56, 189, 248, 0.45);
+    box-shadow: 0 30px 60px -25px rgba(3, 7, 18, .9), 0 0 35px rgba(255, 119, 0, .4), inset 0 0 30px rgba(255, 170, 51, .2);
+    border: 1.5px solid rgba(255, 136, 0, 0.5);
     position: relative;
 }
 .portada::before {
     content: ""; position: absolute; right: -70px; top: -130px; width: 420px; height: 420px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(0, 240, 255, .35), rgba(37, 99, 235, .18) 45%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 170, 51, .4), rgba(234, 88, 12, .2) 45%, transparent 70%);
     animation: flotar 22s ease-in-out infinite; pointer-events: none
 }
 .portada::after {
     content: ""; position: absolute; left: -90px; bottom: -150px; width: 380px; height: 380px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(56, 189, 248, .35), rgba(29, 78, 216, .22) 50%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 136, 0, .35), rgba(194, 65, 12, .25) 50%, transparent 70%);
     animation: flotar 26s ease-in-out infinite reverse; pointer-events: none
 }
-.skyline { color: #38bdf8; opacity: 0.42; filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.45)); animation: flotar 28s ease-in-out infinite reverse }
+.skyline { color: #ffaa33; opacity: 0.42; filter: drop-shadow(0 0 10px rgba(255, 136, 0, 0.5)); animation: flotar 28s ease-in-out infinite reverse }
 .portada h2 { animation: subir 1s var(--ease) .15s backwards }
 .portada > p { animation: subir 1s var(--ease) .3s backwards }
 .stats > div { animation: subir 1s var(--ease) backwards; transition: transform .8s var(--suave) }
@@ -1334,7 +1334,7 @@ button.tema-btn:hover:not(:disabled) { transform: rotate(-14deg) scale(1.08) }
 .stats > div:nth-child(3) { animation-delay: .75s } .stats > div:nth-child(4) { animation-delay: .9s }
 .stats > div:hover { transform: translateY(-4px) scale(1.06) }
 .stats dd {
-    background: linear-gradient(180deg, #ffffff 15%, #bae6fd 60%, #38bdf8 100%);
+    background: linear-gradient(180deg, #ffffff 15%, #ffd4a3 60%, #ffaa33 100%);
     -webkit-background-clip: text; background-clip: text;
     color: transparent; -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 0 10px rgba(56, 189, 248, .5));
@@ -1695,14 +1695,14 @@ label { transition: color .5s }
 }
 
 .tag-admin {
-    background: rgba(37, 99, 235, 0.2);
-    color: #38bdf8;
-    border: 1px solid rgba(56, 189, 248, 0.5);
+    background: rgba(234, 88, 12, 0.22);
+    color: #ffaa33;
+    border: 1px solid rgba(255, 136, 0, 0.5);
     box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
 }
 
 .tag-usuario {
-    background: rgba(29, 78, 216, 0.15);
+    background: rgba(194, 65, 12, 0.15);
     color: #60a5fa;
     border: 1px solid rgba(56, 189, 248, 0.3);
 }
@@ -1717,15 +1717,15 @@ label { transition: color .5s }
     font-weight: 700;
     letter-spacing: .02em;
     cursor: pointer;
-    background: rgba(37, 99, 235, 0.18);
-    color: #38bdf8;
-    border: 1.5px solid rgba(56, 189, 248, 0.5);
+    background: rgba(234, 88, 12, 0.18);
+    color: #ffaa33;
+    border: 1.5px solid rgba(255, 136, 0, 0.5);
     box-shadow: 0 0 12px rgba(37, 99, 235, 0.3);
     transition: all .25s ease;
 }
 .tag-admin-toggle:hover {
-    background: rgba(37, 99, 235, 0.32);
-    border-color: #00f0ff;
+    background: rgba(234, 88, 12, 0.32);
+    border-color: #ffe082;
     transform: translateY(-1px);
     box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
 }
@@ -1739,8 +1739,8 @@ label { transition: color .5s }
     border-color: #c84b31;
 }
 [data-theme="dark"] .tag-admin-toggle {
-    color: #00f0ff;
-    background: rgba(37, 99, 235, 0.25);
+    color: #ffe082;
+    background: rgba(234, 88, 12, 0.25);
     border-color: rgba(0, 240, 255, 0.6);
     box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
 }
@@ -1755,8 +1755,8 @@ label { transition: color .5s }
     margin-top: 24px;
     padding: 22px 26px;
     border-radius: 16px;
-    background: linear-gradient(135deg, rgba(29, 78, 216, 0.15) 0%, rgba(56, 189, 248, 0.08) 100%);
-    border: 1.5px solid rgba(56, 189, 248, 0.5);
+    background: linear-gradient(135deg, rgba(194, 65, 12, 0.15) 0%, rgba(56, 189, 248, 0.08) 100%);
+    border: 1.5px solid rgba(255, 136, 0, 0.5);
     box-shadow: 0 0 25px rgba(37, 99, 235, 0.3);
     display: flex;
     flex-direction: column;

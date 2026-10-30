@@ -39,9 +39,9 @@ export const IcoSparkle = () => (<svg {...base}><path d="m12 3-1.9 5.8a2 2 0 0 1
 // Tono adaptable automáticamente según el tema activo (claro u oscuro).
 export const Logo = () => (
   <svg className="logo-svg" width="36" height="36" viewBox="0 0 36 36" role="img" aria-label="Habitat Capital">
-    <rect className="logo-bg" width="36" height="36" rx="9" fill="var(--logo-bg, #0a1633)" />
-    <rect className="logo-border" x="1.4" y="1.4" width="33.2" height="33.2" rx="7.8" fill="none" stroke="var(--logo-border, rgba(56, 189, 248, 0.5))" strokeWidth="1.4" />
-    <g className="logo-casas" fill="none" stroke="var(--logo-stroke, #38bdf8)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect className="logo-bg" width="36" height="36" rx="9" fill="var(--logo-bg, #1a0f07)" />
+    <rect className="logo-border" x="1.4" y="1.4" width="33.2" height="33.2" rx="7.8" fill="none" stroke="var(--logo-border, rgba(255, 136, 0, 0.65))" strokeWidth="1.4" />
+    <g className="logo-casas" fill="none" stroke="var(--logo-stroke, #ff8800)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M7.5 16.6 13.8 11l6.3 5.6V26h-12.6z" />
       <path d="M11.6 26v-5.2h4.4V26" />
       <path d="M20.4 17.4 25 13.6l4.6 3.8V26H20.4z" />

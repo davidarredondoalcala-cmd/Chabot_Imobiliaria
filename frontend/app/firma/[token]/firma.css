@@ -10,23 +10,23 @@
   display: inline-block;
   font-weight: 600;
   font-size: .92rem;
-  border: 1.5px solid rgba(56, 189, 248, 0.6);
-  background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #38bdf8 100%);
+  border: 1.5px solid rgba(255, 170, 51, 0.65);
+  background: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #ff7700 100%);
   color: #ffffff;
   border-radius: 10px;
   padding: 10px 18px;
   text-decoration: none;
-  box-shadow: 0 0 16px rgba(37, 99, 235, 0.45);
+  box-shadow: 0 0 16px rgba(234, 88, 12, 0.45);
   transition: all .2s ease;
 }
 .btn-pdf:hover {
-  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 45%, #00f0ff 100%);
-  border-color: #00f0ff;
-  box-shadow: 0 0 25px rgba(0, 240, 255, 0.65), 0 0 40px rgba(37, 99, 235, 0.4);
+  background: linear-gradient(135deg, #ea580c 0%, #ff7700 45%, #ffe082 100%);
+  border-color: #ffe082;
+  box-shadow: 0 0 25px rgba(255, 200, 60, 0.7), 0 0 40px rgba(234, 88, 12, 0.4);
 }
 
 /* ---------- Verificación e estados ---------- */
-.fm-verif { border-left: 4px solid var(--ac); box-shadow: 0 0 16px rgba(37, 99, 235, 0.15) }
+.fm-verif { border-left: 4px solid var(--ac); box-shadow: 0 0 16px rgba(255, 119, 0, 0.18) }
 .fm-verif.mal { border-left-color: var(--red) }
 .fm-espera .fm-estados { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 8px }
 .fm-espera .fm-estados li { display: flex; align-items: center; gap: 10px; font-size: .92rem }
@@ -44,10 +44,10 @@
 .fm-tabs button { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; text-align: left; transition: all .2s ease }
 .fm-tabs button small { color: var(--mut); font-weight: 400; font-size: .78rem }
 .fm-tabs button.on {
-  background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #38bdf8 100%);
-  border-color: #38bdf8;
+  background: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #ff7700 100%);
+  border-color: #ffaa33;
   color: #ffffff;
-  box-shadow: 0 0 16px rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 16px rgba(255, 136, 0, 0.5);
 }
 .fm-tabs button.on small { color: rgba(255, 255, 255, .88) }
 @media (max-width: 700px) { .fm-tabs { grid-template-columns: 1fr } }
@@ -55,7 +55,7 @@
 /* ---------- Áreas de dibujo y preview ---------- */
 .fm-caja {
   background: #fff;
-  border: 1.5px dashed rgba(56, 189, 248, 0.55);
+  border: 1.5px dashed rgba(255, 136, 0, 0.55);
   border-radius: 12px;
   min-height: 170px;
   display: grid;
@@ -63,7 +63,7 @@
   padding: 12px;
   background-image: radial-gradient(var(--bd) 1px, transparent 1px);
   background-size: 18px 18px;
-  box-shadow: 0 0 15px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 0 15px rgba(255, 119, 0, 0.15);
 }
 .fm-prev img { max-width: 100%; height: auto; max-height: 180px }
 .fm-lienzo {
@@ -72,11 +72,11 @@
   touch-action: none;
   cursor: crosshair;
   background: #fff;
-  border: 1.5px dashed rgba(56, 189, 248, 0.55);
+  border: 1.5px dashed rgba(255, 136, 0, 0.55);
   border-radius: 12px;
   background-image: radial-gradient(var(--bd) 1px, transparent 1px);
   background-size: 18px 18px;
-  box-shadow: 0 0 18px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 18px rgba(255, 119, 0, 0.18);
 }
 
 /* ---------- Fuentes tipográficas ---------- */
