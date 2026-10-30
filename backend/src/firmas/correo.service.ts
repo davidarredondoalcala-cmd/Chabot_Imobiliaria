@@ -77,7 +77,7 @@ export class CorreoService {
     const apiKey = process.env.BREVO_API_KEY;
     if (!apiKey) throw new Error('BREVO_API_KEY no está configurada');
 
-    const remitenteEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_FROM_EMAIL || 'notificaciones@habitatcapital.com';
+    const remitenteEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_FROM_EMAIL || 'david.arredondo@estudiantesunibague.edu.co';
     const remitenteNombre = process.env.BREVO_SENDER_NAME || 'Habitat Capital Inmobiliaria';
 
     const body: Record<string, any> = {
