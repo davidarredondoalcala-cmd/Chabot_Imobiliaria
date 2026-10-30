@@ -1,5 +1,6 @@
 'use client';
 import { useRef, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Caract from './Caract';
 import Ilustra from './Ilustra';
 import Hoja from './Hoja';
@@ -51,13 +52,22 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
   const [contratoVer, setContratoVer] = useState(null);
   const [descargandoId, setDescargandoId] = useState(null);
   const [fotoPrevia, setFotoPrevia] = useState(null); // { file, previewUrl }
+  const [montado, setMontado] = useState(false);
 
-  // Cierra el visor de contrato con Escape
+  useEffect(() => {
+    setMontado(true);
+  }, []);
+
+  // Cierra el visor de contrato con Escape y bloquea el scroll de fondo
   useEffect(() => {
     if (!contratoVer) return;
     const onTecla = (e) => { if (e.key === 'Escape') setContratoVer(null); };
     window.addEventListener('keydown', onTecla);
-    return () => window.removeEventListener('keydown', onTecla);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onTecla);
+      document.body.style.overflow = '';
+    };
   }, [contratoVer]);
 
   const prepararContratoS = (c) => {
@@ -357,7 +367,7 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
       </div>
 
       {/* Previsualización antes de subir la foto */}
-      {fotoPrevia && (
+      {fotoPrevia && montado && typeof document !== 'undefined' && createPortal(
         <div className="modal-contrato-backdrop" onClick={cancelarFotoPrevia}>
           <div className="card modal-previa-foto" onClick={(e) => e.stopPropagation()}>
             <div className="modal-contrato-header">
@@ -381,11 +391,12 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Visor de Contrato: perspectiva natural tipo documento en escritorio, se sale al hacer clic en cualquier lugar fuera del papel */}
-      {esAdmin && contratoVer && (
+      {esAdmin && contratoVer && montado && typeof document !== 'undefined' && createPortal(
         <div
           className="modal-contrato-visor-overlay"
           onClick={() => setContratoVer(null)}
@@ -442,7 +453,8 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
               <span>Haz clic en cualquier área fuera del contrato o presiona Esc para salir de la perspectiva</span>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
