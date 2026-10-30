@@ -1,0 +1,848 @@
+/* ===== Habitat Capital — sistema visual =====
+   Verde pino como color de marca, ámbar para acciones destacadas.
+   Tipografías: Bricolage Grotesque (títulos) y Figtree (texto), cargadas en layout.js */
+:root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    --bg: #eff3f1;
+    --card: #ffffff;
+    --tx: #14201d;
+    --mut: #5b6b66;
+    --bd: #dbe3e0;
+    --ac: #0f4c43;
+    --ac2: #176b5e;
+    --onac: #ffffff;
+    --amb: #e7a41f;
+    --red: #c92a2a;
+    --st-sin-bg: #e2e9f3;     --st-sin-tx: #2f4468;
+    --st-arr-bg: #d3eedd;     --st-arr-tx: #0b5a33;
+    --st-ven-bg: #fbe6bb;     --st-ven-tx: #6b4200;
+    --st-vdd-bg: #e8def5;     --st-vdd-tx: #4a2a7a;
+    --sh: 0 1px 2px rgba(15, 40, 35, .06), 0 6px 20px rgba(15, 40, 35, .06);
+    --sh2: 0 2px 4px rgba(15, 40, 35, .08), 0 16px 36px rgba(15, 40, 35, .14);
+    --ring: rgba(15, 76, 67, .22);
+}
+
+@media (prefers-color-scheme:dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #0c1412;
+        --card: #131f1c;
+        --tx: #e8f0ed;
+        --mut: #92a59f;
+        --bd: #25352f;
+        --ac: #4fc3ad;
+        --ac2: #6fd6c2;
+        --onac: #06201b;
+        --red: #ff8787;
+        --st-sin-bg: #22324d;  --st-sin-tx: #c3d3f0;
+        --st-arr-bg: #17402c;  --st-arr-tx: #b6ecc9;
+        --st-ven-bg: #4d3a10;  --st-ven-tx: #fbe0a2;
+        --st-vdd-bg: #3a2b57;  --st-vdd-tx: #dccdf5;
+        --sh: 0 1px 2px rgba(0, 0, 0, .4), 0 6px 20px rgba(0, 0, 0, .3);
+        --sh2: 0 2px 4px rgba(0, 0, 0, .5), 0 16px 36px rgba(0, 0, 0, .45);
+        --ring: rgba(79, 195, 173, .3);
+    }
+}
+
+html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 72px) }
+* { box-sizing: border-box }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--tx);
+    font-family: var(--f-body), "Segoe UI", system-ui, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased
+}
+
+h1, h2, h3 { font-family: var(--f-display), var(--f-body), system-ui, sans-serif; letter-spacing: -.015em; line-height: 1.2 }
+h2 { margin: 0 0 20px; font-size: 1.6rem }
+h3 { margin: 30px 0 12px; font-size: 1.15rem }
+.mut { color: var(--mut); font-size: .88rem }
+
+/* ---------- Cabecera ---------- */
+header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: 14px 32px;
+    background: var(--card);
+    border-bottom: 1px solid var(--bd);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    transition: transform .35s ease
+}
+header.oculto { transform: translateY(-110%) }
+.marca { display: flex; align-items: center; gap: 12px }
+header h1 { margin: 0; font-size: 1.3rem; font-weight: 700; color: var(--ac) }
+header p { margin: 0; color: var(--mut); font-size: .9rem }
+@media(max-width:600px) { header { padding: 12px 18px } header p { display: none } }
+
+main { max-width: 1120px; margin: 0 auto; padding: 28px 24px 72px }
+.view { animation: fade .25s ease both }
+@keyframes fade { from { opacity: 0 } to { opacity: 1 } }
+
+/* ---------- Portada (resumen del portafolio) ---------- */
+.portada {
+    position: relative;
+    overflow: hidden;
+    padding: 40px 40px 34px;
+    margin-bottom: 28px;
+    border-radius: 24px;
+    color: #fff;
+    background: linear-gradient(125deg, #0a332d 0%, #0f4c43 55%, #176b5e 100%)
+}
+.portada h2 { position: relative; max-width: 20ch; margin: 0 0 12px; font-size: clamp(1.8rem, 3.6vw, 2.7rem); font-weight: 700 }
+.portada > p { position: relative; max-width: 52ch; margin: 0 0 30px; color: rgba(255, 255, 255, .8); font-size: 1.02rem }
+.skyline { position: absolute; right: 0; bottom: 0; height: 100%; width: 56%; color: #9fe0d2; opacity: .22; pointer-events: none }
+.stats { position: relative; display: flex; flex-wrap: wrap; gap: 20px 0; margin: 0 }
+.stats > div { padding: 0 30px; border-left: 1px solid rgba(255, 255, 255, .22) }
+.stats > div:first-child { padding-left: 0; border-left: 0 }
+.stats dd { margin: 0; font-family: var(--f-display), sans-serif; font-size: 2rem; font-weight: 700; line-height: 1.1 }
+.stats dt { margin-top: 2px; font-size: .85rem; color: rgba(255, 255, 255, .72) }
+@media(max-width:700px) {
+    .portada { padding: 30px 22px 26px }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 18px }
+    .stats > div, .stats > div:first-child { padding: 0; border: 0 }
+}
+
+/* ---------- Pestañas ---------- */
+.tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: min(460px, 100%);
+    gap: 0;
+    background: var(--card);
+    border: 1px solid var(--bd);
+    padding: 5px;
+    border-radius: 14px;
+    margin: 0 0 20px;
+    position: relative
+}
+.tabs button {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 0;
+    background: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: var(--mut);
+    transition: color .25s
+}
+.tabs button:hover { color: var(--ac); border: 0 }
+.tabs button.on { color: var(--onac) }
+.pill {
+    position: absolute;
+    top: 5px;
+    bottom: 5px;
+    left: 5px;
+    width: calc(50% - 5px) !important;
+    border-radius: 10px;
+    background: var(--ac);
+    transition: transform .35s cubic-bezier(.65, 0, .35, 1)
+}
+
+/* ---------- Tarjetas base ---------- */
+.card {
+    background: var(--card);
+    border: 1px solid var(--bd);
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--sh)
+}
+
+/* ---------- Lista de inmuebles ---------- */
+.lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px }
+.lista .card { margin: 0 }
+.item {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s
+}
+.item:hover:not(.estatica) { transform: translateY(-3px); box-shadow: var(--sh2); border-color: var(--ac) }
+.item:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; border-color: var(--ac) }
+
+.thumb { position: relative; height: 168px; overflow: hidden; background: linear-gradient(180deg, #0e4a41, #1e7667) }
+.thumb.Apartamento { background: linear-gradient(180deg, #1b3558, #34628f) }
+.thumb svg { display: block; width: 100%; height: 100% }
+.thumb .foto-thumb { display: block; width: 100%; height: 100%; object-fit: cover }
+.thumb.grande { height: 240px; border-radius: 0 }
+
+/* Foto clicable: abre el selector de archivo (ficha y formulario) */
+.thumb.editable, .foto-picker {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden
+}
+.thumb.editable:focus-visible, .foto-picker:focus-visible { outline: 3px solid var(--ring); outline-offset: -3px }
+.thumb.editable .foto-thumb, .foto-picker img { transition: transform .3s ease, filter .3s ease }
+.thumb.editable:hover .foto-thumb, .foto-picker:hover img { transform: scale(1.03) }
+.foto-cap {
+    position: absolute;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    background: rgba(12, 20, 18, .78);
+    color: #fff;
+    font-size: .85rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 99px;
+    opacity: 0;
+    transition: opacity .2s ease;
+    pointer-events: none;
+    white-space: nowrap
+}
+.thumb.editable:hover .foto-cap, .thumb.editable:focus-visible .foto-cap,
+.foto-picker:hover .foto-cap, .foto-picker:focus-visible .foto-cap { opacity: 1 }
+@media(hover:none) { .thumb.editable .foto-cap, .foto-picker .foto-cap { opacity: 1 } }
+
+/* Miniatura de foto en el formulario */
+.foto-picker {
+    height: 190px;
+    border-radius: 12px;
+    border: 1px solid var(--bd);
+    background: linear-gradient(180deg, #0e4a41, #1e7667)
+}
+.foto-picker.Apartamento { background: linear-gradient(180deg, #1b3558, #34628f) }
+.foto-picker img { display: block; width: 100%; height: 100%; object-fit: cover }
+.foto-picker svg { display: block; width: 100%; height: 100% }
+.foto-quitar {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(12, 20, 18, .72);
+    color: #fff;
+    font-size: 1.2rem;
+    line-height: 1;
+    display: grid;
+    place-items: center
+}
+.foto-quitar:hover { background: var(--red); color: #fff; border: 0 }
+
+.info { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1 }
+.nom { margin: 0 0 2px; font-size: 1.2rem; font-weight: 700 }
+.dir { margin: 0 0 10px; color: var(--mut); font-size: .9rem }
+.meta { margin: 8px 0 0; color: var(--mut); font-size: .85rem }
+.caract { display: flex; gap: 8px 18px; flex-wrap: wrap; margin: 0; font-size: .9rem; font-weight: 500 }
+.caract span { display: inline-flex; align-items: center; gap: 6px }
+.caract svg { color: var(--ac) }
+.precio {
+    margin: auto 0 0;
+    padding-top: 14px;
+    font-family: var(--f-display), sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap
+}
+.info .caract + .precio, .info .meta + .precio { margin-top: 16px }
+.precio small { margin-left: 2px; font-family: var(--f-body), sans-serif; font-size: .82rem; font-weight: 500; color: var(--mut) }
+.precio .tag.grande { margin-left: auto }
+.info > .precio { border-top: 0 }
+
+/* ---------- Etiquetas de estado ---------- */
+.tag {
+    display: inline-flex;
+    align-items: center;
+    font-size: .76rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 99px;
+    background: var(--st-sin-bg);
+    color: var(--st-sin-tx)
+}
+.tag.Arrendada { background: var(--st-arr-bg); color: var(--st-arr-tx) }
+.tag.Venta { background: var(--st-ven-bg); color: var(--st-ven-tx) }
+.tag.Vendida { background: var(--st-vdd-bg); color: var(--st-vdd-tx) }
+.tag.pulse { background: var(--amb); color: #2b1b00; animation: pulse 2.4s infinite }
+/* Etiqueta de estado grande, junto al costo (tarjeta de catálogo y ficha) */
+.tag.grande { font-size: .95rem; padding: 7px 16px; font-weight: 700 }
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(231, 164, 31, .55) }
+    70% { box-shadow: 0 0 0 9px rgba(231, 164, 31, 0) }
+    100% { box-shadow: 0 0 0 0 rgba(231, 164, 31, 0) }
+}
+
+/* ---------- Botones ---------- */
+button {
+    font: inherit;
+    font-weight: 600;
+    font-size: .92rem;
+    border: 1.5px solid var(--bd);
+    background: var(--card);
+    color: var(--tx);
+    border-radius: 10px;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: background .15s, border-color .15s, color .15s, box-shadow .15s
+}
+button:hover { border-color: var(--ac); color: var(--ac) }
+button:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px }
+button.g { background: var(--ac); border-color: var(--ac); color: var(--onac) }
+button.g:hover { background: var(--ac2); border-color: var(--ac2); color: var(--onac); box-shadow: 0 6px 16px var(--ring) }
+button.o { background: var(--amb); border-color: var(--amb); color: #2b1b00 }
+button.o:hover { filter: brightness(.95); color: #2b1b00; border-color: var(--amb) }
+button.l { background: none; border: 0; color: var(--ac); padding: 6px 0 }
+button.l:hover { text-decoration: underline }
+button:disabled { opacity: .6; cursor: wait }
+
+.row { display: flex; gap: 12px; flex-wrap: wrap; margin: 18px 0; align-items: center }
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin: 28px 0 18px }
+.toolbar h2 { margin: 0 }
+
+/* ---------- Detalle ---------- */
+.ficha { padding: 0; overflow: hidden; margin-top: 10px }
+.ficha-body { padding: 28px 32px 32px }
+.titulo { margin: 0 0 4px; font-size: 2rem }
+.datos { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 22px 0 6px }
+.dato { background: var(--bg); border-radius: 12px; padding: 14px 16px }
+.dato span { display: block; color: var(--mut); font-size: .8rem }
+.dato b { font-family: var(--f-display), sans-serif; font-size: 1.2rem }
+/* El dato del precio lleva la etiqueta de estado grande al lado */
+.precio-dato { display: flex; flex-direction: column; align-items: flex-start; gap: 4px }
+.precio-dato .precio-val { font-size: 1.5rem; margin-bottom: 4px }
+.pdf { display: flex; gap: 14px; align-items: center; padding: 14px; border: 1px solid var(--bd); border-radius: 12px; margin-bottom: 10px }
+.pdf-info { flex: 1; min-width: 0 }
+.pdf-acciones { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end }
+.pdfico { flex: none; width: 42px; height: 52px; border-radius: 8px; display: grid; place-items: center; background: var(--ac); color: var(--onac); font-size: .7rem; font-weight: 700 }
+.vacio { text-align: center; color: var(--mut) }
+
+/* ---------- Formularios ---------- */
+.grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 28px; align-items: start }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px }
+@media(max-width:760px) { .grid { grid-template-columns: 1fr } .ficha-body { padding: 22px 20px 26px } }
+.form-t { margin: 0 0 16px; font-size: 1.4rem }
+
+label { display: block; font-size: .82rem; font-weight: 600; color: var(--mut); margin: 14px 0 5px }
+input, textarea, select {
+    width: 100%;
+    font: inherit;
+    padding: 11px 13px;
+    border: 1.5px solid var(--bd);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--tx);
+    transition: border-color .2s, box-shadow .2s
+}
+input:focus, textarea:focus, select:focus { outline: 0; border-color: var(--ac); box-shadow: 0 0 0 4px var(--ring) }
+
+.modo { display: flex; gap: 4px; background: var(--bg); padding: 4px; border-radius: 12px; margin-bottom: 4px }
+.modo button { flex: 1; background: none; border: 0; color: var(--mut) }
+.modo button.on { background: var(--ac); color: var(--onac) }
+
+.filtros-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px }
+.ft { display: inline-flex; align-items: center; gap: 8px; font-family: var(--f-display), sans-serif; font-size: 1.05rem }
+.filtros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 4px 18px }
+.rango { display: flex; gap: 8px }
+
+/* Filtros como píldoras (reemplazan el <select> nativo) */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; align-items: center }
+.chips-hint { font-weight: 500; text-transform: none; color: var(--mut) }
+.filtro-lbl { font-size: .95rem; font-weight: 800; color: var(--ac); letter-spacing: .01em; margin: 14px 0 6px }
+.chip {
+    font: inherit; font-size: 1rem; font-weight: 700;
+    padding: 10px 18px; border-radius: 999px;
+    border: 1.5px solid var(--bd); background: var(--bg); color: var(--mut);
+    cursor: pointer; line-height: 1; transition: border-color .18s, background .18s, color .18s, box-shadow .18s, transform .12s
+}
+.chip:hover { border-color: var(--ac2); color: var(--tx); transform: translateY(-1px) }
+.chip:focus-visible { outline: 0; border-color: var(--ac); box-shadow: 0 0 0 3px var(--ring) }
+.chip.on { background: var(--ac); border-color: var(--ac); color: var(--onac); box-shadow: 0 3px 10px rgba(15, 76, 67, .28) }
+.chip-num {
+    width: 76px; font: inherit; font-size: 1rem; font-weight: 700;
+    padding: 10px 14px; border-radius: 999px; text-align: center;
+    border: 1.5px solid var(--ac); background: var(--card); color: var(--tx)
+}
+.chip-num:focus { outline: 0; box-shadow: 0 0 0 3px var(--ring) }
+
+.visor { max-width: 660px; margin: 0 auto 12px; display: flex; gap: 10px; align-items: center; font-weight: 600; color: var(--mut) }
+.grid > div > .visor { margin-left: 0 }
+.link { word-break: break-all; font-size: .85rem; background: var(--bg); padding: 10px; border-radius: 10px; margin-top: 10px }
+
+/* ---------- Hoja del contrato (vista previa del PDF) ---------- */
+.hoja {
+    background: #fff;
+    color: #222;
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 46px 56px;
+    border-radius: 4px;
+    box-shadow: var(--sh2);
+    border: 1px solid rgba(0, 0, 0, .06);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: .88rem;
+    line-height: 1.75;
+    text-align: justify;
+    min-height: 700px
+}
+.hoja .mem { margin-bottom: 18px }
+.hoja .mem-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px }
+.hoja .mem-t { margin: 0; font-size: 1.05rem; letter-spacing: .6px; color: #073f39; text-transform: uppercase; font-weight: 700 }
+.hoja .mem-sub { margin: 4px 0 0; font-size: .85rem; color: #374151 }
+.hoja .mem-l { text-align: right; font-size: .75rem; color: #4b5563; line-height: 1.4 }
+.hoja hr { border: 0; border-top: 1px solid #d1d5db; margin: 12px 0 18px }
+.hoja h3 { text-align: center; margin: 0 0 20px; font-family: Georgia, serif; font-size: 1.05rem; letter-spacing: .5px; color: #0f4c43 }
+.hoja h4 { margin: 16px 0 8px; font-size: .95rem; color: #0f4c43; font-weight: 700 }
+.hoja p { margin: 0 0 10px }
+.hoja b { color: #0f4c43 }
+.hoja .bl { color: #999; font-weight: 400; border-bottom: 1px solid #aaa }
+.hoja .sig { display: flex; justify-content: space-around; gap: 20px; flex-wrap: wrap; margin-top: 56px; text-align: center }
+.hoja .sig div { border-top: 1px solid #222; padding-top: 6px; min-width: 150px; font-size: .85rem }
+
+/* ---------- Aviso ---------- */
+#toast {    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ac);
+    color: var(--onac);
+    font-weight: 600;
+    padding: 12px 22px;
+    border-radius: 12px;
+    box-shadow: var(--sh2);
+    display: block;
+    animation: fade .25s ease
+}
+
+/* ---------- Cabecera de usuario (sesión) ---------- */
+.header-der { display: flex; align-items: center; gap: 18px }
+.tema-btn {
+    display: inline-grid; place-items: center;
+    width: 40px; height: 40px; padding: 0;
+    border-radius: 50%; cursor: pointer;
+    border: 1.5px solid var(--bd); background: var(--bg); color: var(--tx);
+    transition: border-color .18s, background .18s, color .18s, transform .12s
+}
+.tema-btn:hover { border-color: var(--ac); color: var(--ac); transform: rotate(-12deg) }
+.tema-btn:focus-visible { outline: 0; border-color: var(--ac); box-shadow: 0 0 0 3px var(--ring) }
+.login-fondo ~ .tema-btn, .login-main > .tema-btn { position: absolute; top: 20px; right: 24px; z-index: 2 }
+.usuario { display: flex; align-items: center; gap: 10px }
+.usuario img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid var(--bd) }
+.usuario-nom { font-size: .9rem; font-weight: 600; color: var(--tx); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+@media(max-width:700px) { .header-der p { display: none } .usuario-nom { display: none } }
+
+/* ---------- Pantalla de inicio de sesión ---------- */
+.login-main { position: relative; min-height: 100vh; max-width: none; margin: 0; padding: 8vh 24px 72px; display: flex; justify-content: center; align-items: center }
+
+/* Fondo corporativo sutil: navy + gris oscuro con sombras arquitectónicas y reflejos de cristal (16:9, minimalista) */
+.login-fondo {
+    position: fixed; inset: 0; z-index: -1; overflow: hidden;
+    background:
+        radial-gradient(120% 90% at 15% 8%, rgba(46, 68, 110, .55), transparent 55%),
+        radial-gradient(100% 80% at 88% 92%, rgba(30, 44, 74, .5), transparent 60%),
+        linear-gradient(135deg, #0b1f3a 0%, #101826 52%, #1c2330 100%);
+}
+/* Sombras geométricas arquitectónicas */
+.login-fondo::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+        conic-gradient(from 210deg at 78% 22%, rgba(255,255,255,.06), transparent 22%),
+        linear-gradient(115deg, transparent 62%, rgba(255,255,255,.05) 62.4%, transparent 63%),
+        linear-gradient(105deg, transparent 74%, rgba(255,255,255,.04) 74.3%, transparent 75%);
+}
+/* Reflejos de cristal diagonales */
+.login-fondo::after {
+    content: ""; position: absolute; inset: -20% -10%;
+    background: linear-gradient(72deg, transparent 40%, rgba(180, 210, 255, .07) 47%, transparent 54%),
+                linear-gradient(72deg, transparent 58%, rgba(180, 210, 255, .05) 62%, transparent 66%);
+    mix-blend-mode: screen;
+}
+.login-card { position: relative; z-index: 1; width: min(430px, 100%); text-align: center; padding: 40px 34px 30px; margin: 0; box-shadow: var(--sh2) }
+.login-marca { justify-content: center; margin-bottom: 18px }
+.login-marca h1 { color: var(--ac) }
+.login-t { margin: 0 0 8px; font-size: 1.7rem }
+.login-sub { margin: 0 auto 26px; max-width: 34ch }
+.login-btn { display: flex; justify-content: center; min-height: 44px; margin-bottom: 12px }
+.login-espera { margin: 0 }
+.login-error { margin-top: 8px; padding: 12px 14px; border-radius: 10px; background: var(--st-vdd-bg); color: var(--st-vdd-tx); font-weight: 600; font-size: .9rem }
+.login-pie { display: flex; gap: 10px 22px; justify-content: center; flex-wrap: wrap; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--bd); color: var(--mut); font-size: .86rem }
+.login-pie span { display: inline-flex; align-items: center; gap: 7px }
+.login-pie svg { color: var(--ac) }
+
+@media(prefers-reduced-motion:reduce) {
+    * { animation: none !important; transition: none !important }
+}
+
+/* ---------- Impresión (PDF del contrato) ---------- */
+@page { size: A4; margin: 18mm }
+@media print {
+    header, .noprint, #toast { display: none !important }
+    body { background: #fff; color: #000 }
+    .card { box-shadow: none; border: none; background: #fff; color: #000 }
+    .grid { display: block }
+    .hoja { box-shadow: none !important; border: 0; padding: 0 !important; max-width: none !important; min-height: 0 }
+    .hoja b, .hoja .bl { color: #000 }
+}
+
+
+
+.dd { position: relative; min-width: 0 }
+.dd.abierto { z-index: 20 }
+.dd-btn {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    font: inherit; font-size: 1rem; font-weight: 600; text-align: left;
+    padding: 11px 13px; border-radius: 10px;
+    border: 1.5px solid var(--bd); background: var(--bg); color: var(--tx)
+}
+.dd-btn:hover, .dd.abierto .dd-btn { border-color: var(--ac); color: var(--tx) }
+.dd.abierto .dd-btn { box-shadow: 0 0 0 4px var(--ring) }
+.dd-flecha { flex: none; color: var(--ac); transition: transform .25s ease }
+.dd.abierto .dd-flecha { transform: rotate(180deg) }
+/* Panel que se despliega: las opciones aparecen como píldoras, una tras otra */
+.dd-panel {
+    position: absolute; top: calc(100% + 8px); left: 0; width: min(340px, calc(100vw - 4rem)); padding: 14px;
+    background: var(--card); border: 1.5px solid var(--bd); border-radius: 16px; box-shadow: var(--sh2);
+    transform-origin: top left; animation: dd-abrir .28s cubic-bezier(.2, .9, .3, 1.15) backwards
+}
+.dd-panel .chips { margin-top: 0 }
+.dd-panel .chip { animation: dd-chip .34s cubic-bezier(.2, .9, .3, 1.3) backwards; animation-delay: calc(var(--n, 0) * 45ms + 60ms) }
+@keyframes dd-abrir { from { opacity: 0; transform: translateY(-10px) scale(.94) } to { opacity: 1; transform: none } }
+@keyframes dd-chip { from { opacity: 0; transform: translateY(8px) scale(.6) } to { opacity: 1; transform: none } }
+@media (prefers-reduced-motion: reduce) { .dd-panel, .dd-panel .chip { animation: none } .dd-flecha { transition: none } }
+.foto-cap.subiendo { opacity: 1 }
+
+
+.foto-mas {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 64px; height: 64px; border-radius: 50%;
+    display: grid; place-items: center; padding-bottom: 4px;
+    background: rgba(12, 20, 18, .62); color: #fff; border: 2px solid rgba(255, 255, 255, .85);
+    font-size: 2.4rem; font-weight: 300; line-height: 1;
+    transition: transform .2s ease, background .2s ease; pointer-events: none
+}
+.thumb.editable:hover .foto-mas, .thumb.editable:focus-visible .foto-mas,
+.foto-picker:hover .foto-mas, .foto-picker:focus-visible .foto-mas { transform: translate(-50%, -50%) scale(1.1); background: var(--ac) }
+
+
+.nuevo-item {
+    min-height: 260px; align-items: center; justify-content: center;
+    background: transparent; border: 2px dashed var(--bd); box-shadow: none
+}
+.nuevo-item:hover:not(.estatica) { border-color: var(--ac); background: var(--card) }
+.nuevo-mas {
+    width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; padding-bottom: 6px;
+    background: var(--bg); color: var(--ac); border: 2px solid var(--bd);
+    font-size: 3.4rem; font-weight: 300; line-height: 1;
+    transition: transform .2s ease, background .2s ease, color .2s ease, border-color .2s ease
+}
+.nuevo-item:hover .nuevo-mas, .nuevo-item:focus-visible .nuevo-mas { transform: scale(1.1) rotate(90deg); background: var(--ac); color: var(--onac); border-color: var(--ac) }
+
+
+
+/* =====================================================================
+   REDISEÑO — paleta azul real + cian + ámbar, y movimiento "respirado"
+   Va al final a propósito: sobrescribe reglas anteriores sin cambiar sus
+   nombres de clase. Todo el movimiento se apaga con prefers-reduced-motion
+   (regla general más arriba), así que es seguro para quien lo necesite.
+   ===================================================================== */
+
+/* ---------- Paleta ---------- */
+:root {
+    --bg: #edf2fc;
+    --card: #ffffff;
+    --tx: #0e1a3d;
+    --mut: #56668d;
+    --bd: #d6def0;
+    --ac: #1d4ed8;
+    --ac2: #2f6dff;
+    --onac: #ffffff;
+    --amb: #f5a524;
+    --red: #d92d4a;
+    --st-sin-bg: #e2e8f7;  --st-sin-tx: #293e7a;
+    --st-arr-bg: #cff3e3;  --st-arr-tx: #0a6945;
+    --st-ven-bg: #fde6bd;  --st-ven-tx: #7a4500;
+    --st-vdd-bg: #e9defb;  --st-vdd-tx: #54299c;
+    --st-pv-bg: #ffdccf;   --st-pv-tx: #a02f0b;
+    --sh: 0 1px 2px rgba(18, 38, 105, .07), 0 8px 24px rgba(18, 38, 105, .08);
+    --sh2: 0 2px 4px rgba(18, 38, 105, .10), 0 18px 40px rgba(18, 38, 105, .16);
+    --ring: rgba(37, 99, 235, .26);
+    --grad: linear-gradient(135deg, #1a3cb8 0%, #2563eb 55%, #17a6df 100%);
+    --grad-amb: linear-gradient(135deg, #ffbc3b 0%, #f08a0c 100%);
+    --glow: rgba(37, 99, 235, .45);
+    --suave: cubic-bezier(.37, 0, .63, 1);     /* ritmo de respiración: entra y sale despacio */
+    --ease: cubic-bezier(.22, .61, .36, 1);
+    --rebote: cubic-bezier(.34, 1.25, .5, 1);
+    --resp: 4s;                                 /* duración de un "respiro" completo */
+}
+@media (prefers-color-scheme:dark) {
+    :root:not([data-theme="light"]) {
+        --bg: #0a1022; --card: #121a34; --tx: #e8edfb; --mut: #94a1c6; --bd: #243055;
+        --ac: #6ea2ff; --ac2: #8fb9ff; --onac: #07122e; --red: #ff8a9b;
+        --st-sin-bg: #1f2d54; --st-sin-tx: #c5d3f5;
+        --st-arr-bg: #123d2d; --st-arr-tx: #b4f0d4;
+        --st-ven-bg: #4d3a10; --st-ven-tx: #fbe0a2;
+        --st-vdd-bg: #33295a; --st-vdd-tx: #d9cdf8;
+        --st-pv-bg: #4d2418;  --st-pv-tx: #ffc9b5;
+        --sh: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .32);
+        --sh2: 0 2px 4px rgba(0, 0, 0, .5), 0 18px 40px rgba(0, 0, 0, .5);
+        --ring: rgba(110, 162, 255, .32);
+        --grad: linear-gradient(135deg, #3b74f0 0%, #5b9bff 55%, #4fd0f0 100%);
+        --glow: rgba(110, 162, 255, .45);
+    }
+}
+/* El botón de tema pone data-theme="dark" aunque el sistema esté en claro:
+   este bloque hace que ese modo oscuro funcione siempre. */
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0a1022; --card: #121a34; --tx: #e8edfb; --mut: #94a1c6; --bd: #243055;
+    --ac: #6ea2ff; --ac2: #8fb9ff; --onac: #07122e; --red: #ff8a9b;
+    --st-sin-bg: #1f2d54; --st-sin-tx: #c5d3f5;
+    --st-arr-bg: #123d2d; --st-arr-tx: #b4f0d4;
+    --st-ven-bg: #4d3a10; --st-ven-tx: #fbe0a2;
+    --st-vdd-bg: #33295a; --st-vdd-tx: #d9cdf8;
+    --st-pv-bg: #4d2418;  --st-pv-tx: #ffc9b5;
+    --sh: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .32);
+    --sh2: 0 2px 4px rgba(0, 0, 0, .5), 0 18px 40px rgba(0, 0, 0, .5);
+    --ring: rgba(110, 162, 255, .32);
+    --grad: linear-gradient(135deg, #3b74f0 0%, #5b9bff 55%, #4fd0f0 100%);
+    --glow: rgba(110, 162, 255, .45);
+}
+
+html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 100px) }
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(900px 520px at 92% -8%, color-mix(in srgb, var(--amb) 14%, transparent), transparent 62%),
+        radial-gradient(900px 600px at -8% 2%, color-mix(in srgb, var(--ac2) 18%, transparent), transparent 60%),
+        var(--bg);
+}
+::selection { background: color-mix(in srgb, var(--ac2) 35%, transparent) }
+
+/* ---------- Animaciones base (lentas, como una respiración) ---------- */
+@keyframes subir { from { opacity: 0; transform: translateY(18px) } to { opacity: 1; transform: none } }
+@keyframes brillo { 0% { background-position: 0% 50% } 100% { background-position: 200% 50% } }
+@keyframes aurora { 0%, 100% { background-position: 0% 50% } 50% { background-position: 100% 50% } }
+@keyframes flotar { 0%, 100% { transform: translate(0, 0) } 50% { transform: translate(-22px, 16px) } }
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, 28px) scale(.94) } to { opacity: 1; transform: translate(-50%, 0) } }
+/* Respiro: se infla y se desinfla despacio (usa la propiedad "scale", independiente de "transform") */
+@keyframes respirar { 0%, 100% { scale: 1 } 50% { scale: 1.04 } }
+@keyframes aura {
+    0%, 100% { box-shadow: 0 0 0 3px var(--ring), 0 12px 24px -12px var(--glow) }
+    50% { box-shadow: 0 0 0 9px transparent, 0 20px 38px -12px var(--glow) }
+}
+@keyframes barrido { 0% { left: -90% } 55%, 100% { left: 140% } }
+@keyframes aliento-tag {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--st-pv-tx) 38%, transparent); scale: 1 }
+    50% { box-shadow: 0 0 0 7px transparent; scale: 1.06 }
+}
+
+.view { animation: subir .9s var(--ease) both }
+
+/* ---------- Cabecera: título centrado y más grande ---------- */
+header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    padding: 16px 36px;
+    background: var(--card);
+    background: color-mix(in srgb, var(--card) 84%, transparent);
+    -webkit-backdrop-filter: saturate(1.5) blur(14px);
+    backdrop-filter: saturate(1.5) blur(14px);
+    border-bottom: 1px solid color-mix(in srgb, var(--bd) 80%, transparent);
+    box-shadow: 0 12px 30px -22px rgba(18, 38, 105, .5)
+}
+header .marca { grid-column: 2; grid-row: 1; justify-self: center; gap: 14px; cursor: default }
+header .header-der { grid-column: 3; grid-row: 1; justify-self: end }
+header .marca svg {
+    width: 46px; height: 46px; border-radius: 12px;
+    box-shadow: 0 6px 16px -6px var(--glow);
+    transition: transform .8s var(--suave), box-shadow .6s var(--suave)
+}
+header .marca:hover svg { transform: rotate(-8deg) scale(1.1); box-shadow: 0 12px 26px -6px var(--glow) }
+header h1 {
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -.025em;
+    background: linear-gradient(90deg, var(--ac) 0%, var(--ac2) 35%, var(--amb) 50%, var(--ac2) 65%, var(--ac) 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+    animation: brillo 18s linear infinite
+}
+@media(max-width:900px) { header .header-der p { display: none } }
+@media(max-width:600px) {
+    header { padding: 12px 14px }
+    header .marca { gap: 9px }
+    header .marca svg { width: 34px; height: 34px }
+    header h1 { font-size: 1.3rem }
+}
+
+main { max-width: 1160px; padding: 36px 28px 88px }
+
+/* ---------- Botones: respiran y se resaltan bajo el cursor ---------- */
+button {
+    border-radius: 12px;
+    padding: 11px 20px;
+    transition: transform .8s var(--suave), box-shadow .7s var(--suave), background .5s var(--suave),
+                border-color .5s var(--suave), color .5s var(--suave), filter .6s var(--suave), opacity .6s var(--suave)
+}
+/* Botón bajo el cursor: se infla, se ilumina y "respira" mientras el cursor siga encima */
+button:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.06);
+    filter: brightness(1.08) saturate(1.15);
+    box-shadow: 0 0 0 4px var(--ring), 0 16px 30px -12px var(--glow);
+    animation: respirar var(--resp) var(--suave) infinite, aura var(--resp) var(--suave) infinite
+}
+button:active:not(:disabled) { transform: translateY(0) scale(.96); box-shadow: none; animation: none; transition-duration: .15s }
+/* Los botones normales (con borde) se tiñen de azul al resaltarse */
+button:not(.g):not(.o):not(.l):not(.chip):not(.dd-btn):not(.tema-btn):not(.foto-quitar):not([role="tab"]):not(.on):hover:not(:disabled) {
+    background: color-mix(in srgb, var(--ac) 10%, var(--card));
+    border-color: var(--ac); color: var(--ac)
+}
+/* Si hay varios botones juntos, los demás se apagan un poco para que destaque el que tiene el cursor */
+.row:has(> button:hover:not(:disabled)) > button:not(:hover) { opacity: .72; filter: saturate(.75) }
+
+button.g, button.o { position: relative; overflow: hidden; border-color: transparent }
+button.g { background: var(--grad); color: var(--onac) }
+button.g:hover:not(:disabled) { background: var(--grad); border-color: transparent; color: var(--onac) }
+button.o { background: var(--grad-amb); color: #2b1b00; --ring: rgba(245, 165, 36, .34); --glow: rgba(240, 138, 12, .65) }
+button.o:hover:not(:disabled) { background: var(--grad-amb); border-color: transparent; color: #2b1b00 }
+/* Destello que cruza el botón; mientras el cursor sigue encima se repite con calma */
+button.g::after, button.o::after {
+    content: ""; position: absolute; top: 0; left: -90%; width: 55%; height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .42), transparent);
+    transform: skewX(-22deg); pointer-events: none
+}
+button.g:hover::after, button.o:hover::after { animation: barrido var(--resp) var(--suave) infinite }
+
+/* Botones que NO se inflan (pestañas, selectores, textos, iconos) */
+.tabs button:hover, .modo button:hover, button.dd-btn:hover, button.l:hover, button.tema-btn:hover, button.foto-quitar:hover, .fm-tabs button:hover {
+    animation: none; box-shadow: none; filter: none
+}
+.tabs button:hover:not(:disabled), .modo button:hover:not(:disabled), button.dd-btn:hover:not(:disabled) { transform: none }
+button.l:hover:not(:disabled) { transform: translateX(-4px) }          /* "← Volver" se desliza hacia atrás */
+button.tema-btn:hover:not(:disabled) { transform: rotate(-14deg) scale(1.08) }
+.modo button.on, .fm-tabs button.on { background: var(--grad); border-color: transparent }
+.modo button { transition: background .5s var(--suave), color .5s var(--suave) }
+.chip.on { background: var(--grad); border-color: transparent; box-shadow: 0 5px 14px -5px var(--glow) }
+.pill { background: var(--grad); box-shadow: 0 8px 16px -8px var(--glow); transition: transform .7s var(--suave) }
+.btn-pdf { background: var(--grad); border-color: transparent }
+
+/* ---------- Tarjetas ---------- */
+.card { border-radius: 20px; margin-bottom: 24px }
+.card:not(.item):not(.ficha) { padding: 28px }   /* las tarjetas de inmueble y la ficha llevan la foto a sangre (padding 0) */
+.lista { gap: 26px }
+.lista > * { animation: subir .9s var(--ease) backwards }   /* "backwards": no bloquea el hover */
+.lista > :nth-child(1) { animation-delay: .05s }  .lista > :nth-child(2) { animation-delay: .15s }
+.lista > :nth-child(3) { animation-delay: .25s }  .lista > :nth-child(4) { animation-delay: .35s }
+.lista > :nth-child(5) { animation-delay: .45s }  .lista > :nth-child(6) { animation-delay: .55s }
+.lista > :nth-child(7) { animation-delay: .65s }  .lista > :nth-child(8) { animation-delay: .75s }
+.lista > :nth-child(n+9) { animation-delay: .85s }
+
+.item { border-radius: 22px; transition: transform .7s var(--suave), box-shadow .7s var(--suave), border-color .5s var(--suave) }
+.item:hover:not(.estatica) { transform: translateY(-8px); box-shadow: 0 24px 46px -18px var(--glow), var(--sh2) }
+.item:active:not(.estatica) { transform: translateY(-3px) scale(.99); transition-duration: .2s }
+.item .thumb > svg, .item .foto-thumb { transition: transform 1.4s var(--ease) }
+.item:hover .thumb > svg, .item:hover .foto-thumb { transform: scale(1.08) }
+.item .tag.grande { transition: transform .8s var(--suave) }
+.item:hover .tag.grande { transform: scale(1.08) }
+.nom { transition: color .6s var(--suave) }
+.item:hover .nom { color: var(--ac) }
+
+/* Fotos y fondos de las tarjetas con la nueva paleta */
+.thumb, .foto-picker { background: linear-gradient(180deg, #123c9c, #2f78e6) }
+.thumb.Apartamento, .foto-picker.Apartamento { background: linear-gradient(180deg, #2b2a8c, #6a63e6) }
+
+/* ---------- Portada con movimiento lento ---------- */
+.portada {
+    border-radius: 28px;
+    padding: 46px 46px 40px;
+    background: linear-gradient(125deg, #0b1747 0%, #12308f 36%, #1f5bdc 70%, #0f2f86 100%);
+    background-size: 220% 220%;
+    animation: aurora 34s ease-in-out infinite, subir 1s var(--ease) both;
+    box-shadow: 0 30px 60px -32px rgba(11, 23, 71, .85)
+}
+.portada::before {
+    content: ""; position: absolute; right: -70px; top: -130px; width: 380px; height: 380px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(245, 165, 36, .45), transparent 66%);
+    animation: flotar 22s ease-in-out infinite; pointer-events: none
+}
+.portada::after {
+    content: ""; position: absolute; left: -90px; bottom: -150px; width: 360px; height: 360px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(34, 190, 240, .4), transparent 66%);
+    animation: flotar 26s ease-in-out infinite reverse; pointer-events: none
+}
+.skyline { color: #c4dbff; animation: flotar 28s ease-in-out infinite reverse }
+.portada h2 { animation: subir 1s var(--ease) .15s backwards }
+.portada > p { animation: subir 1s var(--ease) .3s backwards }
+.stats > div { animation: subir 1s var(--ease) backwards; transition: transform .8s var(--suave) }
+.stats > div:nth-child(1) { animation-delay: .45s } .stats > div:nth-child(2) { animation-delay: .6s }
+.stats > div:nth-child(3) { animation-delay: .75s } .stats > div:nth-child(4) { animation-delay: .9s }
+.stats > div:hover { transform: translateY(-4px) scale(1.06) }
+.stats dd { background: linear-gradient(180deg, #fff, #cfe4ff); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent }
+@media(max-width:700px) { .portada { padding: 30px 22px 26px } }
+
+/* ---------- Pestañas, datos, contratos ---------- */
+.tabs { border-radius: 16px; padding: 6px; box-shadow: var(--sh) }
+.tabs button { padding: 12px 16px; transition: color .6s var(--suave) }
+.tabs button:hover:not(.on) { color: var(--ac) }
+.dato { border-radius: 14px; transition: transform .7s var(--suave), box-shadow .7s var(--suave) }
+.dato:hover { transform: translateY(-3px); box-shadow: var(--sh) }
+.pdf { transition: transform .7s var(--suave), border-color .5s, box-shadow .7s var(--suave) }
+.pdf:hover { transform: translateX(5px); border-color: var(--ac); box-shadow: var(--sh) }
+.pdfico { background: var(--grad); transition: transform .8s var(--suave) }
+.pdf:hover .pdfico { transform: rotate(-6deg) scale(1.1) }
+h3 { position: relative }
+.ficha-body h3 { padding-left: 14px }
+.ficha-body h3::before { content: ""; position: absolute; left: 0; top: 14%; bottom: 14%; width: 4px; border-radius: 4px; background: var(--grad-amb) }
+
+/* ---------- Estado extra: "Por vencer" (se calcula, no se guarda) ---------- */
+.tag { transition: transform .8s var(--suave) }
+.tag.PorVencer { background: var(--st-pv-bg); color: var(--st-pv-tx); animation: aliento-tag var(--resp) var(--suave) infinite }
+.meta .tag { margin-left: 10px; vertical-align: middle }
+.tag.pulse { animation-duration: 4s }
+
+/* ---------- Formularios ---------- */
+input, textarea, select { border-radius: 12px; transition: border-color .5s var(--suave), box-shadow .6s var(--suave), background .5s, transform .6s var(--suave) }
+input:hover, textarea:hover, select:hover { border-color: color-mix(in srgb, var(--ac) 55%, var(--bd)) }
+input:focus, textarea:focus, select:focus { background: var(--card); transform: translateY(-1px) }
+label { transition: color .5s }
+.chip { transition: border-color .5s var(--suave), background .5s var(--suave), color .5s var(--suave), box-shadow .6s var(--suave), transform .8s var(--suave) }
+
+/* ---------- Enlaces de firma (uno al lado del otro) ---------- */
+.enlaces { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-top: 16px }
+.enlace {
+    display: flex; flex-direction: column; gap: 10px; min-width: 0;
+    padding: 16px; border-radius: 16px; background: var(--bg); border: 1px solid var(--bd);
+    animation: subir .9s var(--ease) backwards; animation-delay: calc(var(--n, 0) * 150ms + 100ms);
+    transition: transform .7s var(--suave), box-shadow .7s var(--suave), border-color .5s
+}
+.enlace:hover { transform: translateY(-5px); box-shadow: 0 18px 32px -18px var(--glow); border-color: var(--ac) }
+.enlace-rol { display: flex; align-items: center; gap: 10px; font-weight: 700; text-transform: capitalize }
+.enlace-n {
+    display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--grad); color: var(--onac); font-size: .8rem; font-weight: 800
+}
+.enlace .link { margin: 0; background: var(--card); font-size: .78rem; flex: 1 }
+.enlace button { align-self: flex-start }
+
+/* ---------- Aviso ---------- */
+#toast { animation: toast-in .9s var(--rebote); background: var(--grad); border-radius: 14px; padding: 13px 24px }
+
+/* ---------- Pantalla de firma ---------- */
+.fm-main > * { animation: subir .9s var(--ease) backwards }
+.fm-tabs button { transition: transform .7s var(--suave), background .5s, border-color .5s }
+.fm-tabs button:hover:not(.on) { transform: translateY(-3px) }
+
+/* La regla general de reduced-motion (más arriba) también cubre todo lo anterior */
