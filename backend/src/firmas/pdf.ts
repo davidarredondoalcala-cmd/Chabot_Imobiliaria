@@ -1,6 +1,7 @@
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { GridFSBucket } from 'mongodb';
 import * as clausulas from './clausulas';
+import { FIRMA_INMOBILIARIA_DATA_URL } from './firma-inmobiliaria';
 
 const A4 = { w: 595.28, h: 841.89 };
 const M = 50; // margen
@@ -105,9 +106,11 @@ export async function generarPdf(acuerdo: any) {
   est.y -= 30;
   const filas: any[][] = [];
   let fila: any[] = [];
-  // Arriendo: tras arrendador y arrendatario aparecen los codeudores (si los hay); no firman por enlace
-  const cods = acuerdo.tipo === 'arriendo' ? (acuerdo.datos?.cods || []).filter(Boolean) : [];
-  const bloque = [...acuerdo.firmantes, ...cods.map((c: string) => ({ rol: 'Codeudor', nombre: c, sinFirma: true }))];
+  // Codeudores que no estén ya incluidos en acuerdo.firmantes
+  const nombresYaEnFirmantes = new Set((acuerdo.firmantes || []).map((f: any) => (f.nombre || f.datos?.nombre || '').trim().toLowerCase()));
+  const codsRestantes = (acuerdo.tipo === 'arriendo' ? (acuerdo.datos?.cods || []).filter(Boolean) : [])
+    .filter((c: string) => !nombresYaEnFirmantes.has(c.trim().toLowerCase()));
+  const bloque = [...acuerdo.firmantes, ...codsRestantes.map((c: string) => ({ rol: 'Codeudor', nombre: c, sinFirma: true }))];
   for (const f of bloque) {
     fila.push(f);
     if (fila.length === 2) { filas.push(fila); fila = []; }
@@ -313,11 +316,25 @@ export async function generarPdfBorrador(tipo: string, datos: any) {
     for (let i = 0; i < fr.length; i++) {
       const f = fr[i];
       const x = M + i * (anchoCol + 20);
+
+      // Si es Arrendador o Vendedor (Inmobiliaria), estampa la firma corporativa por defecto
+      const esInmobiliaria = f.rol === 'Arrendador' || f.rol === 'Vendedor';
+      if (esInmobiliaria) {
+        try {
+          const png = FIRMA_INMOBILIARIA_DATA_URL.replace(/^data:image\/png;base64,/, '');
+          const embebida = await doc.embedPng(Buffer.from(png, 'base64'));
+          const wImg = 140;
+          const hImg = wImg * (embebida.height / embebida.width);
+          est.pag.drawImage(embebida, { x: x + (anchoCol - wImg) / 2, y: est.y - hImg + 16, width: wImg, height: hImg });
+        } catch { /* continuar si no carga */ }
+      }
+
       est.pag.drawLine({ start: { x, y: est.y }, end: { x: x + anchoCol, y: est.y }, thickness: 1, color: NEGRO });
       const nombre = f.nombre || '____________________';
       const nombreL = envolver(nombre, helv, 9.5, anchoCol)[0] || nombre;
       est.pag.drawText(nombreL, { x, y: est.y - 14, size: 9.5, font: helv, color: NEGRO });
-      est.pag.drawText(String(f.rol || ''), { x, y: est.y - 26, size: 8.5, font: italica, color: GRIS });
+      const rolTxt = esInmobiliaria ? `${f.rol} (Firma autorizada del propietario)` : String(f.rol || '');
+      est.pag.drawText(rolTxt, { x, y: est.y - 26, size: 8.5, font: italica, color: GRIS });
     }
     est.y -= 70;
   }

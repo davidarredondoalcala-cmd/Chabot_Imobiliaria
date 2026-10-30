@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Hoja from './Hoja';
 import { crearAcuerdo, descargarPdfBorrador, obtenerAcuerdo } from '../lib/apiFirmas';
 import { IcoImprimir, IcoDescargar, IcoMail, IcoCheck, IcoMas, IcoBasura, IcoEditar, IcoDocumento } from './Iconos';
+import { INMOBILIARIA_INFO } from '../lib/firmaInmobiliaria';
 
 const CLAUSULAS_ARRIENDO_DEF = [
   { pre: 'PRIMERA – Objeto.', resto: 'EL ARRENDADOR entrega a título de arrendamiento el inmueble ubicado en la dirección indicada.' },
@@ -36,15 +37,15 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
   );
 
   const [S, setS] = useState({
-    arr: 'Habitat Capital Inmobiliaria',
-    arrCedula: '901234567-8',
-    arrEmail: 'admin@habitatcapital.com',
+    arr: INMOBILIARIA_INFO.nombre,
+    arrCedula: INMOBILIARIA_INFO.cedula,
+    arrEmail: INMOBILIARIA_INFO.email,
     ate: '',
     ateCedula: '',
     ateEmail: '',
-    vend: 'Habitat Capital Inmobiliaria',
-    vendCedula: '901234567-8',
-    vendEmail: 'admin@habitatcapital.com',
+    vend: INMOBILIARIA_INFO.nombre,
+    vendCedula: INMOBILIARIA_INFO.cedula,
+    vendEmail: INMOBILIARIA_INFO.email,
     comp: '',
     compCedula: '',
     compEmail: '',
@@ -165,24 +166,43 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
       const firmantes =
         modo === 'arriendo'
           ? [
-              { rol: 'arrendador', nombre: S.arr, cedula: S.arrCedula, email: S.arrEmail },
-              { rol: 'arrendatario', nombre: S.ate, cedula: S.ateCedula, email: S.ateEmail },
+              {
+                rol: 'arrendador',
+                nombre: INMOBILIARIA_INFO.nombre,
+                cedula: INMOBILIARIA_INFO.cedula,
+                email: INMOBILIARIA_INFO.email,
+              },
+              { rol: 'arrendatario', nombre: S.ate.trim(), cedula: S.ateCedula.trim(), email: S.ateEmail.trim() },
               ...codsValidos.map((c, k) => ({
                 rol: 'codeudor',
-                nombre: c,
-                cedula: S.codsCedula?.[k] || '',
-                email: S.codsEmail?.[k] || '',
+                nombre: c.trim(),
+                cedula: (S.codsCedula?.[k] || '').trim(),
+                email: (S.codsEmail?.[k] || '').trim(),
               })),
             ]
           : [
-              { rol: 'vendedor', nombre: S.vend, cedula: S.vendCedula, email: S.vendEmail },
-              { rol: 'comprador', nombre: S.comp, cedula: S.compCedula, email: S.compEmail },
+              {
+                rol: 'vendedor',
+                nombre: INMOBILIARIA_INFO.nombre,
+                cedula: INMOBILIARIA_INFO.cedula,
+                email: INMOBILIARIA_INFO.email,
+              },
+              { rol: 'comprador', nombre: S.comp.trim(), cedula: S.compCedula.trim(), email: S.compEmail.trim() },
             ];
 
       const r = await crearAcuerdo({
         inmueble: inm._id,
         tipo: modo,
-        datos: { ...S, clausulas },
+        datos: {
+          ...S,
+          arr: INMOBILIARIA_INFO.nombre,
+          arrCedula: INMOBILIARIA_INFO.cedula,
+          arrEmail: INMOBILIARIA_INFO.email,
+          vend: INMOBILIARIA_INFO.nombre,
+          vendCedula: INMOBILIARIA_INFO.cedula,
+          vendEmail: INMOBILIARIA_INFO.email,
+          clausulas,
+        },
         firmantes,
         frontendUrl: typeof window !== 'undefined' ? window.location.origin : undefined,
       });
@@ -224,10 +244,25 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
 
           {modo === 'arriendo' ? (
             <>
-              {campo('arr', 'Nombre del Arrendador')}
-              <div className="grid3" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                <div>{campo('arrCedula', 'Cédula / NIT')}</div>
-                <div>{campo('arrEmail', 'Correo electrónico', 'email')}</div>
+              {/* Arrendador: Inmobiliaria propietaria fija por defecto */}
+              <div style={{ background: 'var(--bg)', padding: '14px 16px', borderRadius: 12, border: '1.5px solid var(--bd)', marginBottom: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--ac)' }}>
+                    Arrendador (Propietario del inmueble)
+                  </span>
+                  <span className="tag Arrendada" style={{ fontSize: '0.75rem', padding: '3px 8px' }}>
+                    <IcoCheck /> Firma corporativa autorizada
+                  </span>
+                </div>
+                <div style={{ fontWeight: 800, fontSize: '0.98rem', color: 'var(--fg)' }}>
+                  {INMOBILIARIA_INFO.nombre}
+                </div>
+                <div className="mut" style={{ fontSize: '0.82rem', marginTop: 3 }}>
+                  NIT: <b>{INMOBILIARIA_INFO.cedula}</b> · Correo: <b>{INMOBILIARIA_INFO.email}</b>
+                </div>
+                <p className="mut" style={{ margin: '8px 0 0', fontSize: '0.76rem', lineHeight: 1.4, borderTop: '1px dashed var(--bd)', paddingTop: 6 }}>
+                  La inmobiliaria es la propietaria legal del inmueble. Su firma digital institucional y datos están incorporados por defecto.
+                </p>
               </div>
 
               {campo('ate', 'Nombre del Arrendatario *', 'text', 'Ej: Andrés Gómez')}
@@ -276,10 +311,25 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
             </>
           ) : (
             <>
-              {campo('vend', 'Nombre del Vendedor')}
-              <div className="grid3" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                <div>{campo('vendCedula', 'Cédula / NIT Vendedor')}</div>
-                <div>{campo('vendEmail', 'Correo Vendedor', 'email')}</div>
+              {/* Vendedor: Inmobiliaria propietaria fija por defecto */}
+              <div style={{ background: 'var(--bg)', padding: '14px 16px', borderRadius: 12, border: '1.5px solid var(--bd)', marginBottom: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--ac)' }}>
+                    Vendedor (Propietario del inmueble)
+                  </span>
+                  <span className="tag Arrendada" style={{ fontSize: '0.75rem', padding: '3px 8px' }}>
+                    <IcoCheck /> Firma corporativa autorizada
+                  </span>
+                </div>
+                <div style={{ fontWeight: 800, fontSize: '0.98rem', color: 'var(--fg)' }}>
+                  {INMOBILIARIA_INFO.nombre}
+                </div>
+                <div className="mut" style={{ fontSize: '0.82rem', marginTop: 3 }}>
+                  NIT: <b>{INMOBILIARIA_INFO.cedula}</b> · Correo: <b>{INMOBILIARIA_INFO.email}</b>
+                </div>
+                <p className="mut" style={{ margin: '8px 0 0', fontSize: '0.76rem', lineHeight: 1.4, borderTop: '1px dashed var(--bd)', paddingTop: 6 }}>
+                  La inmobiliaria es la propietaria legal del inmueble. Su firma digital institucional y datos están incorporados por defecto.
+                </p>
               </div>
 
               {campo('comp', 'Nombre del Comprador *', 'text', 'Nombre completo')}
@@ -380,24 +430,27 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
                 El contrato en formato PDF y el enlace seguro de firma fueron enviados a través de Brevo directamente a los correos registrados en el formulario:
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {enviados.map((f, k) => (
-                  <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg)', padding: '12px 16px', borderRadius: 12, border: '1px solid var(--bd)' }}>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontWeight: 700, fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--ac)' }}>
-                          {f.rol}:
-                        </span>
-                        <strong style={{ fontSize: '0.95rem' }}>{f.nombre || 'Sin nombre'}</strong>
+                {enviados.map((f, k) => {
+                  const esInm = f.rol === 'arrendador' || f.rol === 'vendedor';
+                  return (
+                    <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg)', padding: '12px 16px', borderRadius: 12, border: '1px solid var(--bd)' }}>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ fontWeight: 700, fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--ac)' }}>
+                            {f.rol}:
+                          </span>
+                          <strong style={{ fontSize: '0.95rem' }}>{f.nombre || 'Sin nombre'}</strong>
+                        </div>
+                        <div className="mut" style={{ fontSize: '0.82rem', marginTop: 3, display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <IcoMail /> {f.email || 'Sin correo especificado'} {f.cedula ? ` · C.C./NIT ${f.cedula}` : ''}
+                        </div>
                       </div>
-                      <div className="mut" style={{ fontSize: '0.82rem', marginTop: 3, display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <IcoMail /> {f.email || 'Sin correo especificado'} {f.cedula ? ` · C.C. ${f.cedula}` : ''}
-                      </div>
+                      <span className={`tag ${esInm ? 'Vendida' : 'Arrendada'}`} style={{ fontSize: '0.78rem' }}>
+                        <IcoCheck /> {esInm ? 'Firma corporativa por defecto' : 'Enlace enviado al correo'}
+                      </span>
                     </div>
-                    <span className="tag Arrendada" style={{ fontSize: '0.78rem' }}>
-                      <IcoCheck /> Enviado al correo
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               <div style={{ marginTop: 20, textAlign: 'right' }}>
                 <button type="button" className="g" onClick={() => terminado?.()}>

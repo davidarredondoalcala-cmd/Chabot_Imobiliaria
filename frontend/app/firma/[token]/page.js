@@ -45,7 +45,8 @@ export default function PaginaFirma() {
     if (v.estado === 'firmado') descargar(v.id);
   };
 
-  const miTurno = vista && vista.estado === 'en_firma' && vista.miEstado === 'pendiente' && vista.turno?.orden === vista.miOrden;
+  // Enlace directo de firma: cualquier firmante pendiente puede firmar de inmediato al abrir su link
+  const miTurno = vista && vista.estado === 'en_firma' && vista.miEstado === 'pendiente';
 
   const cerrado = vista && (vista.estado === 'firmado' || vista.estado === 'rechazado');
 
@@ -53,8 +54,12 @@ export default function PaginaFirma() {
   const firmasEnHoja = { codeudores: [] };
   (vista?.firmantes || []).forEach((f) => {
     if (!f.imagen) return;
-    if (f.rol === 'codeudor') firmasEnHoja.codeudores[f.orden - 3] = f.imagen; // codeudores: orden 3, 4, 5…
-    else firmasEnHoja[f.rol] = f.imagen;
+    if (f.rol === 'codeudor') {
+      const idx = typeof f.orden === 'number' && f.orden >= 3 ? f.orden - 3 : firmasEnHoja.codeudores.length;
+      firmasEnHoja.codeudores[idx] = f.imagen;
+    } else {
+      firmasEnHoja[f.rol] = f.imagen;
+    }
   });
 
   const comprobar = async () => {

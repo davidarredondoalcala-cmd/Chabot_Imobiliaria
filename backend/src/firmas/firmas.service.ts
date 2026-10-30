@@ -7,6 +7,7 @@ import { generarPdf, generarPdfBorrador, guardarEnGridFS, leerDeGridFS } from '.
 import { ErrorFirma } from './errores';
 import { InmueblesService } from '../inmuebles/inmuebles.service';
 import { CorreoService } from './correo.service';
+import { INMOBILIARIA_INFO, FIRMA_INMOBILIARIA_DATA_URL } from './firma-inmobiliaria';
 
 const METODOS = ['tipografica', 'canvas', 'imagen'];
 const MAX_FIRMA = Number(process.env.MAX_FIRMA_BYTES || 1000000);
@@ -46,9 +47,54 @@ export class FirmasService {
       throw new ErrorFirma(400, 'Se requieren las dos partes del contrato (y los codeudores solo en arriendo)');
     }
 
+    // El snapshot congela los datos y la fecha del contrato
+    // La Inmobiliaria es la propietaria por defecto y sus datos quedan sellados
+    const snapshot = {
+      ...datos,
+      fecha: datos.fecha || fechaTexto(),
+      ...(tipo === 'arriendo'
+        ? { arr: INMOBILIARIA_INFO.nombre, arrCedula: INMOBILIARIA_INFO.cedula, arrEmail: INMOBILIARIA_INFO.email }
+        : { vend: INMOBILIARIA_INFO.nombre, vendCedula: INMOBILIARIA_INFO.cedula, vendEmail: INMOBILIARIA_INFO.email }),
+    };
+
+    const contratoHash = hashContrato(snapshot);
+
     const conOrden = firmantes.map((f: any, i: number) => {
       if (!f.rol || typeof f.rol !== 'string') throw new ErrorFirma(400, 'Cada firmante necesita un rol');
       if (i >= 2 && f.rol !== 'codeudor') throw new ErrorFirma(400, 'Después de las dos partes solo pueden firmar codeudores');
+
+      const esInmobiliaria = f.rol === 'arrendador' || f.rol === 'vendedor';
+      if (esInmobiliaria) {
+        // La firma corporativa de la Inmobiliaria viene precargada y firmada por defecto como propietaria
+        const nombreInm = INMOBILIARIA_INFO.nombre;
+        const cedulaInm = INMOBILIARIA_INFO.cedula;
+        const emailInm = INMOBILIARIA_INFO.email;
+        const fechaFirma = new Date();
+        const cadena = hashCadena(contratoHash, null, f.rol, cedulaInm);
+
+        return {
+          rol: f.rol,
+          orden: i + 1,
+          estado: 'firmada',
+          token: generarToken(),
+          nombre: nombreInm,
+          email: emailInm,
+          cedula: cedulaInm,
+          datos: { nombre: nombreInm, cedula: cedulaInm, email: emailInm },
+          imagen: FIRMA_INMOBILIARIA_DATA_URL,
+          evidencia: {
+            usuario: { nombre: nombreInm, cedula: cedulaInm, email: emailInm },
+            metodo: 'imagen',
+            fecha: fechaFirma,
+            ip: '127.0.0.1 (Firma autorizada del propietario)',
+            userAgent: 'Habitat Capital Legal Platform',
+            hashDocumento: contratoHash,
+            hashAnterior: null,
+            hashCadena: cadena,
+          },
+        };
+      }
+
       return {
         rol: f.rol,
         orden: i + 1,
@@ -63,14 +109,12 @@ export class FirmasService {
       };
     });
 
-    // El snapshot congela la fecha del contrato: pantalla, PDF y hash coinciden siempre
-    const snapshot = { ...datos, fecha: datos.fecha || fechaTexto() };
     const acuerdo = await this.acuerdos.create({
       inmueble: inmueble || undefined,
       tipo,
       datos: snapshot,
       fechaContrato: snapshot.fecha,
-      contratoHash: hashContrato(snapshot),
+      contratoHash,
       firmantes: conOrden,
     });
 
@@ -84,11 +128,11 @@ export class FirmasService {
       console.warn('No se pudo generar buffer PDF borrador para adjunto:', e.message);
     }
 
-    // Envío automático de correos con Brevo API a firmantes y codeudores
+    // Envío automático de correos con Brevo API a contrapartes y codeudores pendientes
     let baseUrl = frontendUrl || process.env.FRONTEND_URL || 'https://habitatcapitalweb.vercel.app';
     if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
     for (const f of conOrden) {
-      if (f.email && typeof f.email === 'string' && f.email.includes('@')) {
+      if (f.estado === 'pendiente' && f.email && typeof f.email === 'string' && f.email.includes('@')) {
         this.correo.enviarEnlaceFirma({
           destinatario: f.email.trim(),
           nombre: f.nombre || '',
@@ -154,7 +198,7 @@ export class FirmasService {
       firmantes: acuerdo.firmantes.map((f: any) => ({
         rol: f.rol, orden: f.orden, estado: f.estado,
         nombre: f.datos?.nombre || f.nombre || '',
-        imagen: f.imagen || null, // solo visible una vez firmada
+        imagen: f.estado === 'firmada' ? (f.imagen || null) : null,
         evidencia: f.estado === 'firmada' && f.evidencia ? {
           metodo: f.evidencia.metodo,
           fecha: f.evidencia.fecha,
@@ -201,7 +245,7 @@ export class FirmasService {
     return !!acuerdo;
   }
 
-  // ===== Firmar: valida el TURNO en servidor, registra evidencia y encadena hashes =====
+  // ===== Firmar: registra evidencia y encadena hashes (sin bloquear por turno) =====
   async firmar(token: string, { datos, metodo, imagen, condiciones, req }: any) {
     const acuerdo: any = await this.acuerdos.findOne({ 'firmantes.token': token });
     const propia = buscarPorToken(acuerdo, token);
@@ -210,11 +254,6 @@ export class FirmasService {
     if (acuerdo.estado === 'firmado') throw new ErrorFirma(409, 'El acuerdo ya está cerrado; las firmas quedaron bloqueadas');
     if (acuerdo.estado === 'rechazado') throw new ErrorFirma(409, 'El acuerdo fue rechazado y no puede firmarse');
     if (propia.estado !== 'pendiente') throw new ErrorFirma(409, 'Tu firma ya fue registrada');
-
-    const turno = acuerdo.firmantes.find((f: any) => f.estado === 'pendiente');
-    if (!turno || turno.orden !== propia.orden) {
-      throw new ErrorFirma(409, `Ahora le corresponde firmar a: ${turno?.rol || '—'}`);
-    }
 
     if (condiciones !== true) throw new ErrorFirma(400, 'Debes aceptar las condiciones de firma electrónica');
     if (!METODOS.includes(metodo)) throw new ErrorFirma(400, 'Método de firma inválido');
@@ -232,10 +271,11 @@ export class FirmasService {
     }
 
     // Evidencia técnica — Ley 527 de 1999
-    const anterior = [...acuerdo.firmantes]
-      .filter((f: any) => f.estado === 'firmada' && f.evidencia)
-      .sort((a: any, b: any) => a.orden - b.orden)
-      .pop();
+    // Busca la última firma registrada cronológicamente para encadenar
+    const anteriores = [...acuerdo.firmantes]
+      .filter((f: any) => f.estado === 'firmada' && f.evidencia?.hashCadena)
+      .sort((a: any, b: any) => new Date(a.evidencia.fecha).getTime() - new Date(b.evidencia.fecha).getTime());
+    const anterior = anteriores[anteriores.length - 1];
     const hashAnterior = anterior?.evidencia?.hashCadena || null;
     const hashDoc = acuerdo.contratoHash;
     const cadena = hashCadena(hashDoc, hashAnterior, propia.rol, cedula);
@@ -267,7 +307,7 @@ export class FirmasService {
         acuerdo.pdfGridId = await guardarEnGridFS(buffer, `acuerdo-${acuerdo._id}.pdf`, this.conn.db);
         await acuerdo.save();
 
-        const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        const baseUrl = process.env.FRONTEND_URL || 'https://habitatcapitalweb.vercel.app';
         const pdfNombre = `Contrato_Firmado_${acuerdo.tipo === 'arriendo' ? 'Arrendamiento' : 'Compraventa'}_${acuerdo._id}.pdf`;
 
         // Notificar por correo a cada parte con el PDF oficial firmado
@@ -350,20 +390,19 @@ export class FirmasService {
     if (!acuerdo) throw new ErrorFirma(404, 'Acuerdo no encontrado');
 
     const contratoIntegro = hashContrato(acuerdo.datos) === acuerdo.contratoHash;
-    let anterior: string | null = null;
     const firmas: any[] = [];
     let cadenaIntegra = true;
 
-    for (const f of [...acuerdo.firmantes].sort((a: any, b: any) => a.orden - b.orden)) {
-      if (f.estado !== 'firmada' || !f.evidencia) {
-        firmas.push({ rol: f.rol, orden: f.orden, estado: f.estado, verificada: null });
-        continue;
-      }
+    // Se verifican las firmas en el orden cronológico en que fueron registradas
+    const firmadasOrdenadas = [...acuerdo.firmantes]
+      .filter((f: any) => f.estado === 'firmada' && f.evidencia)
+      .sort((a: any, b: any) => new Date(a.evidencia.fecha).getTime() - new Date(b.evidencia.fecha).getTime());
+
+    for (const f of firmadasOrdenadas) {
       const docOk = f.evidencia.hashDocumento === acuerdo.contratoHash;
-      const esperado = hashCadena(acuerdo.contratoHash, anterior, f.rol, f.evidencia.usuario?.cedula);
+      const esperado = hashCadena(acuerdo.contratoHash, f.evidencia.hashAnterior, f.rol, f.evidencia.usuario?.cedula);
       const cadenaOk = esperado === f.evidencia.hashCadena;
       if (!docOk || !cadenaOk) cadenaIntegra = false;
-      anterior = f.evidencia.hashCadena;
       firmas.push({
         rol: f.rol, orden: f.orden, estado: f.estado,
         fecha: f.evidencia.fecha, ip: f.evidencia.ip, metodo: f.evidencia.metodo,
@@ -371,6 +410,10 @@ export class FirmasService {
         hashCadena: f.evidencia.hashCadena,
         verificada: docOk && cadenaOk,
       });
+    }
+
+    for (const f of acuerdo.firmantes.filter((f: any) => f.estado !== 'firmada' || !f.evidencia)) {
+      firmas.push({ rol: f.rol, orden: f.orden, estado: f.estado, verificada: null });
     }
 
     return {

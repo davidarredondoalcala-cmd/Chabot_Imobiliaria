@@ -1,5 +1,6 @@
 import { fmt } from '../lib/utils';
 import FirmaEspacio from './firmas/FirmaEspacio';
+import { INMOBILIARIA_INFO, FIRMA_INMOBILIARIA_DATA_URL } from '../lib/firmaInmobiliaria';
 
 const V = ({ x, d }) => (x && String(x).trim() ? <b>{x}</b> : <b className="bl">{d || '__________'}</b>);
 
@@ -58,9 +59,24 @@ export default function Hoja({ modo, S = {}, firmas }) {
 
         <p>Para constancia, se firma en dos ejemplares del mismo tenor.</p>
         <div className="sig">
-          <FirmaEspacio nombre={S.arr || 'Arrendador'} rol="Arrendador" imagen={firmas?.arrendador} />
-          <FirmaEspacio nombre={S.ate || 'Arrendatario'} rol="Arrendatario" imagen={firmas?.arrendatario} />
-          {cs.map((c, k) => <FirmaEspacio key={k} nombre={c} rol="Codeudor" imagen={firmas?.codeudores?.[k]} />)}
+          <FirmaEspacio
+            nombre={S.arr || INMOBILIARIA_INFO.nombre}
+            rol="Arrendador (Propietario)"
+            imagen={firmas?.arrendador || FIRMA_INMOBILIARIA_DATA_URL}
+          />
+          <FirmaEspacio
+            nombre={S.ate || 'Arrendatario'}
+            rol="Arrendatario"
+            imagen={firmas?.arrendatario}
+          />
+          {cs.map((c, k) => (
+            <FirmaEspacio
+              key={k}
+              nombre={c}
+              rol={`Codeudor ${cs.length > 1 ? `#${k + 1}` : ''}`}
+              imagen={firmas?.codeudores?.[k]}
+            />
+          ))}
         </div>
       </div>
     );
@@ -99,8 +115,16 @@ export default function Hoja({ modo, S = {}, firmas }) {
 
       <p>Para constancia, se firma en dos ejemplares del mismo tenor.</p>
       <div className="sig">
-        <FirmaEspacio nombre={S.vend || 'Vendedor'} rol="Vendedor" imagen={firmas?.vendedor} />
-        <FirmaEspacio nombre={S.comp || 'Comprador'} rol="Comprador" imagen={firmas?.comprador} />
+        <FirmaEspacio
+          nombre={S.vend || INMOBILIARIA_INFO.nombre}
+          rol="Vendedor (Propietario)"
+          imagen={firmas?.vendedor || FIRMA_INMOBILIARIA_DATA_URL}
+        />
+        <FirmaEspacio
+          nombre={S.comp || 'Comprador'}
+          rol="Comprador"
+          imagen={firmas?.comprador}
+        />
       </div>
     </div>
   );
