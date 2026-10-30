@@ -286,6 +286,25 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
+.hc-prop-img-wrap {
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+  background: var(--bg, #eff3f1);
+}
+
+.hc-prop-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.hc-prop-card:hover .hc-prop-thumb {
+  transform: scale(1.04);
+}
+
 .hc-prop-header {
   background: linear-gradient(135deg, #0d3832 0%, var(--ac, #0f4c43) 100%);
   color: #ffffff;

@@ -22,7 +22,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 6,
     amenidades: ['piscina', 'gimnasio', 'vigilancia 24/7', 'ascensor', 'salon social', 'zona bbq', 'parque infantil'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0001'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0001',
+    foto: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1000&q=80'
   },
   // 2. Apartamento - Venta - El Vergel
   {
@@ -44,7 +45,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 6,
     amenidades: ['piscina sin fin', 'jacuzzi', 'gimnasio', 'turco', 'vigilancia 24/7', 'canchas multiples', 'ascensor'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0002'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0002',
+    foto: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1000&q=80'
   },
   // 3. Apartamento - Arriendo - La Macarena
   {
@@ -66,7 +68,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['vigilancia 24/7', 'ascensor', 'parqueadero cubierto', 'circuito cerrado de tv'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0003'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0003',
+    foto: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1000&q=80'
   },
   // 4. Casa - Venta - Calambeo
   {
@@ -88,7 +91,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 5,
     amenidades: ['piscina', 'zonas verdes', 'sendero ecologico', 'vigilancia privada', 'cancha de tenis', 'parque infantil'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0004'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0004',
+    foto: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80'
   },
   // 5. Casa - Arriendo - Cádiz
   {
@@ -110,7 +114,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['patio interno', 'garaje cubierto', 'rejas de seguridad', 'zona de lavanderia espaciosa'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0005'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0005',
+    foto: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1000&q=80'
   },
   // 6. Apartamento - Venta - Piedra Pintada
   {
@@ -132,7 +137,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['piscina', 'vigilancia 24/7', 'ascensor', 'salon comunal', 'parqueadero de visitantes'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0006'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0006',
+    foto: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1000&q=80'
   },
   // 7. Apartamento - Arriendo - Piedra Pintada
   {
@@ -154,7 +160,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['vigilancia 24/7', 'piscina', 'parque infantil', 'porteria'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0007'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0007',
+    foto: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1000&q=80'
   },
   // 8. Apartamento - Venta - Jordán 8va Etapa
   {
@@ -176,7 +183,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['vigilancia 24/7', 'ascensor', 'salon social', 'zona infantil'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0008'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0008',
+    foto: 'https://images.unsplash.com/photo-1574362848149-11496d93a7c7?auto=format&fit=crop&w=1000&q=80'
   },
   // 9. Apartamento - Arriendo - Jordán 1ra Etapa
   {
@@ -198,7 +206,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 3,
     amenidades: ['gas natural', 'zona de ropas', 'rejas de seguridad'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0009'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0009',
+    foto: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1000&q=80'
   },
   // 10. Casa - Venta - Interlaken (Habitat Capital: Casa Interlaken)
   {
@@ -220,7 +229,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['patio con jardin', 'estudio', 'garaje cubierto', 'deposito'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0010'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0010',
+    foto: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1000&q=80'
   },
   // 11. Casa - Arriendo - El Vergel (Habitat Capital: Casa El Vergel)
   {
@@ -242,7 +252,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 5,
     amenidades: ['patio de ropas', 'balcon', 'gas natural', 'calentador'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0011'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0011',
+    foto: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80'
   },
   // 12. Apartamento - Arriendo - El Salado
   {
@@ -264,7 +275,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 3,
     amenidades: ['piscina para adultos y ninos', 'parque acuatico', 'vigilancia 24/7', 'cancha sintetica', 'salon social'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0012'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0012',
+    foto: 'https://images.unsplash.com/photo-1515263487990-61b07816b324?auto=format&fit=crop&w=1000&q=80'
   },
   // 13. Apartamento - Venta - El Salado
   {
@@ -286,7 +298,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 3,
     amenidades: ['piscina', 'vigilancia 24/7', 'zona de juegos', 'salon comunal', 'kiosco bbq'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0013'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0013',
+    foto: 'https://images.unsplash.com/photo-1536376072261-38c75010e6c9?auto=format&fit=crop&w=1000&q=80'
   },
   // 14. Casa - Venta - Santa Helena
   {
@@ -308,7 +321,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 3,
     amenidades: ['local comercial', 'terraza cubierta', 'tanque de reserva', 'gas natural'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0014'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0014',
+    foto: 'https://images.unsplash.com/photo-1576941089067-2de3c901e126?auto=format&fit=crop&w=1000&q=80'
   },
   // 15. Apartamento - Venta - La Pola
   {
@@ -330,7 +344,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['ascensor', 'vigilancia 24/7', 'terraza comunal', 'camaras de seguridad'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0015'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0015',
+    foto: 'https://images.unsplash.com/photo-1512915922686-57c11dde9b6b?auto=format&fit=crop&w=1000&q=80'
   },
   // 16. Casa - Arriendo - Campestre / Picaleña
   {
@@ -352,7 +367,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 5,
     amenidades: ['piscina privada', 'zona bbq', 'jardines amplios', 'vigilancia motorizada', 'cancha de tenis', 'cancha de futbol'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0016'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0016',
+    foto: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1000&q=80'
   },
   // 17. Casa - Venta - Campestre
   {
@@ -374,7 +390,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 6,
     amenidades: ['piscina privada', 'jacuzzi', 'paneles solares', 'zona humeda', 'seguridad armada 24/7', 'cancha polideportiva'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0017'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0017',
+    foto: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1000&q=80'
   },
   // 18. Apartamento - Arriendo - La Pola (Habitat Capital: Apto Torres del Parque 302)
   {
@@ -396,7 +413,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 3,
     amenidades: ['vigilancia 24/7', 'parque infantil', 'salon comunitario', 'zonas verdes'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0018'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0018',
+    foto: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=1000&q=80'
   },
   // 19. Apartamento - Venta - Picaleña
   {
@@ -418,7 +436,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 3,
     amenidades: ['piscina', 'vigilancia 24/7', 'cancha multideportiva', 'zonas verdes', 'parqueadero comunal'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0019'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0019',
+    foto: 'https://images.unsplash.com/photo-1460317442991-0ec209397118?auto=format&fit=crop&w=1000&q=80'
   },
   // 20. Apartamento - Arriendo - Ambalá (Habitat Capital: Apto Mirador 601)
   {
@@ -440,7 +459,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['ascensor', 'vigilancia 24/7', 'piscina', 'parqueadero'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0020'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0020',
+    foto: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1000&q=80'
   },
   // 21. Casa - Venta - La Macarena
   {
@@ -462,7 +482,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['entradas independientes', 'garaje cubierto', 'dos contadores de servicios', 'patio amplio'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0021'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0021',
+    foto: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1000&q=80'
   },
   // 22. Apartamento - Venta - Arkacentro
   {
@@ -484,7 +505,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['piscina', 'vigilancia 24/7', 'parque infantil', 'cancha multiple', 'zona bbq'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0022'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0022',
+    foto: 'https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=1000&q=80'
   },
   // 23. Casa - Arriendo - Jordán (Habitat Capital: Casa Jordán)
   {
@@ -506,7 +528,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 3,
     amenidades: ['un solo piso', 'garaje cubierto', 'patio techado', 'gas natural'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0023'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0023',
+    foto: 'https://images.unsplash.com/photo-1598228723793-52759bba239c?auto=format&fit=crop&w=1000&q=80'
   },
   // 24. Casa - Venta - El Vergel
   {
@@ -528,7 +551,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 6,
     amenidades: ['piscina', 'canchas de tenis', 'vigilancia 24/7 armada', 'sendero de trote', 'gimnasio equipado', 'sala de cine comunal'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0024'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0024',
+    foto: 'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=1000&q=80'
   },
   // 25. Apartamento - Arriendo - La Pola
   {
@@ -550,7 +574,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['amoblado', 'ascensor', 'vigilancia 24/7', 'lavanderia comunal', 'terraza mirador'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0025'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0025',
+    foto: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1000&q=80'
   },
   // 26. Apartamento - Venta - Centro (Habitat Capital: Apto Central 204)
   {
@@ -572,7 +597,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 3,
     amenidades: ['ascensor', 'vigilancia 24/7', 'gas natural'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0026'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0026',
+    foto: 'https://images.unsplash.com/photo-1534349762230-e0cadf78f5da?auto=format&fit=crop&w=1000&q=80'
   },
   // 27. Casa - Venta - Cádiz
   {
@@ -594,7 +620,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['patio con jardin', 'garaje cubierto', 'estudio privado', 'zona de ropas amplia'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0027'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0027',
+    foto: 'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?auto=format&fit=crop&w=1000&q=80'
   },
   // 28. Apartamento - Arriendo - Jordán (Milla de Oro)
   {
@@ -616,7 +643,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 5,
     amenidades: ['piscina climatizada', 'gimnasio dotado', 'ascensor', 'vigilancia 24/7', 'parque infantil'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0028'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0028',
+    foto: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80'
   },
   // 29. Apartamento - Venta - Centro
   {
@@ -638,7 +666,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['ascensor', 'vigilancia 24/7', 'deposito privado', 'citofono'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0029'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0029',
+    foto: 'https://images.unsplash.com/photo-1502672023488-70e25813eb80?auto=format&fit=crop&w=1000&q=80'
   },
   // 30. Casa - Arriendo - Piedra Pintada (Habitat Capital: Casa Piedra Pintada)
   {
@@ -660,7 +689,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['garaje', 'patio amplio', 'zona de ropas'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0030'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0030',
+    foto: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1000&q=80'
   },
   // 31. Apartamento - Arriendo - Cádiz
   {
@@ -682,7 +712,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['ascensor', 'vigilancia 24/7', 'parqueadero cubierto', 'calentador a gas'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0031'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0031',
+    foto: 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1000&q=80'
   },
   // 32. Apartamento - Venta - Jordán (Acqua)
   {
@@ -704,7 +735,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 5,
     amenidades: ['piscina sin fin', 'gimnasio dotado', 'sauna y turco', 'ascensores de alta velocidad', 'vigilancia 24/7'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0032'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0032',
+    foto: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80'
   },
   // 33. Apartamento - Arriendo - Belén
   {
@@ -726,7 +758,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 3,
     amenidades: ['porteria', 'citofono', 'gas domiciliario', 'calentador a gas'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0033'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0033',
+    foto: 'https://images.unsplash.com/photo-1501183638710-841dd1904471?auto=format&fit=crop&w=1000&q=80'
   },
   // 34. Casa - Venta - La Macarena
   {
@@ -748,7 +781,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['terraza cubierta', 'garaje cubierto', 'patio interior', 'estudio'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0034'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0034',
+    foto: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=80'
   },
   // 35. Casa - Venta - El Totumo
   {
@@ -770,7 +804,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 3,
     amenidades: ['jardines amplios', 'piscina comunal', 'porteria 24/7', 'lago de pesca', 'zona bbq'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0035'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0035',
+    foto: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80'
   },
   // 36. Casa - Venta - Calambeo
   {
@@ -792,7 +827,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 5,
     amenidades: ['vista panoramica', 'chimenea', 'terraza mirador', 'vigilancia privada', 'zonas boscosas'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0036'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0036',
+    foto: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1000&q=80'
   },
   // 37. Casa - Venta - Piedra Pintada
   {
@@ -814,7 +850,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['porton electrico', 'estudio', 'patio amplio', 'calentador a gas'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0037'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0037',
+    foto: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1000&q=80'
   },
   // 38. Apartamento - Venta - El Salado
   {
@@ -836,7 +873,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 3,
     amenidades: ['piscina', 'vigilancia 24/7', 'parque infantil', 'cancha sintetica', 'salon social'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0038'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0038',
+    foto: 'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&w=1000&q=80'
   },
   // 39. Casa - Arriendo - Mirolindo / Picaleña
   {
@@ -858,7 +896,8 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['piscina adultos y ninos', 'canchas de tenis', 'vigilancia 24/7', 'gimnasio', 'zonas verdes'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0039'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0039',
+    foto: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1000&q=80'
   },
   // 40. Apartamento - Arriendo - Interlaken
   {
@@ -880,6 +919,7 @@ export const SEED_PROPERTIES: Omit<Property, 'id' | 'embedding' | 'similarity'>[
     estrato: 4,
     amenidades: ['garaje cubierto', 'citofono', 'gas domiciliario', 'calentador a gas'],
     disponible: true,
-    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0040'
+    url_ficha: 'https://inmobiliariaibague.co/propiedades/IBG-0040',
+    foto: 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1000&q=80'
   }
 ];

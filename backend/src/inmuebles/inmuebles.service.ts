@@ -20,6 +20,7 @@ const SEMILLA = [
     barrio: 'Piedra Pintada',
     lind: 'Al norte la calle, al sur la casa #, al este el edificio rojo, al oeste la casa de don Juan.',
     descripcion: 'Acogedora casa familiar con excelente distribución, tres habitaciones iluminadas, patio interior y garaje cubierto en un sector residencial tranquilo y central.',
+    foto: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1000&q=80',
     contratos: [{ tipo: 'Arriendo', vig: true, fecha: '2025-12-30', firm: F }, { tipo: 'Arriendo', vig: false, fecha: '2024-12-30', firm: F }],
   },
   {
@@ -36,6 +37,7 @@ const SEMILLA = [
     barrio: 'El Vergel',
     lind: '',
     descripcion: 'Espaciosa residencia de dos niveles en conjunto cerrado, con amplios ventanales, cocina integral, acabados modernos y agradable entorno campestre.',
+    foto: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80',
     contratos: [{ tipo: 'Arriendo', vig: true, fecha: '2026-03-15', firm: ['Maria', 'Luis'] }],
   },
   {
@@ -50,6 +52,7 @@ const SEMILLA = [
     barrio: 'Jordán',
     lind: '',
     descripcion: 'Cómoda vivienda sobre vía principal con fácil acceso a transporte, comercios y colegios, ideal para familias que buscan practicidad y confort.',
+    foto: 'https://images.unsplash.com/photo-1598228723793-52759bba239c?auto=format&fit=crop&w=1000&q=80',
   },
   {
     tipo: 'Casa',
@@ -63,6 +66,7 @@ const SEMILLA = [
     barrio: 'Interlaken',
     lind: '',
     descripcion: 'Gran casa tradicional con generosos espacios, patio de ropas independiente, jardín frontal y ubicación privilegiada en zona de alta valorización.',
+    foto: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1000&q=80',
   },
   {
     tipo: 'Apartamento',
@@ -78,6 +82,7 @@ const SEMILLA = [
     barrio: 'La Pola',
     lind: '',
     descripcion: 'Apartamento moderno con linda vista al cañón del Combeima, sala-comedor ventilada, balcón privado y vigilancia permanente las 24 horas.',
+    foto: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=1000&q=80',
     contratos: [{ tipo: 'Arriendo', vig: true, fecha: '2025-11-20', firm: ['Carlos', 'Ana'] }],
   },
   {
@@ -92,6 +97,7 @@ const SEMILLA = [
     barrio: 'Ambalá',
     lind: '',
     descripcion: 'Inmueble iluminado en piso alto con ascensor, tres alcobas con clóset, cocina semi-integral y cercanía a centros comerciales y universidades.',
+    foto: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1000&q=80',
   },
   {
     tipo: 'Apartamento',
@@ -105,6 +111,7 @@ const SEMILLA = [
     barrio: 'Centro',
     lind: '',
     descripcion: 'Apartamento funcional y bien ubicado a pasos del centro financiero, ideal para inversión o personas que buscan practicidad y bajos costos.',
+    foto: 'https://images.unsplash.com/photo-1534349762230-e0cadf78f5da?auto=format&fit=crop&w=1000&q=80',
   },
 ];
 
@@ -115,7 +122,7 @@ export class InmueblesService implements OnModuleInit {
   // Si la colección está vacía, carga datos de ejemplo y sincroniza las propiedades del chatbot
   async onModuleInit() {
     if ((await this.model.estimatedDocumentCount()) === 0) await this.model.insertMany(SEMILLA);
-    // Bases ya creadas: completa habitaciones, baños, área y descripción en los inmuebles de ejemplo
+    // Bases ya creadas: completa habitaciones, baños, área, descripción y foto en los inmuebles de ejemplo
     for (const s of SEMILLA) {
       await this.model.updateOne(
         { nombre: s.nombre },
@@ -125,6 +132,7 @@ export class InmueblesService implements OnModuleInit {
             banos: s.banos,
             area: s.area,
             ...(s.descripcion ? { descripcion: s.descripcion } : {}),
+            ...(s.foto ? { foto: s.foto } : {}),
           },
         },
       );
@@ -152,15 +160,19 @@ export class InmueblesService implements OnModuleInit {
           banos: sp.banos || 2,
           area: sp.area_m2 || 75,
           contratos: [],
+          foto: sp.foto || '',
         });
       } else {
-        // Actualiza el nombre sencillo y la descripción si estaba vacía o con el título largo previo
+        // Actualiza el nombre sencillo, la descripción y la foto real
         const update: any = {};
         if (sp.titulo && existe.nombre !== sp.titulo && (existe.dir === sp.direccion_aproximada || sp.titulo.includes(existe.barrio || ''))) {
           update.nombre = sp.titulo;
         }
         if (sp.descripcion && (!existe.descripcion || existe.descripcion.trim() === '')) {
           update.descripcion = sp.descripcion;
+        }
+        if (sp.foto && (!existe.foto || existe.foto.trim() === '' || existe.foto.startsWith('http'))) {
+          update.foto = sp.foto;
         }
         if (Object.keys(update).length > 0) {
           await this.model.updateOne({ _id: existe._id }, { $set: update });

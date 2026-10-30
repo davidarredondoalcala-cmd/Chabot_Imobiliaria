@@ -42,6 +42,7 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
   const ven = i.contratos.filter((c) => !c.vig);
   const fileRef = useRef(null);
   const [subiendo, setSubiendo] = useState(false);
+  const [imgErr, setImgErr] = useState(false);
   const [contratoVer, setContratoVer] = useState(null);
   const [descargandoId, setDescargandoId] = useState(null);
 
@@ -125,7 +126,7 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
           onClick={esAdmin ? abrirSelector : undefined}
           onKeyDown={esAdmin ? alTeclado : undefined}
         >
-          {i.foto ? <img className="foto-thumb" src={urlImagen(i.foto)} alt={i.nombre} /> : <Ilustra tipo={i.tipo} />}
+          {i.foto && !imgErr ? <img className="foto-thumb" src={urlImagen(i.foto)} alt={i.nombre} onError={() => setImgErr(true)} /> : <Ilustra tipo={i.tipo} />}
           {esAdmin && !i.foto && <span className="foto-mas" aria-hidden="true">{subiendo ? '…' : '+'}</span>}
           {esAdmin && i.foto && subiendo && <span className="foto-cap subiendo">Subiendo…</span>}
         </div>

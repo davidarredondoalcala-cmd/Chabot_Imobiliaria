@@ -1,3 +1,5 @@
+'use client';
+import { useState } from 'react';
 import Caract from './Caract';
 import Ilustra from './Ilustra';
 import { fd, fmt, cls, sufijo, estaPorVencer } from '../lib/utils';
@@ -5,11 +7,24 @@ import { urlImagen } from '../lib/apiImagenes';
 
 // Tarjeta de un inmueble (la usan la lista y la vista previa del formulario)
 export default function Tarjeta({ i, abrir }) {
+  const [imgErr, setImgErr] = useState(false);
   const ir = abrir ? { role: 'button', tabIndex: 0, onClick: abrir, onKeyDown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrir(); } } } : { style: { cursor: 'default' } };
+  const tieneFoto = i.foto && !imgErr;
+
   return (
     <article className={`card item${abrir ? '' : ' estatica'}`} {...ir}>
       <div className={`thumb ${i.tipo}`}>
-        {i.foto ? <img className="foto-thumb" src={urlImagen(i.foto)} alt={i.nombre} loading="lazy" /> : <Ilustra tipo={i.tipo} />}
+        {tieneFoto ? (
+          <img
+            className="foto-thumb"
+            src={urlImagen(i.foto)}
+            alt={i.nombre}
+            loading="lazy"
+            onError={() => setImgErr(true)}
+          />
+        ) : (
+          <Ilustra tipo={i.tipo} />
+        )}
       </div>
       <div className="info">
         <h3 className="nom">{i.nombre}</h3>

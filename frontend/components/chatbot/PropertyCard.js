@@ -28,6 +28,11 @@ export default function PropertyCard({ property, whatsappUrl }) {
 
   return (
     <div className="hc-prop-card">
+      {property.foto && (
+        <div className="hc-prop-img-wrap">
+          <img src={property.foto} alt={property.titulo} className="hc-prop-thumb" loading="lazy" />
+        </div>
+      )}
       <div className="hc-prop-header">
         <div className="hc-prop-badges">
           <span className="hc-badge-op">
