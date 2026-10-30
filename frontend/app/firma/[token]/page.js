@@ -18,7 +18,29 @@ export default function PaginaFirma() {
 
   const avisar = (t) => { setToast(t); setTimeout(() => setToast(''), 2600); };
   const cargar = useCallback(() => porToken(token).then(setVista).catch((e) => setErr(e.message)), [token]);
-  useEffect(() => { cargar(); }, [cargar]);
+
+  useEffect(() => {
+    cargar();
+    // Sondeo automático cada 2.5 segundos para reflejar en tiempo real las firmas del arrendatario o codeudores sin refrescar
+    const interval = setInterval(() => {
+      porToken(token)
+        .then((v) => {
+          setVista((prev) => {
+            if (!prev) return v;
+            // Solo actualizamos el estado si cambió algún firmante o el estado general
+            const prevHash = (prev.firmantes || []).map((f) => `${f.rol}:${f.estado}:${f.imagen ? '1' : '0'}`).join(';');
+            const vHash = (v.firmantes || []).map((f) => `${f.rol}:${f.estado}:${f.imagen ? '1' : '0'}`).join(';');
+            if (prevHash !== vHash || prev.estado !== v.estado) {
+              return v;
+            }
+            return prev;
+          });
+        })
+        .catch(() => {});
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [token, cargar]);
 
   const descargar = async (id) => {
     try { await descargarPdfFinal(id, token); } catch (e) { avisar(e.message); }
@@ -42,6 +64,7 @@ export default function PaginaFirma() {
   const firmado = (v) => {
     setVista(v);
     setVerif(null);
+    avisar('¡Tu firma ha sido estampada exitosamente en el contrato!');
     if (v.estado === 'firmado') descargar(v.id);
   };
 
@@ -50,13 +73,15 @@ export default function PaginaFirma() {
 
   const cerrado = vista && (vista.estado === 'firmado' || vista.estado === 'rechazado');
 
-  // Imágenes de las firmas ya registradas, para pintarlas dentro del contrato
+  // Imágenes de las firmas ya registradas, para pintarlas dentro del contrato en tiempo real
   const firmasEnHoja = { codeudores: [] };
+  const codeudoresList = (vista?.firmantes || []).filter((f) => f.rol === 'codeudor');
   (vista?.firmantes || []).forEach((f) => {
     if (!f.imagen) return;
     if (f.rol === 'codeudor') {
-      const idx = typeof f.orden === 'number' && f.orden >= 3 ? f.orden - 3 : firmasEnHoja.codeudores.length;
-      firmasEnHoja.codeudores[idx] = f.imagen;
+      const idx = codeudoresList.indexOf(f);
+      if (idx >= 0) firmasEnHoja.codeudores[idx] = f.imagen;
+      else firmasEnHoja.codeudores.push(f.imagen);
     } else {
       firmasEnHoja[f.rol] = f.imagen;
     }

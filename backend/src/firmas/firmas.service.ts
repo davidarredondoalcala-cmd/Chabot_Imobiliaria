@@ -171,6 +171,7 @@ export class FirmasService {
         rol: f.rol, orden: f.orden, estado: f.estado,
         nombre: f.nombre || f.datos?.nombre || '',
         email: f.email || '',
+        imagen: f.estado === 'firmada' ? (f.imagen || null) : null,
         tieneImagen: !!f.imagen,
         rechazo: f.rechazo || null,
       })),
@@ -293,6 +294,7 @@ export class FirmasService {
       hashAnterior,
       hashCadena: cadena,
     };
+    acuerdo.markModified('firmantes');
 
     // ¿Cerramos el acuerdo? (cuando ya no quedan firmas pendientes)
     const quedan = acuerdo.firmantes.filter((f: any) => f.estado === 'pendiente');

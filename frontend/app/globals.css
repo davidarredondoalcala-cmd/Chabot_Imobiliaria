@@ -522,8 +522,14 @@ input:focus, textarea:focus, select:focus { outline: 0; border-color: var(--ac);
 .hoja p { margin: 0 0 10px }
 .hoja b { color: #0f4c43 }
 .hoja .bl { color: #999; font-weight: 400; border-bottom: 1px solid #aaa }
-.hoja .sig { display: flex; justify-content: space-around; gap: 20px; flex-wrap: wrap; margin-top: 56px; text-align: center }
-.hoja .sig div { border-top: 1px solid #222; padding-top: 6px; min-width: 150px; font-size: .85rem }
+.hoja .sig { display: flex; justify-content: space-around; gap: 28px; flex-wrap: wrap; margin-top: 56px; text-align: center; }
+.hoja .sig .firma-slot-wrapper { display: flex; flex-direction: column; align-items: center; min-width: 180px; max-width: 280px; border-top: none !important; }
+.hoja .sig .firma-img-area { min-height: 72px; display: flex; align-items: flex-end; justify-content: center; margin-bottom: 6px; border-top: none !important; }
+.hoja .sig .firma-img-area .firma-img { display: block; max-width: 190px; max-height: 72px; object-fit: contain; margin: 0 auto; }
+.hoja .sig .firma-linea-firmante { border-top: 1px solid #222 !important; padding-top: 6px; width: 100%; min-width: 180px; font-size: .85rem; text-align: center; }
+.hoja .sig .firma-nombre-txt { font-weight: 700; color: #111; }
+.hoja .sig .firma-rol-txt { font-size: .78rem; color: #555; }
+.hoja .sig > div:not(.firma-slot-wrapper) { border-top: 1px solid #222; padding-top: 6px; min-width: 150px; font-size: .85rem; }
 
 /* ---------- Aviso ---------- */
 #toast {    position: fixed;

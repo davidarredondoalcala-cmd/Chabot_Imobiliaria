@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Hoja from './Hoja';
 import { crearAcuerdo, descargarPdfBorrador, obtenerAcuerdo } from '../lib/apiFirmas';
 import { IcoImprimir, IcoDescargar, IcoMail, IcoCheck, IcoMas, IcoBasura, IcoEditar, IcoDocumento } from './Iconos';
-import { INMOBILIARIA_INFO } from '../lib/firmaInmobiliaria';
+import { INMOBILIARIA_INFO, FIRMA_INMOBILIARIA_DATA_URL } from '../lib/firmaInmobiliaria';
 
 const CLAUSULAS_ARRIENDO_DEF = [
   { pre: 'PRIMERA – Objeto.', resto: 'EL ARRENDADOR entrega a título de arrendamiento el inmueble ubicado en la dirección indicada.' },
@@ -30,6 +30,13 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
   const [acuerdoId, setAcuerdoId] = useState(null);
   const [creando, setCreando] = useState(false);
   const [descargando, setDescargando] = useState(false);
+
+  // Firmas en vivo para la vista previa interactiva del contrato
+  const [firmasPreview, setFirmasPreview] = useState({
+    arrendador: (modo0 || 'arriendo') === 'arriendo' ? FIRMA_INMOBILIARIA_DATA_URL : null,
+    vendedor: (modo0 || 'arriendo') === 'venta' ? FIRMA_INMOBILIARIA_DATA_URL : null,
+    codeudores: [],
+  });
 
   // Cláusulas dinámicas editables
   const [clausulas, setClausulas] = useState(
@@ -69,6 +76,11 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
     const def = m === 'arriendo' ? CLAUSULAS_ARRIENDO_DEF : CLAUSULAS_VENTA_DEF;
     setClausulas(def);
     setS((prev) => ({ ...prev, clausulas: def }));
+    setFirmasPreview((prev) => ({
+      ...prev,
+      arrendador: m === 'arriendo' ? FIRMA_INMOBILIARIA_DATA_URL : null,
+      vendedor: m === 'venta' ? FIRMA_INMOBILIARIA_DATA_URL : null,
+    }));
   };
 
   const set = (k) => (e) => setS({ ...S, [k]: e.target.value });
@@ -133,12 +145,32 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
     }));
   };
 
-  // Monitoreo del acuerdo hasta completarse
+  // Monitoreo del acuerdo hasta completarse (actualiza firmas en vivo sin refrescar)
   useEffect(() => {
     if (!acuerdoId) return;
     const t = setInterval(async () => {
       try {
         const a = await obtenerAcuerdo(acuerdoId);
+        if (Array.isArray(a.firmantes)) {
+          const nuevasFirmas = {
+            arrendador: modo === 'arriendo' ? FIRMA_INMOBILIARIA_DATA_URL : null,
+            vendedor: modo === 'venta' ? FIRMA_INMOBILIARIA_DATA_URL : null,
+            codeudores: [],
+          };
+          const codeudores = a.firmantes.filter((f) => f.rol === 'codeudor');
+          a.firmantes.forEach((f) => {
+            if (!f.imagen) return;
+            if (f.rol === 'codeudor') {
+              const idx = codeudores.indexOf(f);
+              if (idx >= 0) nuevasFirmas.codeudores[idx] = f.imagen;
+              else nuevasFirmas.codeudores.push(f.imagen);
+            } else {
+              nuevasFirmas[f.rol] = f.imagen;
+            }
+          });
+          setFirmasPreview(nuevasFirmas);
+        }
+
         if (a.estado === 'firmado') {
           clearInterval(t);
           avisar?.('Firmas completas: el contrato ha sido firmado y el inmueble fue actualizado');
@@ -147,9 +179,9 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
       } catch {
         /* reintenta */
       }
-    }, 4000);
+    }, 2500);
     return () => clearInterval(t);
-  }, [acuerdoId, terminado, avisar]);
+  }, [acuerdoId, modo, terminado, avisar]);
 
   // Crea el acuerdo de firma en el backend y envía automáticamente los correos
   const enviar = async () => {
@@ -405,7 +437,7 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
 
         <div>
           <div className="visor noprint"><span className="tag pulse" style={{ margin: 0 }}>En vivo</span> Vista previa interactiva del contrato</div>
-          <Hoja modo={modo} S={{ ...S, clausulas }} />
+          <Hoja modo={modo} S={{ ...S, clausulas }} firmas={firmasPreview} />
           <div className="row noprint" style={{ justifyContent: 'center', marginTop: 18 }}>
             <button className="g" onClick={enviar} disabled={creando}>
               <IcoMail /> {creando ? 'Generando y enviando…' : 'Enviar contrato por correo para firma'}
