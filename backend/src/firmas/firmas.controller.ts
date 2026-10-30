@@ -55,12 +55,14 @@ export class FirmasController {
     return this.svc.verificar(id);
   }
 
-  // PDF de un contrato en borrador (sin firmas). Requiere sesión activa.
+  // PDF de un contrato en borrador (sin firmas). Exclusivo para administradores.
   @Post('borrador/pdf')
   @HttpCode(200)
   async pdfBorrador(@Body() body: any, @Req() req: any, @Res() res: any) {
-    const usuario = await this.auth.usuarioDe(req);
-    if (!usuario) return res.status(401).json({ error: 'Debes iniciar sesión' });
+    const usuario = req.usuario || (await this.auth.usuarioDe(req));
+    if (!usuario?.admin) {
+      return res.status(403).json({ error: 'Solo los administradores pueden generar y descargar borradores de contratos' });
+    }
     const { tipo, datos } = body || {};
     const buffer = await this.svc.pdfBorrador(tipo, datos);
     res.setHeader('Content-Type', 'application/pdf');
@@ -69,17 +71,16 @@ export class FirmasController {
   }
 
   // PDF final (contrato + firmas + anexo de evidencia).
-  // Se descarga desde un <a href>, que no puede mandar cabecera Authorization:
-  // se acepta ?token= bien sea la sesión del administrador o el token del firmante.
+  // Solo accesible para administradores o para el firmante que cuente con su token privado de firma.
   @Public()
   @Get('acuerdos/:id/pdf')
   async pdf(@Param('id') id: string, @Query('token') token: string, @Req() req: any, @Res() res: any) {
-    // Sesión de administrador: por cabecera Authorization (fetch) o como ?token= (enlace directo)
-    const esAdmin = !!(await this.auth.usuarioDe(req))
-      || (token ? !!(await this.auth.usuarioDe({ headers: { authorization: `Bearer ${token}` } })) : false);
+    const usuario = req.usuario || (await this.auth.usuarioDe(req))
+      || (token ? await this.auth.usuarioDe({ headers: { authorization: `Bearer ${token}` } }) : null);
+    const esAdmin = !!usuario?.admin;
     const esFirmante = token ? await this.svc.tieneToken(id, token) : false;
     if (!esAdmin && !esFirmante) {
-      return res.status(401).json({ error: 'Debes iniciar sesión' });
+      return res.status(403).json({ error: 'No tienes permisos para descargar este contrato' });
     }
     const buffer = await this.svc.pdfDe(id);
     res.setHeader('Content-Type', 'application/pdf');

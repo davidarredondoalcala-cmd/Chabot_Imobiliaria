@@ -181,8 +181,15 @@ export class InmueblesService implements OnModuleInit {
     }
   }
 
-  findAll() {
-    return this.model.find().sort({ createdAt: 1 }).lean();
+  async findAll(esAdmin = false) {
+    const list = await this.model.find().sort({ createdAt: 1 }).lean();
+    if (esAdmin) return list;
+    return list.map((item: any) => ({
+      ...item,
+      venc: undefined,
+      diaPago: undefined,
+      contratos: [],
+    }));
   }
 
   // Agregar un inmueble nuevo

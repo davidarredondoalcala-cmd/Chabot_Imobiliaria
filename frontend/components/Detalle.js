@@ -152,10 +152,10 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
               <span>{i.estado === 'Para la venta' || i.estado === 'Vendida' ? 'Precio de venta' : 'Valor mensual'}</span>
               <b className="precio-val">{fmt(i.valor)}</b>
               <span className={`tag grande ${cls(i.estado)}`}>{i.estado}</span>
-              {estaPorVencer(i) && <span className="tag grande PorVencer">Por vencer</span>}
+              {esAdmin && estaPorVencer(i) && <span className="tag grande PorVencer">Por vencer</span>}
             </div>
-            {i.venc && <div className="dato"><span>Vencimiento del contrato</span><b>{fd(i.venc)}</b></div>}
-            {i.venc && <div className="dato"><span>Día de pago</span><b>El {i.diaPago} de cada mes</b></div>}
+            {esAdmin && i.venc && <div className="dato"><span>Vencimiento del contrato</span><b>{fd(i.venc)}</b></div>}
+            {esAdmin && i.venc && <div className="dato"><span>Día de pago</span><b>El {i.diaPago} de cada mes</b></div>}
           </div>
           {esAdmin && i.estado !== 'Arrendada' && (
             <div className="row">
@@ -163,32 +163,38 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
               <button onClick={() => crear('venta')}>Descargar formato de compraventa</button>
             </div>
           )}
-          {vig && <>
-            <h3>Contrato vigente</h3>
-            <Pdf
-              c={vig}
-              esAdmin={esAdmin}
-              vence={!!porVencer(i)}
-              renovar={() => crear('arriendo')}
-              onVer={verContrato}
-              onDescargar={descargarContrato}
-              descargando={descargandoId === (vig.fecha || vig.tipo)}
-            />
-          </>}
-          <h3>Contratos vencidos</h3>
-          {ven.length ? (
-            ven.map((c, k) => (
-              <Pdf
-                key={k}
-                c={c}
-                esAdmin={esAdmin}
-                onVer={verContrato}
-                onDescargar={descargarContrato}
-                descargando={descargandoId === (c.fecha || c.tipo)}
-              />
-            ))
-          ) : (
-            <p className="mut">Sin contratos vencidos.</p>
+          {esAdmin && (
+            <>
+              {vig && (
+                <>
+                  <h3>Contrato vigente</h3>
+                  <Pdf
+                    c={vig}
+                    esAdmin={esAdmin}
+                    vence={!!porVencer(i)}
+                    renovar={() => crear('arriendo')}
+                    onVer={verContrato}
+                    onDescargar={descargarContrato}
+                    descargando={descargandoId === (vig.fecha || vig.tipo)}
+                  />
+                </>
+              )}
+              <h3>Historial de contratos</h3>
+              {ven.length ? (
+                ven.map((c, k) => (
+                  <Pdf
+                    key={k}
+                    c={c}
+                    esAdmin={esAdmin}
+                    onVer={verContrato}
+                    onDescargar={descargarContrato}
+                    descargando={descargandoId === (c.fecha || c.tipo)}
+                  />
+                ))
+              ) : (
+                <p className="mut">Sin contratos vencidos.</p>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -6,8 +6,8 @@ export class InmueblesController {
   constructor(private readonly service: InmueblesService) {}
 
   @Get()
-  listar() {
-    return this.service.findAll();
+  listar(@Req() req: any) {
+    return this.service.findAll(!!req.usuario?.admin);
   }
 
   @Post()

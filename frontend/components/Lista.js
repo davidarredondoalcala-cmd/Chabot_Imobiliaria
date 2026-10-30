@@ -17,18 +17,29 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
   const n = (t) => base.filter((i) => i.tipo === t).length;
   const items = base.filter((i) => i.tipo === tab);
   const idx = tab === 'Casa' ? 0 : 1;
-  const stats = [
-    ['Inmuebles', data.length],
-    ['Arrendados', data.filter((i) => i.estado === 'Arrendada').length],
-    ['En venta', data.filter((i) => i.estado === 'Para la venta').length],
-    ['Contratos por vencer', data.filter((i) => i.estado === 'Arrendada' && porVencer(i)).length],
-  ];
+  const stats = esAdmin
+    ? [
+        ['Inmuebles', data.length],
+        ['Arrendados', data.filter((i) => i.estado === 'Arrendada').length],
+        ['En venta', data.filter((i) => i.estado === 'Para la venta').length],
+        ['Contratos por vencer', data.filter((i) => i.estado === 'Arrendada' && porVencer(i)).length],
+      ]
+    : [
+        ['Inmuebles', data.length],
+        ['Disponibles', data.filter((i) => i.estado === 'Sin arrendar').length],
+        ['En arriendo', data.filter((i) => i.estado === 'Sin arrendar' || i.estado === 'Arrendada').length],
+        ['En venta', data.filter((i) => i.estado === 'Para la venta').length],
+      ];
   return (
     <div className="view">
       <section className="portada noprint">
         <Skyline />
         <h2>Habitat Capital, siempre al día</h2>
-        <p>Consulta el estado de cada casa y apartamento, controla los vencimientos y genera contratos listos para firmar.</p>
+        <p>
+          {esAdmin
+            ? 'Consulta el estado de cada casa y apartamento, controla los vencimientos y genera contratos listos para firmar.'
+            : 'Explora casas y apartamentos disponibles, revisa características detalladas y contacta con nuestros asesores.'}
+        </p>
         <dl className="stats">
           {stats.map(([t, v]) => (<div key={t}><dd>{v}</dd><dt>{t}</dt></div>))}
         </dl>
@@ -44,7 +55,7 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
       </div>
       {items.length === 0 && <div className="card vacio">Ningún inmueble coincide con los filtros. Amplía los rangos o cambia de pestaña.</div>}
       <div className="lista">
-        {items.map((i) => <Tarjeta key={i._id} i={i} abrir={() => abrir(i._id)} />)}
+        {items.map((i) => <Tarjeta key={i._id} i={i} esAdmin={esAdmin} abrir={() => abrir(i._id)} />)}
         {esAdmin && (
           <article
             className="card item nuevo-item"
