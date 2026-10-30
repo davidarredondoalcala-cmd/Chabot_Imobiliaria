@@ -186,7 +186,7 @@ Abre tu navegador en `http://localhost:5173`. Verás la página de la inmobiliar
 | `EMBEDDING_PROVIDER` | Proveedor de embeddings (`openai`, `mock`) | `openai` (o `mock`) |
 | `EMBEDDING_MODEL` | Modelo de embeddings | `text-embedding-3-small` |
 | `EMBEDDING_DIMENSION` | Dimensión del vector | `1536` |
-| `WHATSAPP_NUMBER` | Número telefónico para atención en WhatsApp | `573100000000` |
+| `WHATSAPP_NUMBER` | Número telefónico para atención en WhatsApp | `573229001080` |
 
 ---
 

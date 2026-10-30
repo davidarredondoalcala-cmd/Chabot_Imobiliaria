@@ -25,7 +25,7 @@ export const App: React.FC = () => {
           </nav>
 
           <a
-            href="https://wa.me/573100000000?text=Hola,%20deseo%20asesor%C3%ADa%20inmobiliaria%20en%20Ibagu%C3%A9"
+            href="https://wa.me/573229001080?text=Hola,%20deseo%20asesor%C3%ADa%20inmobiliaria%20en%20Ibagu%C3%A9"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold px-3.5 py-2 rounded-xl transition-colors"

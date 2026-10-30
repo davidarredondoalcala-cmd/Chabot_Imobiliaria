@@ -19,6 +19,16 @@ export async function crearAcuerdo(datos) {
   return j(r);
 }
 
+// Administrativo: edita las cláusulas de un acuerdo aún en firma y sin firmas externas.
+export async function actualizarClausulas(id, clausulas) {
+  const r = await fetch(`${API}/api/firmas/acuerdos/${id}/clausulas`, {
+    method: 'PATCH',
+    headers: conAuth({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ clausulas }),
+  });
+  return j(r);
+}
+
 // Administrativo: estado del acuerdo (para saber cuándo se completó la firma).
 export async function obtenerAcuerdo(id) {
   const r = await fetch(`${API}/api/firmas/acuerdos/${id}`, { cache: 'no-store', headers: conAuth() });

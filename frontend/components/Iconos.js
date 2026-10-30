@@ -24,6 +24,13 @@ export const IcoEditar = () => (<svg {...base}><path d="M11 4H4a2 2 0 0 0-2 2v14
 export const IcoMas = () => (<svg {...base}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>);
 export const IcoBasura = () => (<svg {...base}><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>);
 export const IcoCamara = () => (<svg {...base}><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>);
+export const IcoNegrita = () => (<svg {...base}><path d="M7 4h6a4 4 0 0 1 0 8H7zM7 12h7a4 4 0 0 1 0 8H7z" /></svg>);
+export const IcoCursiva = () => (<svg {...base}><path d="M19 4h-9M14 20H5M15 4 9 20" /></svg>);
+export const IcoSubrayado = () => (<svg {...base}><path d="M6 4v6a6 6 0 0 0 12 0V4M4 21h16" /></svg>);
+export const IcoLista = () => (<svg {...base}><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01" /></svg>);
+export const IcoListaNum = () => (<svg {...base}><path d="M10 6h10M10 12h10M10 18h10M4 5h1v4M3.5 13.5c.4-.6 2-.7 2 .4 0 .8-2 1.3-2 2.6h2" /></svg>);
+export const IcoDeshacer = () => (<svg {...base}><path d="M9 14 4 9l5-5" /><path d="M4 9h10a6 6 0 0 1 0 12h-3" /></svg>);
+export const IcoRehacer = () => (<svg {...base}><path d="m15 14 5-5-5-5" /><path d="M20 9H10a6 6 0 0 0 0 12h3" /></svg>);
 export const IcoMail = () => (<svg {...base}><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>);
 export const IcoWhatsApp = () => (<svg {...base}><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" /></svg>);
 export const IcoSparkle = () => (<svg {...base}><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z" /></svg>);

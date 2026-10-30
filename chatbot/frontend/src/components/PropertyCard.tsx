@@ -31,7 +31,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property, whatsappUr
     maximumFractionDigits: 0,
   }).format(property.precio);
 
-  const fallbackWa = `https://wa.me/573100000000?text=${encodeURIComponent(`Hola, me interesa información sobre el inmueble ${property.codigo}: ${property.titulo}`)}`;
+  const fallbackWa = `https://wa.me/573229001080?text=${encodeURIComponent(`Hola, me interesa información sobre el inmueble ${property.codigo}: ${property.titulo}`)}`;
   const waTarget = whatsappUrl || fallbackWa;
 
   return (

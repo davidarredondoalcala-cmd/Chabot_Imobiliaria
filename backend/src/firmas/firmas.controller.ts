@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Get, HttpCode, Param, Post, Query, Req, Res } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, HttpCode, Param, Patch, Post, Query, Req, Res } from '@nestjs/common';
 import { FirmasService } from './firmas.service';
 import { AuthService } from '../auth/auth.service';
 import { Public } from '../auth/public.decorator';
@@ -18,6 +18,16 @@ export class FirmasController {
     const { inmueble, tipo, datos, firmantes, frontendUrl } = body || {};
     const origin = frontendUrl || req?.headers?.origin || req?.headers?.referer;
     return this.svc.crearAcuerdo({ inmueble, tipo, datos, firmantes, frontendUrl: origin });
+  }
+
+  // Editar cláusulas de un acuerdo en firma (panel administrativo)
+  @Patch('acuerdos/:id/clausulas')
+  async actualizarClausulas(@Param('id') id: string, @Body() body: any, @Req() req: any) {
+    const usuario = await this.auth.usuarioDe(req);
+    if (!usuario?.admin) {
+      throw new ForbiddenException('Solo los administradores pueden editar las cláusulas del contrato');
+    }
+    return this.svc.actualizarClausulas(id, body?.clausulas);
   }
 
   // Estado del acuerdo (panel administrativo)

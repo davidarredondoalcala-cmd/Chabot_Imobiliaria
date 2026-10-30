@@ -8,8 +8,10 @@ import { fd, fmt, cls, porVencer, estaPorVencer } from '../lib/utils';
 import { subirImagen, urlImagen } from '../lib/apiImagenes';
 import { setFotoInmueble } from '../lib/api';
 import { INMOBILIARIA_INFO } from '../lib/firmaInmobiliaria';
-import { descargarPdfBorrador, descargarPdfFinal, obtenerAcuerdo, obtenerAcuerdoPorInmueble } from '../lib/apiFirmas';
-import { IcoOjo, IcoDescargar, IcoImprimir, IcoCerrar, IcoDocumento, IcoSparkle, IcoWhatsApp, IcoCamara, IcoCheck } from './Iconos';
+import { descargarPdfBorrador, descargarPdfFinal, obtenerAcuerdo, obtenerAcuerdoPorInmueble, actualizarClausulas } from '../lib/apiFirmas';
+import { IcoOjo, IcoDescargar, IcoImprimir, IcoCerrar, IcoDocumento, IcoSparkle, IcoWhatsApp, IcoCamara, IcoCheck, IcoEditar } from './Iconos';
+import { waUrl } from '../lib/contacto';
+import EditorClausulas from './EditorClausulas';
 
 // Tarjeta del contrato con acciones de ver, descargar y renovar (exclusivo para administradores)
 const Pdf = ({ c, renovar, porVencer: vence, onVer, onDescargar, descargando, esAdmin }) => {
@@ -50,6 +52,8 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
   const [subiendo, setSubiendo] = useState(false);
   const [imgErr, setImgErr] = useState(false);
   const [contratoVer, setContratoVer] = useState(null);
+  const [editorContrato, setEditorContrato] = useState(false);
+  const [guardandoClausulas, setGuardandoClausulas] = useState(false);
   const [descargandoId, setDescargandoId] = useState(null);
   const [fotoPrevia, setFotoPrevia] = useState(null); // { file, previewUrl }
   const [montado, setMontado] = useState(false);
@@ -127,7 +131,7 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
   const verContrato = async (c) => {
     if (!esAdmin) return;
     const { modo, S, firmas, acuerdoId } = prepararContratoS(c);
-    setContratoVer({ c, modo, S, firmas: firmas || null, acuerdoId });
+    setContratoVer({ c, modo, S, firmas: firmas || null, acuerdoId, estado: null, firmantes: null });
 
     // Carga en segundo plano el acuerdo para traer las firmas gráficas reales del arrendatario / codeudores
     try {
@@ -177,6 +181,8 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
             ...prev,
             S: nuevoS,
             acuerdoId: acuerdo.id || prev.acuerdoId,
+            estado: acuerdo.estado || prev.estado,
+            firmantes: acuerdo.firmantes || prev.firmantes,
             firmas: {
               arrendador: firmasObj.arrendador || prev.firmas?.arrendador,
               arrendatario: firmasObj.arrendatario || prev.firmas?.arrendatario,
@@ -218,6 +224,33 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
       }
     } finally {
       setDescargandoId(null);
+    }
+  };
+
+  // Solo se pueden editar acuerdos en firma que todavía no tengan firmas externas registradas.
+  const contratoEditable = (() => {
+    if (!contratoVer?.acuerdoId || contratoVer.estado !== 'en_firma' || !Array.isArray(contratoVer.firmantes)) {
+      return false;
+    }
+    return contratoVer.firmantes
+      .filter((f) => !['arrendador', 'vendedor'].includes(f.rol))
+      .every((f) => f.estado === 'pendiente');
+  })();
+
+  const guardarClausulasContrato = async (nuevas) => {
+    if (!contratoVer?.acuerdoId) return;
+    setGuardandoClausulas(true);
+    try {
+      await actualizarClausulas(contratoVer.acuerdoId, nuevas);
+      setContratoVer((prev) => (
+        prev ? { ...prev, S: { ...prev.S, clausulas: nuevas } } : prev
+      ));
+      setEditorContrato(false);
+      avisar?.('Cláusulas actualizadas. La integridad del contrato fue recalculada.');
+    } catch (err) {
+      avisar?.(err.message || 'No se pudieron actualizar las cláusulas');
+    } finally {
+      setGuardandoClausulas(false);
     }
   };
 
@@ -350,7 +383,7 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
               </div>
               <div className="ficha-cliente-acciones">
                 <a
-                  href={`https://wa.me/573100000000?text=${encodeURIComponent(`Hola Habitat Capital, me interesa el inmueble "${i.nombre}" (${i.tipo} en ${i.barrio || 'Ibagué'}). ¿Está disponible para visita?`)}`}
+                  href={waUrl(`Hola Habitat Capital, me interesa el inmueble "${i.nombre}" (${i.tipo} en ${i.barrio || 'Ibagué'}). ¿Está disponible para visita?`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="g btn-cliente-wa"
@@ -416,6 +449,19 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
               <button
                 type="button"
                 className="s"
+                onClick={() => setEditorContrato(true)}
+                disabled={!contratoEditable}
+                title={
+                  contratoEditable
+                    ? 'Editar las cláusulas del contrato'
+                    : 'Solo se puede editar mientras el contrato está en firma y sin firmas externas registradas'
+                }
+              >
+                <IcoEditar /> Editar contrato
+              </button>
+              <button
+                type="button"
+                className="s"
                 onClick={() => descargarContrato(contratoVer.c)}
                 title="Descargar documento en PDF"
               >
@@ -455,6 +501,17 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
           </div>
         </div>,
         document.body
+      )}
+
+      {esAdmin && contratoVer && (
+        <EditorClausulas
+          abierto={editorContrato}
+          clausulas={contratoVer.S?.clausulas || []}
+          onGuardar={guardarClausulasContrato}
+          onCerrar={() => setEditorContrato(false)}
+          guardando={guardandoClausulas}
+          titulo={`Editar contrato de ${contratoVer.c.tipo}`}
+        />
       )}
     </div>
   );

@@ -1,8 +1,30 @@
 import { fmt } from '../lib/utils';
+import { sanitizarHtml, escaparHtml } from '../lib/clausulas';
 import FirmaEspacio from './firmas/FirmaEspacio';
 import { INMOBILIARIA_INFO, FIRMA_INMOBILIARIA_DATA_URL } from '../lib/firmaInmobiliaria';
 
 const V = ({ x, d }) => (x && String(x).trim() ? <b>{x}</b> : <b className="bl">{d || '__________'}</b>);
+
+// Cláusula con formato enriquecido (si existe `html`) o texto plano de respaldo.
+const Clausula = ({ cl }) => {
+  if (cl?.html) {
+    const titulo = cl.pre ? `<b>${escaparHtml(cl.pre)}</b> ` : '';
+    return (
+      <div className="hoja-clausula">
+        <div
+          className="hoja-clausula-cuerpo"
+          dangerouslySetInnerHTML={{ __html: `${titulo}${sanitizarHtml(cl.html)}` }}
+        />
+      </div>
+    );
+  }
+  return (
+    <p>
+      {cl.pre && <b>{cl.pre} </b>}
+      {cl.resto}
+    </p>
+  );
+};
 
 // Plantilla del contrato (vista previa en vivo, se imprime como PDF).
 // `firmas` es OPCIONAL: si no se pasa, renderiza solo espacios con nombres.
@@ -40,10 +62,7 @@ export default function Hoja({ modo, S = {}, firmas }) {
 
         {Array.isArray(S.clausulas) && S.clausulas.length > 0 ? (
           S.clausulas.map((cl, idx) => (
-            <p key={idx}>
-              {cl.pre && <b>{cl.pre} </b>}
-              {cl.resto}
-            </p>
+            <Clausula cl={cl} key={idx} />
           ))
         ) : (
           <>
@@ -97,10 +116,7 @@ export default function Hoja({ modo, S = {}, firmas }) {
 
       {Array.isArray(S.clausulas) && S.clausulas.length > 0 ? (
         S.clausulas.map((cl, idx) => (
-          <p key={idx}>
-            {cl.pre && <b>{cl.pre} </b>}
-            {cl.resto}
-          </p>
+          <Clausula cl={cl} key={idx} />
         ))
       ) : (
         <>

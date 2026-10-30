@@ -3,7 +3,7 @@ import { ConversationCriterios, Property } from '../types/index.js';
 
 dotenv.config();
 
-const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '573100000000';
+const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '573229001080';
 
 export interface WhatsAppContext {
   codigoInmueble?: string;

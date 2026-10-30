@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Hoja from './Hoja';
+import EditorClausulas from './EditorClausulas';
 import { crearAcuerdo, descargarPdfBorrador, obtenerAcuerdo } from '../lib/apiFirmas';
 import { IcoImprimir, IcoDescargar, IcoMail, IcoCheck, IcoMas, IcoBasura, IcoEditar, IcoDocumento } from './Iconos';
 import { INMOBILIARIA_INFO, FIRMA_INMOBILIARIA_DATA_URL } from '../lib/firmaInmobiliaria';
@@ -52,6 +53,7 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
   const [clausulas, setClausulas] = useState(
     (modo0 || 'arriendo') === 'arriendo' ? CLAUSULAS_ARRIENDO_DEF : CLAUSULAS_VENTA_DEF
   );
+  const [editorClausulas, setEditorClausulas] = useState(false);
 
   const [S, setS] = useState({
     arr: INMOBILIARIA_INFO.nombre,
@@ -149,30 +151,11 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
     </div>
   );
 
-  // Manejo de cláusulas dinámicas
-  const modificarClausula = (idx, campoKey, valor) => {
-    const act = clausulas.map((c, i) => (i === idx ? { ...c, [campoKey]: valor } : c));
-    setClausulas(act);
-    setS((prev) => ({ ...prev, clausulas: act }));
-  };
-
-  const agregarClausula = () => {
-    const num = clausulas.length + 1;
-    const nueva = {
-      pre: `CLÁUSULA ${num} – Estipulación adicional.`,
-      resto: 'Las partes acuerdan expresamente que…',
-    };
-    const act = [...clausulas, nueva];
-    setClausulas(act);
-    setS((prev) => ({ ...prev, clausulas: act }));
-    avisar?.('Cláusula adicional agregada');
-  };
-
-  const eliminarClausula = (idx) => {
-    const act = clausulas.filter((_, i) => i !== idx);
-    setClausulas(act);
-    setS((prev) => ({ ...prev, clausulas: act }));
-    avisar?.('Cláusula eliminada');
+  const guardarClausulas = (nuevas) => {
+    setClausulas(nuevas);
+    setS((prev) => ({ ...prev, clausulas: nuevas }));
+    setEditorClausulas(false);
+    avisar?.('Cláusulas actualizadas en la vista previa');
   };
 
   // Manejo de codeudores múltiples con nombre, cédula y correo
@@ -505,47 +488,26 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
             campo('pago', 'Forma de pago', 'text', 'Ej: De contado contra firma', 120)
           )}
 
-          {/* Editor de Cláusulas (Añadir y Modificar cláusulas) */}
+          {/* Cláusulas del contrato: resumen y acceso al editor tipo Word */}
           <div style={{ marginTop: 24, borderTop: '1px solid var(--bd)', paddingTop: 14 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 8, flexWrap: 'wrap' }}>
               <h3 style={{ margin: 0, fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <IcoEditar /> Cláusulas del contrato ({clausulas.length})
               </h3>
-              <button type="button" className="s" onClick={agregarClausula} title="Añadir una cláusula adicional">
-                <IcoMas /> Añadir cláusula
+              <button type="button" className="s" onClick={() => setEditorClausulas(true)}>
+                <IcoEditar /> Editar cláusulas
               </button>
             </div>
-            <p className="mut" style={{ margin: '0 0 12px', fontSize: '0.8rem' }}>
-              Puedes editar el título y redacción de cada cláusula, agregar cláusulas especiales o eliminar las que no apliquen:
+            <p className="mut" style={{ margin: '0 0 12px', fontSize: '0.8rem', lineHeight: 1.5 }}>
+              Abre el editor para dar formato (negrita, cursiva, subrayado y listas), agregar, reordenar o eliminar cláusulas.
+              Los cambios se reflejan en la vista previa y en el PDF.
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 380, overflowY: 'auto', paddingRight: 4 }}>
+            <div className="editor-clausulas-resumen">
               {clausulas.map((cl, idx) => (
-                <div key={idx} style={{ background: 'var(--bg)', padding: 10, borderRadius: 10, border: '1px solid var(--bd)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <input
-                      style={{ fontWeight: 700, fontSize: '0.85rem', padding: '6px 8px' }}
-                      value={cl.pre}
-                      onChange={(e) => modificarClausula(idx, 'pre', e.target.value)}
-                      placeholder="Título de la cláusula (ej: PRIMERA – Objeto.)"
-                    />
-                    <button
-                      type="button"
-                      className="l"
-                      style={{ color: 'var(--red)', padding: '2px 6px' }}
-                      onClick={() => eliminarClausula(idx)}
-                      title="Eliminar esta cláusula"
-                    >
-                      <IcoBasura />
-                    </button>
-                  </div>
-                  <textarea
-                    rows="2"
-                    style={{ fontSize: '0.84rem', padding: '6px 8px', marginTop: 4 }}
-                    value={cl.resto}
-                    onChange={(e) => modificarClausula(idx, 'resto', e.target.value)}
-                    placeholder="Contenido de la cláusula..."
-                  />
+                <div className="editor-clausulas-resumen-item" key={idx}>
+                  <b>{cl.pre || `Cláusula ${idx + 1}`}</b>
+                  <span>{cl.resto}</span>
                 </div>
               ))}
             </div>
@@ -610,6 +572,14 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
           )}
         </div>
       </div>
+
+      <EditorClausulas
+        abierto={editorClausulas}
+        clausulas={clausulas}
+        onGuardar={guardarClausulas}
+        onCerrar={() => setEditorClausulas(false)}
+        titulo={`Cláusulas del contrato de ${modo === 'arriendo' ? 'arriendo' : 'compraventa'}`}
+      />
     </div>
   );
 }

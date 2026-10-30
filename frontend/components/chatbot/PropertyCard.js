@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { IcoChatPin, IcoChatBed, IcoChatBath, IcoChatArea, IcoChatWhatsApp, IcoChatExternal } from './IconosChat';
+import { waUrl } from '../../lib/contacto';
 
 export default function PropertyCard({ property, whatsappUrl }) {
   if (!property) return null;
@@ -11,9 +12,9 @@ export default function PropertyCard({ property, whatsappUrl }) {
     maximumFractionDigits: 0,
   }).format(property.precio || 0);
 
-  const fallbackWa = `https://wa.me/573100000000?text=${encodeURIComponent(
+  const fallbackWa = waUrl(
     `Hola, me interesa información sobre el inmueble ${property.codigo}: ${property.titulo}`
-  )}`;
+  );
   const waTarget = whatsappUrl || fallbackWa;
 
   const isArriendo = property.operacion === 'arriendo';

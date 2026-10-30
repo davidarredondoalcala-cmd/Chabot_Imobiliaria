@@ -1,6 +1,6 @@
 import { ConversationCriterios, Property } from './types';
 
-const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '573100000000';
+const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '573229001080';
 
 export interface WhatsAppContext {
   codigoInmueble?: string;

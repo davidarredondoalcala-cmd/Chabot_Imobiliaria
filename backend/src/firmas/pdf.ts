@@ -42,13 +42,120 @@ function paginar(doc: any, estado: any) {
   return estado.pag;
 }
 
+function fuenteRun(fuentes: any, run: any) {
+  if (run?.b && run?.i) return fuentes.negritaItalica;
+  if (run?.b) return fuentes.negrita;
+  if (run?.i) return fuentes.italica;
+  return fuentes.normal;
+}
+
+// Dibuja texto enriquecido respetando negrita, cursiva, subrayado y saltos de línea.
+function dibujarRuns(doc: any, est: any, runs: any[], fuentes: any) {
+  const tam = 10.5;
+  const interlineado = 15;
+
+  const fragmentos: Array<{ t: string; r: any }> = [];
+  for (const run of runs) {
+    if (!run) continue;
+    if (run.br) { fragmentos.push({ t: '\n', r: run }); continue; }
+    const texto = String(run.t || '');
+    if (!texto) continue;
+    for (const parte of texto.split(/(\s+)/)) {
+      if (!parte) continue;
+      fragmentos.push({ t: /^\s+$/.test(parte) ? ' ' : parte, r: run });
+    }
+  }
+
+  let linea: Array<{ t: string; r: any }> = [];
+  let ancho = 0;
+
+  const dibujarLinea = () => {
+    let x = M;
+    for (const f of linea) {
+      if (!f.t) continue;
+      const fuente = fuenteRun(fuentes, f.r);
+      est.pag.drawText(f.t, { x, y: est.y, size: tam, font: fuente, color: NEGRO });
+      if (f.r.u) {
+        const w = fuente.widthOfTextAtSize(f.t, tam);
+        est.pag.drawLine({ start: { x, y: est.y - 2 }, end: { x: x + w, y: est.y - 2 }, thickness: 0.6, color: NEGRO });
+      }
+      x += fuente.widthOfTextAtSize(f.t, tam);
+    }
+    est.y -= interlineado;
+  };
+
+  for (const frag of fragmentos) {
+    if (frag.t === '\n') {
+      if (linea.length) {
+        while (linea.length && !linea[linea.length - 1].t.trim()) linea.pop();
+        paginar(doc, est);
+        dibujarLinea();
+      } else {
+        paginar(doc, est);
+        est.y -= interlineado;
+      }
+      linea = [];
+      ancho = 0;
+      continue;
+    }
+
+    const fuente = fuenteRun(fuentes, frag.r);
+    const w = fuente.widthOfTextAtSize(frag.t, tam);
+    if (ancho + w > COL && ancho > 0 && frag.t.trim()) {
+      while (linea.length && !linea[linea.length - 1].t.trim()) linea.pop();
+      paginar(doc, est);
+      dibujarLinea();
+      linea = [];
+      ancho = 0;
+      if (!frag.t.trim()) continue;
+    }
+    linea.push(frag);
+    ancho += w;
+  }
+
+  if (linea.length) {
+    while (linea.length && !linea[linea.length - 1].t.trim()) linea.pop();
+    if (linea.length) {
+      paginar(doc, est);
+      dibujarLinea();
+    }
+  }
+}
+
+// Cuerpo del contrato: usa los runs con formato si existen; si no, texto plano.
+function dibujarCuerpo(doc: any, est: any, plantilla: any, fuentes: any) {
+  for (const p of plantilla.parrafos) {
+    if (p.pre) {
+      paginar(doc, est);
+      for (const l of envolver(p.pre, fuentes.negrita, 10.5, COL)) {
+        paginar(doc, est);
+        est.pag.drawText(l, { x: M, y: est.y, size: 10.5, font: fuentes.negrita, color: VERDE });
+        est.y -= 15;
+      }
+    }
+
+    if (Array.isArray(p.runs) && p.runs.length) {
+      dibujarRuns(doc, est, p.runs, fuentes);
+    } else {
+      for (const l of envolver(p.resto || '', fuentes.normal, 10.5, COL)) {
+        paginar(doc, est);
+        est.pag.drawText(l, { x: M, y: est.y, size: 10.5, font: fuentes.normal, color: NEGRO });
+        est.y -= 15;
+      }
+    }
+    est.y -= 4;
+  }
+}
+
 export async function generarPdf(acuerdo: any) {
   const doc = await PDFDocument.create();
   const helv = await doc.embedFont(StandardFonts.Helvetica);
   const negrita = await doc.embedFont(StandardFonts.HelveticaBold);
   const courier = await doc.embedFont(StandardFonts.Courier);
   const italica = await doc.embedFont(StandardFonts.HelveticaOblique);
+  const negritaItalica = await doc.embedFont(StandardFonts.HelveticaBoldOblique);
 
+  const fuentes = { normal: helv, negrita, italica, negritaItalica };
   const est = { pag: null as any, y: 0 };
   const plantilla = clausulas.construir(acuerdo.tipo, { ...acuerdo.datos, fecha: acuerdo.fechaContrato });
 
@@ -76,31 +183,7 @@ export async function generarPdf(acuerdo: any) {
   est.y -= 24;
 
   // ===== Cuerpo del contrato =====
-  for (const p of plantilla.parrafos) {
-    if (p.pre) {
-      paginar(doc, est);
-      const lineasPre = envolver(p.pre, negrita, 10.5, COL);
-      for (const l of lineasPre) {
-        paginar(doc, est);
-        est.pag.drawText(l, { x: M, y: est.y, size: 10.5, font: negrita, color: VERDE });
-        est.y -= 15;
-      }
-      // el resto del párrafo va en la misma línea visual cuando es corto
-      const lineas = envolver(p.resto, helv, 10.5, COL);
-      for (const l of lineas) {
-        paginar(doc, est);
-        est.pag.drawText(l, { x: M, y: est.y, size: 10.5, font: helv, color: NEGRO });
-        est.y -= 15;
-      }
-    } else {
-      for (const l of envolver(p.resto, helv, 10.5, COL)) {
-        paginar(doc, est);
-        est.pag.drawText(l, { x: M, y: est.y, size: 10.5, font: helv, color: NEGRO });
-        est.y -= 15;
-      }
-    }
-    est.y -= 4;
-  }
+  dibujarCuerpo(doc, est, plantilla, fuentes);
 
   // ===== Bloque de firmas =====
   est.y -= 30;
@@ -249,7 +332,9 @@ export async function generarPdfBorrador(tipo: string, datos: any) {
   const helv = await doc.embedFont(StandardFonts.Helvetica);
   const negrita = await doc.embedFont(StandardFonts.HelveticaBold);
   const italica = await doc.embedFont(StandardFonts.HelveticaOblique);
+  const negritaItalica = await doc.embedFont(StandardFonts.HelveticaBoldOblique);
 
+  const fuentes = { normal: helv, negrita, italica, negritaItalica };
   const fecha = datos?.fecha || new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
   const plantilla = clausulas.construir(tipo, { ...datos, fecha });
 
@@ -276,28 +361,7 @@ export async function generarPdfBorrador(tipo: string, datos: any) {
   est.y -= 24;
 
   // Cuerpo
-  for (const p of plantilla.parrafos) {
-    if (p.pre) {
-      paginar(doc, est);
-      for (const l of envolver(p.pre, negrita, 10.5, COL)) {
-        paginar(doc, est);
-        est.pag.drawText(l, { x: M, y: est.y, size: 10.5, font: negrita, color: VERDE });
-        est.y -= 15;
-      }
-      for (const l of envolver(p.resto, helv, 10.5, COL)) {
-        paginar(doc, est);
-        est.pag.drawText(l, { x: M, y: est.y, size: 10.5, font: helv, color: NEGRO });
-        est.y -= 15;
-      }
-    } else {
-      for (const l of envolver(p.resto, helv, 10.5, COL)) {
-        paginar(doc, est);
-        est.pag.drawText(l, { x: M, y: est.y, size: 10.5, font: helv, color: NEGRO });
-        est.y -= 15;
-      }
-    }
-    est.y -= 4;
-  }
+  dibujarCuerpo(doc, est, plantilla, fuentes);
 
   // Bloque de firmas (nombres y roles, sin imagen ni evidencia)
   est.y -= 30;

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ChatMessage from './ChatMessage';
 import SuggestionChips from './SuggestionChips';
 import { IcoChatBubble, IcoChatSend, IcoChatBot, IcoChatChevronDown } from './IconosChat';
+import { waUrl } from '../../lib/contacto';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -241,7 +242,7 @@ export default function ChatWidget() {
           id: `bot-err-${Date.now()}`,
           role: 'assistant',
           content: 'Qué pena contigo, ocurrió un inconveniente momentáneo. Por favor intenta de nuevo o comunícate directamente por WhatsApp.',
-          whatsappUrl: 'https://wa.me/573100000000?text=Hola,%20solicito%20asesoria%20inmobiliaria%20en%20Ibague',
+          whatsappUrl: waUrl('Hola, solicito asesoría inmobiliaria en Ibagué'),
         },
       ]);
     } finally {

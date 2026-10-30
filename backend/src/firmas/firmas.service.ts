@@ -5,6 +5,7 @@ import { NOMBRE_ACUERDO } from './model';
 import { hashContrato, hashCadena, generarToken, ipDe, tokenSeguro } from './hash';
 import { generarPdf, generarPdfBorrador, guardarEnGridFS, leerDeGridFS } from './pdf';
 import { ErrorFirma } from './errores';
+import { normalizarClausulas } from './clausulas';
 import { InmueblesService } from '../inmuebles/inmuebles.service';
 import { CorreoService } from './correo.service';
 import { INMOBILIARIA_INFO, FIRMA_INMOBILIARIA_DATA_URL } from './firma-inmobiliaria';
@@ -47,11 +48,16 @@ export class FirmasService {
       throw new ErrorFirma(400, 'Se requieren las dos partes del contrato (y los codeudores solo en arriendo)');
     }
 
+    // Sanitiza y normaliza las cláusulas editables antes de congelar el snapshot.
+    const datosBase = Array.isArray(datos?.clausulas)
+      ? { ...datos, clausulas: normalizarClausulas(datos.clausulas) }
+      : datos;
+
     // El snapshot congela los datos y la fecha del contrato
     // La Inmobiliaria es la propietaria por defecto y sus datos quedan sellados
     const snapshot = {
-      ...datos,
-      fecha: datos.fecha || fechaTexto(),
+      ...datosBase,
+      fecha: datosBase.fecha || fechaTexto(),
       ...(tipo === 'arriendo'
         ? { arr: INMOBILIARIA_INFO.nombre, arrCedula: INMOBILIARIA_INFO.cedula, arrEmail: INMOBILIARIA_INFO.email }
         : { vend: INMOBILIARIA_INFO.nombre, vendCedula: INMOBILIARIA_INFO.cedula, vendEmail: INMOBILIARIA_INFO.email }),
@@ -170,6 +176,8 @@ export class FirmasService {
       tipo: acuerdo.tipo,
       estado: acuerdo.estado,
       inmueble: acuerdo.inmueble,
+      datos: acuerdo.datos,
+      contratoHash: acuerdo.contratoHash,
       links,
       firmantes: acuerdo.firmantes.map((f: any) => ({
         rol: f.rol, orden: f.orden, estado: f.estado,
@@ -234,6 +242,54 @@ export class FirmasService {
   async obtenerAcuerdo(id: string) {
     const acuerdo = await this.acuerdos.findById(id);
     if (!acuerdo) throw new ErrorFirma(404, 'Acuerdo no encontrado');
+    return this.pactoPublico(acuerdo);
+  }
+
+  // ===== Editar cláusulas: solo en firma, sin firmas externas, recalculando integridad =====
+  async actualizarClausulas(id: string, clausulas: any) {
+    if (!isValidObjectId(id)) throw new ErrorFirma(400, 'Acuerdo inválido');
+    const acuerdo: any = await this.acuerdos.findById(id);
+    if (!acuerdo) throw new ErrorFirma(404, 'Acuerdo no encontrado');
+
+    if (acuerdo.estado !== 'en_firma') {
+      throw new ErrorFirma(409, 'El contrato ya no está en firma y no puede modificarse');
+    }
+
+    const externasNoPendientes = (acuerdo.firmantes || []).filter(
+      (f: any) => !['arrendador', 'vendedor'].includes(f.rol) && f.estado !== 'pendiente',
+    );
+    if (externasNoPendientes.length) {
+      throw new ErrorFirma(409, 'El contrato ya tiene firmas o rechazos de las contrapartes y no puede modificarse');
+    }
+
+    const nuevas = normalizarClausulas(clausulas);
+    if (!nuevas.length) throw new ErrorFirma(400, 'El contrato debe conservar al menos una cláusula');
+
+    const datosPrevios = acuerdo.datos?.toObject ? acuerdo.datos.toObject() : { ...(acuerdo.datos || {}) };
+    const datos = { ...datosPrevios, clausulas: nuevas };
+    acuerdo.datos = datos;
+    acuerdo.markModified('datos');
+
+    const contratoHash = hashContrato(datos);
+    acuerdo.contratoHash = contratoHash;
+    acuerdo.markModified('contratoHash');
+
+    // El PDF congelado (si existiera) ya no representa el contrato vigente.
+    acuerdo.set('pdfGridId', undefined);
+
+    // La firma institucional se renueva para que la cadena de evidencia siga siendo válida.
+    for (const f of acuerdo.firmantes || []) {
+      if (!['arrendador', 'vendedor'].includes(f.rol) || !f.evidencia) continue;
+      const cedula = f.evidencia?.usuario?.cedula || f.cedula || '';
+      f.evidencia.hashDocumento = contratoHash;
+      f.evidencia.hashAnterior = null;
+      f.evidencia.hashCadena = hashCadena(contratoHash, null, f.rol, cedula);
+      f.markModified?.('evidencia');
+    }
+    acuerdo.markModified('firmantes');
+
+    await acuerdo.save();
+
     return this.pactoPublico(acuerdo);
   }
 
