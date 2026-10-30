@@ -35,8 +35,24 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
   };
 
   const campo = (k, l, t, p, maxLen) => (
-    <>
-      <label>{l}</label>
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+      <label
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          height: '20px',
+          margin: '12px 0 6px',
+          fontSize: '0.82rem',
+          fontWeight: 600,
+          color: 'var(--mut)',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+        title={l}
+      >
+        {l}
+      </label>
       <input
         type={t || 'text'}
         placeholder={p}
@@ -44,7 +60,7 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
         value={S[k] || ''}
         onChange={(e) => actualizarCampo(k, e.target.value)}
       />
-    </>
+    </div>
   );
 
   // Previsualización local inmediata antes de subir
@@ -166,17 +182,17 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
             maxLength={500}
             onChange={(e) => actualizarCampo('lind', e.target.value)}
           />
-          <div className="grid3">
-            <div>{campo('habitaciones', 'Habitaciones', 'text', '0', 2)}</div>
-            <div>{campo('banos', 'Baños', 'text', '0', 2)}</div>
-            <div>{campo('area', 'Área (m²)', 'text', '0', 5)}</div>
+          <div className="grid3" style={{ alignItems: 'end' }}>
+            {campo('habitaciones', 'Habitaciones', 'text', '0', 2)}
+            {campo('banos', 'Baños', 'text', '0', 2)}
+            {campo('area', 'Área (m²)', 'text', '0', 5)}
           </div>
           {campo('valor', S.estado === 'Para la venta' ? 'Precio de venta *' : 'Valor mensual *', 'text', 'Ej: 1500000', 12)}
           {arrendada && (
-            <>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', alignItems: 'end' }}>
               {campo('venc', 'Vencimiento del contrato', 'date')}
-              {campo('dia', 'Día de pago de cada mes (1-31)', 'text', '5', 2)}
-            </>
+              {campo('dia', 'Día de pago de cada mes', 'text', 'Ej: 5 (entre 1 y 31)', 2)}
+            </div>
           )}
           
           <label>Foto del inmueble con previsualización</label>

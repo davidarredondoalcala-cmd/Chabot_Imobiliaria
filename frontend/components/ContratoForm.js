@@ -121,8 +121,24 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
   };
 
   const campo = (k, l, t, p, maxLen) => (
-    <>
-      <label>{l}</label>
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+      <label
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          height: '20px',
+          margin: '12px 0 6px',
+          fontSize: '0.82rem',
+          fontWeight: 600,
+          color: 'var(--mut)',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+        title={l}
+      >
+        {l}
+      </label>
       <input
         type={t || 'text'}
         placeholder={p}
@@ -130,7 +146,7 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
         value={S[k] || ''}
         onChange={(e) => actualizarCampo(k, e.target.value)}
       />
-    </>
+    </div>
   );
 
   // Manejo de cláusulas dinámicas
@@ -395,9 +411,9 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
               </div>
 
               {campo('ate', 'Nombre del Arrendatario *', 'text', 'Ej: Andrés Gómez', 60)}
-              <div className="grid3" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                <div>{campo('ateCedula', 'Cédula Arrendatario (6-10 dígitos) *', 'text', 'Ej: 1110543210', 10)}</div>
-                <div>{campo('ateEmail', 'Correo Arrendatario *', 'email', 'cliente@ejemplo.com', 80)}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', alignItems: 'end' }}>
+                {campo('ateCedula', 'Cédula Arrendatario *', 'text', 'Ej: 1110543210 (6 a 10 dígitos)', 10)}
+                {campo('ateEmail', 'Correo Arrendatario *', 'email', 'cliente@ejemplo.com', 80)}
               </div>
 
               <div style={{ marginTop: 14, borderTop: '1px solid var(--bd)', paddingTop: 10 }}>
@@ -419,9 +435,9 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
                       maxLength={60}
                       onChange={(e) => actualizarCodeudor(k, 'cods', e.target.value)}
                     />
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 6 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 8 }}>
                       <input
-                        placeholder="Cédula codeudor (6-10 dígitos)"
+                        placeholder="Cédula codeudor (6 a 10 dígitos)"
                         value={S.codsCedula?.[k] || ''}
                         maxLength={10}
                         inputMode="numeric"
@@ -466,9 +482,9 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
               </div>
 
               {campo('comp', 'Nombre del Comprador *', 'text', 'Nombre completo', 60)}
-              <div className="grid3" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                <div>{campo('compCedula', 'Cédula Comprador (6-10 dígitos) *', 'text', 'Cédula sin puntos ni espacios', 10)}</div>
-                <div>{campo('compEmail', 'Correo Comprador *', 'email', 'comprador@ejemplo.com', 80)}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', alignItems: 'end' }}>
+                {campo('compCedula', 'Cédula Comprador *', 'text', 'Ej: 1110543210 (6 a 10 dígitos)', 10)}
+                {campo('compEmail', 'Correo Comprador *', 'email', 'comprador@ejemplo.com', 80)}
               </div>
             </>
           )}
@@ -481,9 +497,9 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
           <textarea rows="3" value={S.lin} maxLength={500} onChange={(e) => actualizarCampo('lin', e.target.value)} />
           {campo('val', modo === 'arriendo' ? 'Valor mensual ($)' : 'Precio de venta ($)', 'text', 'Ej: 1500000', 12)}
           {modo === 'arriendo' ? (
-            <div className="grid3" style={{ gridTemplateColumns: '1fr 1fr' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', alignItems: 'end' }}>
               <div>{campo('dur', 'Duración (meses)', 'text', 'Ej: 12', 3)}</div>
-              <div>{campo('dia', 'Día de pago de cada mes (1-31)', 'text', 'Ej: 5', 2)}</div>
+              <div>{campo('dia', 'Día de pago de cada mes', 'text', 'Ej: 5 (entre 1 y 31)', 2)}</div>
             </div>
           ) : (
             campo('pago', 'Forma de pago', 'text', 'Ej: De contado contra firma', 120)
