@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Query, Req, Res } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, HttpCode, Param, Post, Query, Req, Res } from '@nestjs/common';
 import { FirmasService } from './firmas.service';
 import { AuthService } from '../auth/auth.service';
 import { Public } from '../auth/public.decorator';
@@ -10,7 +10,11 @@ export class FirmasController {
   // Crear acuerdo (desde el formulario de contrato del frontend)
   @Post('acuerdos')
   @HttpCode(200)
-  crear(@Body() body: any) {
+  async crear(@Body() body: any, @Req() req: any) {
+    const usuario = await this.auth.usuarioDe(req);
+    if (!usuario?.admin) {
+      throw new ForbiddenException('Solo los administradores pueden generar acuerdos de firma');
+    }
     const { inmueble, tipo, datos, firmantes } = body || {};
     return this.svc.crearAcuerdo({ inmueble, tipo, datos, firmantes });
   }
@@ -51,12 +55,12 @@ export class FirmasController {
     return this.svc.verificar(id);
   }
 
-  // PDF de un contrato en borrador (sin firmas). Requiere sesión de administrador.
+  // PDF de un contrato en borrador (sin firmas). Requiere sesión activa.
   @Post('borrador/pdf')
   @HttpCode(200)
   async pdfBorrador(@Body() body: any, @Req() req: any, @Res() res: any) {
-    const esAdmin = !!(await this.auth.usuarioDe(req));
-    if (!esAdmin) return res.status(401).json({ error: 'Debes iniciar sesión' });
+    const usuario = await this.auth.usuarioDe(req);
+    if (!usuario) return res.status(401).json({ error: 'Debes iniciar sesión' });
     const { tipo, datos } = body || {};
     const buffer = await this.svc.pdfBorrador(tipo, datos);
     res.setHeader('Content-Type', 'application/pdf');

@@ -12,7 +12,7 @@ const Skyline = () => (
   </svg>
 );
 
-export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, nuevo }) {
+export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, nuevo, esAdmin }) {
   const base = filtrar(data, filtros);
   const n = (t) => base.filter((i) => i.tipo === t).length;
   const items = base.filter((i) => i.tipo === tab);
@@ -44,17 +44,19 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
       </div>
       {items.length === 0 && <div className="card vacio">Ningún inmueble coincide con los filtros. Amplía los rangos o cambia de pestaña.</div>}
       <div className="lista">
-        <article
-          className="card item nuevo-item"
-          role="button"
-          tabIndex={0}
-          aria-label="Agregar inmueble"
-          title="Agregar inmueble"
-          onClick={nuevo}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nuevo(); } }}
-        >
-          <span className="nuevo-mas" aria-hidden="true">+</span>
-        </article>
+        {esAdmin && (
+          <article
+            className="card item nuevo-item"
+            role="button"
+            tabIndex={0}
+            aria-label="Agregar inmueble"
+            title="Agregar inmueble"
+            onClick={nuevo}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nuevo(); } }}
+          >
+            <span className="nuevo-mas" aria-hidden="true">+</span>
+          </article>
+        )}
         {items.map((i) => <Tarjeta key={i._id} i={i} abrir={() => abrir(i._id)} />)}
       </div>
     </div>

@@ -18,6 +18,14 @@ export default function PropertyCard({ property, whatsappUrl }) {
 
   const isArriendo = property.operacion === 'arriendo';
 
+  const abrirEnPlataforma = () => {
+    window.dispatchEvent(
+      new CustomEvent('habitat-abrir-inmueble', {
+        detail: property,
+      })
+    );
+  };
+
   return (
     <div className="hc-prop-card">
       <div className="hc-prop-header">
@@ -71,15 +79,26 @@ export default function PropertyCard({ property, whatsappUrl }) {
           </div>
         )}
 
-        <a
-          href={waTarget}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hc-prop-btn-wa"
-        >
-          <IcoChatWhatsApp size={15} />
-          <span>Preguntar por WhatsApp</span>
-        </a>
+        <div className="hc-prop-actions">
+          <button
+            type="button"
+            className="hc-prop-btn-view"
+            onClick={abrirEnPlataforma}
+            title="Abrir detalles de la propiedad en la plataforma"
+          >
+            🏠 Ver en la plataforma
+          </button>
+
+          <a
+            href={waTarget}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hc-prop-btn-wa"
+          >
+            <IcoChatWhatsApp size={15} />
+            <span>Preguntar por WhatsApp</span>
+          </a>
+        </div>
       </div>
     </div>
   );

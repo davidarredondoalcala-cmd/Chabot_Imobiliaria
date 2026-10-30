@@ -9,10 +9,11 @@ export function formatCOP(value: number): string {
   }).format(value);
 }
 
-const SYSTEM_PROMPT_TEXT = `Eres el asistente virtual oficial de Habitat Capital en Ibagué, Tolima, Colombia.
-Tu misión es ayudar a los clientes a encontrar la propiedad ideal (única y exclusivamente casas y apartamentos residenciales en arriendo o en venta) o conectarlos con un asesor inmobiliario humano.
-Habla en español colombiano auténtico, cálido, profesional, empático y claro ("con gusto", "claro que sí").
-Respuestas breves y al grano: máximo ~120 palabras.
+const SYSTEM_PROMPT_TEXT = `Eres Valentina, asesora inmobiliaria personal de Habitat Capital en Ibagué, Tolima, Colombia.
+Tu tono es humano, cálido, conversacional y empático, como si hablaras directamente con una persona querida que busca su próximo hogar.
+Usa expresiones colombianas amables y respetuosas ("¡con muchísimo gusto!", "qué buena elección", "un sector maravilloso y muy tranquilo", "con gusto te cuento").
+Sé proactiva y cercana. Conoce bien la ciudad de Ibagué (sectores como La Pola, Piedra Pintada, El Vergel, Calambeo, Interlaken, Cádiz).
+Respuestas directas, ordenadas y amables (máximo ~130 palabras).
 SOLO debes recomendar inmuebles que estén explícitamente en el catálogo.
 NUNCA inventes códigos de inmuebles ni precios.`;
 
@@ -31,7 +32,7 @@ export function generateDeterministicSearchReply(
     const sector = (criterios?.barrios && criterios.barrios.length > 0)
       ? ` en ${criterios.barrios.join(', ')}`
       : ' en Ibagué';
-    return `En este momento no encontré propiedades con esos criterios específicos${sector} en nuestro catálogo. ¿Te gustaría ajustar el presupuesto o buscar en otra zona?`;
+    return `Revisé con detalle nuestro inventario y en este momento no encontré propiedades disponibles con esas características exactas${sector}. 🏡\n\n¿Te gustaría que miremos en un sector cercano o con un rango de presupuesto un poco más amplio? ¡Con gusto te busco más alternativas!`;
   }
 
   const lines: string[] = [];
@@ -45,8 +46,8 @@ export function generateDeterministicSearchReply(
     ? 'casas'
     : criterios?.tipo === 'apartamento'
       ? 'apartamentos'
-      : 'opciones';
-  lines.push(`Encontré estas excelentes opciones de ${tipoInm} disponibles para ti${sector}:`);
+      : 'propiedades';
+  lines.push(`¡Qué alegría! Encontré estas excelentes opciones de ${tipoInm} que te van a encantar${sector}:`);
 
   items.slice(0, 3).forEach((item, idx) => {
     const p = item.inmueble;
@@ -59,7 +60,7 @@ export function generateDeterministicSearchReply(
     );
   });
 
-  lines.push('¿Deseas conocer más detalles de alguna de estas opciones o agendar una visita?');
+  lines.push('💡 Puedes hacer clic en el botón **"🏠 Ver en la plataforma"** de cualquier tarjeta para ver su ficha completa, o si prefieres, podemos coordinar una visita presencial por WhatsApp. ¿Cuál te llama más la atención?');
   return lines.join('\n\n');
 }
 
@@ -69,20 +70,20 @@ export function generateDeterministicSearchReply(
 export function generateDeterministicDetailReply(p: Property): string {
   const amenidadesStr = p.amenidades && p.amenidades.length > 0
     ? p.amenidades.join(', ')
-    : 'No especificadas';
+    : 'Servicios completos y excelente iluminación';
 
-  return `Aquí tienes el detalle completo de **${p.titulo}** (${p.codigo}):
+  return `¡Con todo el gusto! Aquí tienes todos los detalles de **${p.titulo}** (${p.codigo}):
 
-• **Ubicación:** Barrio ${p.barrio}, Ibagué (${p.direccion_aproximada || 'sector residencial'})
-• **Operación:** ${p.operacion.toUpperCase()}
-• **Precio:** ${formatCOP(p.precio)}
+• **Ubicación:** Barrio ${p.barrio}, Ibagué (${p.direccion_aproximada || 'sector residencial muy tranquilo'})
+• **Modalidad:** ${p.operacion.toUpperCase()}
+• **Valor:** ${formatCOP(p.precio)}
 • **Área:** ${p.area_m2} m² (Estrato ${p.estrato})
-• **Distribución:** ${p.habitaciones} habitaciones, ${p.banos} baños, ${p.parqueaderos} parqueaderos
-• **Amenidades:** ${amenidadesStr}
+• **Comodidades:** ${p.habitaciones} habitaciones, ${p.banos} baños, ${p.parqueaderos} parqueaderos
+• **Características:** ${amenidadesStr}
 
 ${p.descripcion}
 
-¿Te gustaría coordinar una visita presencial o hablar directamente con nuestro asesor?`;
+¿Te gustaría que coordinemos una visita presencial para conocerla o deseas verla en la plataforma?`;
 }
 
 /**

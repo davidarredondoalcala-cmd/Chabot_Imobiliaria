@@ -48,9 +48,8 @@ export class AuthService {
       throw new ErrorFirma(403, 'El correo de Google no está verificado');
     }
 
-    if (!esAdmin(email)) {
-      throw new ErrorFirma(403, 'Este correo no está autorizado como administrador');
-    }
+    const admin = esAdmin(email);
+    const rol = admin ? 'admin' : 'usuario';
 
     const usuario = await this.usuarios.findOneAndUpdate(
       { email },
@@ -58,8 +57,9 @@ export class AuthService {
         $set: {
           googleId: String(payload.sub || ''),
           email,
-          nombre: String(payload.name || ''),
+          nombre: String(payload.name || email.split('@')[0]),
           foto: String(payload.picture || ''),
+          rol,
           ultimoAcceso: new Date(),
         },
       },
@@ -98,6 +98,14 @@ export class AuthService {
   }
 
   private publico(u: any) {
-    return { email: u.email, nombre: u.nombre || '', foto: u.foto || '', admin: true };
+    const admin = esAdmin(u.email);
+    return {
+      id: String(u._id || ''),
+      email: u.email,
+      nombre: u.nombre || u.email?.split('@')[0] || '',
+      foto: u.foto || '',
+      admin,
+      rol: admin ? 'admin' : 'usuario',
+    };
   }
 }

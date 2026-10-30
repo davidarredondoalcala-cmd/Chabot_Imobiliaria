@@ -28,9 +28,39 @@ export async function processUserMessage(
   const understanding = await understandUserMessage(userMessage);
   meta.understanding = understanding;
 
+  // Agradecimiento o cortesía
+  const isThankYou = /^\s*(gracias|muchas gracias|mil gracias|gracias vale|excelente gracias|vale gracias|perfecto gracias|todo claro|ok gracias|listo gracias)[\s\.,!¡?¿]*$/i.test(userMessage.trim());
+  if (isThankYou) {
+    const thankReply = '¡Con el mayor de los gustos! 😊 En Habitat Capital estamos siempre a tu total disposición para ayudarte a encontrar ese espacio soñado en Ibagué. Si deseas conocer otra zona o visitar cualquier inmueble, aquí estaré atenta. ¡Que tengas un día maravilloso!';
+    await recordMessage(conversationId, 'user', userMessage);
+    await recordMessage(conversationId, 'assistant', thankReply, meta);
+    return {
+      conversationId,
+      reply: thankReply,
+      properties: [],
+      needsHuman: false,
+      metadata: meta,
+    };
+  }
+
+  // Preguntas sobre el asistente o cómo está
+  const isSmallTalk = /^\s*(c[oó]mo est[aá]s|c[oó]mo te va|qu[eé] tal|quiubo|c[oó]mo andas|qui[eé]n eres)[\s\.,!¡?¿]*$/i.test(userMessage.trim());
+  if (isSmallTalk) {
+    const talkReply = '¡Hola! Muy bien, gracias a Dios y muy contenta de acompañarte hoy. 😊 Soy Valentina, asesora de Habitat Capital aquí en Ibagué. Cuéntame, ¿estás buscando arrendar o comprar casa o apartamento? ¡Con gusto te oriento!';
+    await recordMessage(conversationId, 'user', userMessage);
+    await recordMessage(conversationId, 'assistant', talkReply, meta);
+    return {
+      conversationId,
+      reply: talkReply,
+      properties: [],
+      needsHuman: false,
+      metadata: meta,
+    };
+  }
+
   // Detección de reinicio o saludo puro
   const isPureGreetingOrReset =
-    /^\s*(hola|buen[oa]s?|buenos d[ií]as|buenas tardes|buenas noches|quiubo|qu[eé] tal|c[oó]mo est[aá]s|reiniciar|inicio|empezar|comenzar)[\s\.,!¡?¿]*$/i.test(userMessage.trim()) ||
+    /^\s*(hola|buen[oa]s?|buenos d[ií]as|buenas tardes|buenas noches|quiubo|qu[eé] tal|reiniciar|inicio|empezar|comenzar)[\s\.,!¡?¿]*$/i.test(userMessage.trim()) ||
     (/^\s*(hola|buenas|reiniciar|inicio)\b/i.test(userMessage.trim()) &&
       !understanding.operacion &&
       !understanding.criterios_duros.tipo &&
@@ -43,8 +73,11 @@ export async function processUserMessage(
     state.ultimo_listado_ids = [];
     await saveConversationState(state);
 
+    const hora = new Date().getUTCHours() - 5; // Hora de Colombia (UTC-5)
+    const saludoHora = (hora >= 5 && hora < 12) ? '¡Buenos días!' : (hora >= 12 && hora < 18) ? '¡Buenas tardes!' : '¡Buenas noches!';
+
     const greetingReply =
-      '¡Hola! Qué gusto saludarte. Soy tu asesor virtual inmobiliario de Habitat Capital en Ibagué. 🏡\n\nPara ayudarte a encontrar la mejor opción en nuestro catálogo, cuéntame:\n\n1. **¿Estás buscando inmueble en arriendo o para comprar?**\n2. **¿Qué tipo de propiedad prefieres** (casa o apartamento)?\n3. **¿Tienes algún presupuesto aproximado o barrio de preferencia** (como El Vergel, Calambeo, Cádiz o Piedra Pintada)?';
+      `${saludoHora} Qué alegría saludarte. Soy **Valentina**, tu asesora inmobiliaria personal de Habitat Capital en Ibagué. 🏡✨\n\nCuéntame un poco sobre lo que buscas para guiarte de la mejor manera:\n\n1. **¿Prefieres en arriendo o para comprar?**\n2. **¿Casa o apartamento?**\n3. **¿Tienes algún barrio favorito** (como El Vergel, La Pola, Calambeo, Cádiz o Piedra Pintada) o presupuesto estimado?`;
 
     await recordMessage(conversationId, 'user', userMessage);
     await recordMessage(conversationId, 'assistant', greetingReply, meta);

@@ -7,6 +7,7 @@ export const UsuarioSchema = new Schema(
     email: { type: String, required: true, unique: true, index: true },
     nombre: String,
     foto: String,
+    rol: { type: String, enum: ['admin', 'usuario'], default: 'usuario' },
     ultimoAcceso: Date,
   },
   { timestamps: true },

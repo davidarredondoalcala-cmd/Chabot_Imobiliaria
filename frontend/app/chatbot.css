@@ -393,6 +393,35 @@
   align-self: center;
 }
 
+.hc-prop-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.hc-prop-btn-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--ac, #0f4c43);
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 6px rgba(15, 76, 67, 0.2);
+}
+
+.hc-prop-btn-view:hover {
+  background: var(--ac2, #176b5e);
+  transform: translateY(-1px);
+}
+
 .hc-prop-btn-wa {
   display: flex;
   align-items: center;
@@ -406,7 +435,7 @@
   font-weight: 600;
   text-decoration: none;
   transition: background 0.15s ease;
-  margin-top: 2px;
+  margin-top: 0;
 }
 
 .hc-prop-btn-wa:hover {

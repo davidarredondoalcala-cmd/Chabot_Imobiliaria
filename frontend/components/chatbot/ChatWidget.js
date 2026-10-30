@@ -55,11 +55,13 @@ export default function ChatWidget() {
   }, []);
 
   const addWelcome = () => {
+    const hora = new Date().getHours();
+    const saludo = hora < 12 ? '¡Buenos días!' : hora < 18 ? '¡Buenas tardes!' : '¡Buenas noches!';
     setMessages([
       {
         id: 'welcome',
         role: 'assistant',
-        content: '¡Hola! Bienvenido a Habitat Capital en Ibagué. 🏡\n\nEstoy aquí para ayudarte a encontrar la casa o apartamento ideal en venta o arriendo. Cuéntame qué estás buscando o elige una sugerencia rápida:',
+        content: `${saludo} Qué alegría saludarte. Soy **Valentina**, asesora de Habitat Capital en Ibagué. 🏡✨\n\nEstoy aquí para acompañarte a encontrar tu próximo hogar o inversión ideal (casas y apartamentos en arriendo o en venta).\n\nCuéntame qué estás buscando o elige una de estas opciones rápidas:`,
       },
     ]);
   };
@@ -148,7 +150,7 @@ export default function ChatWidget() {
           aria-label="Abrir asistente inmobiliario"
         >
           <IcoChatBubble size={24} />
-          <span className="hc-trigger-badge">Asesor IA</span>
+          <span className="hc-trigger-badge">Valentina • Asesora IA</span>
         </button>
       )}
 
@@ -162,7 +164,7 @@ export default function ChatWidget() {
                 <IcoChatBot size={20} />
               </div>
               <div className="hc-bot-info">
-                <h3>Asesor Habitat Capital</h3>
+                <h3>Valentina • Habitat Capital</h3>
                 <span className="hc-bot-status">
                   <span className="hc-status-dot" /> En línea • Ibagué, Tolima
                 </span>
