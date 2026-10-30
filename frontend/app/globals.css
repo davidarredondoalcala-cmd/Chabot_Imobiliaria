@@ -614,6 +614,10 @@ input:focus, textarea:focus, select:focus { outline: 0; border-color: var(--ac);
     .grid { display: block }
     .hoja { box-shadow: none !important; border: 0; padding: 0 !important; max-width: none !important; min-height: 0 }
     .hoja b, .hoja .bl { color: #000 }
+    .modal-contrato-visor-overlay { position: static !important; background: transparent !important; padding: 0 !important; }
+    .modal-contrato-toolbar, .modal-contrato-hint-exterior { display: none !important }
+    .modal-contrato-papel { max-width: none !important; width: 100% !important; margin: 0 !important; }
+    .modal-contrato-papel .hoja { box-shadow: none !important; border: 0 !important; padding: 0 !important; max-width: none !important; }
 }
 
 
@@ -1066,6 +1070,155 @@ label { transition: color .5s }
     cursor: pointer;
 }
 
+/* ---------- Visor inmersivo y natural del contrato (Perspectiva de lectura tipo escritorio) ---------- */
+.modal-contrato-visor-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(8, 16, 14, 0.84);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 18px 20px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer; /* Hace evidente que hacer clic fuera sale de la perspectiva */
+    animation: fade .2s ease both;
+}
+
+.modal-contrato-toolbar {
+    position: sticky;
+    top: 14px;
+    z-index: 30;
+    max-width: 630px;
+    width: 100%;
+    margin: 0 auto 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 18px;
+    background: rgba(18, 30, 27, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.55);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    cursor: default; /* No sale al interactuar con la barra */
+}
+
+.modal-contrato-toolbar-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.modal-contrato-toolbar-ico {
+    display: flex;
+    align-items: center;
+    color: var(--ac);
+    flex-shrink: 0;
+}
+
+.modal-contrato-toolbar-txt {
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.88);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.modal-contrato-toolbar-txt strong {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.modal-contrato-toolbar-btns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn-cerrar-perspectiva {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+.btn-cerrar-perspectiva:hover {
+    background: rgba(239, 68, 68, 0.85) !important;
+    border-color: rgba(239, 68, 68, 1) !important;
+    color: #ffffff !important;
+}
+
+.modal-contrato-escenario {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer; /* Clic en los márgenes exteriores cierra la perspectiva */
+}
+
+.modal-contrato-papel {
+    max-width: 630px;
+    width: 100%;
+    margin: 0 auto;
+    cursor: default; /* Solo el área del papel interactúa normalmente y no se cierra */
+}
+
+.modal-contrato-papel .hoja {
+    max-width: 630px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 42px 48px;
+    background: #ffffff;
+    color: #1a202c;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.85rem;
+    line-height: 1.68;
+    text-align: justify;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 24px 50px -10px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.modal-contrato-hint-exterior {
+    margin-top: 18px;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.65);
+    text-align: center;
+    pointer-events: none;
+    letter-spacing: 0.2px;
+}
+
+@media (max-width: 680px) {
+    .modal-contrato-visor-overlay {
+        padding: 12px 10px 40px;
+    }
+    .modal-contrato-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 12px;
+    }
+    .modal-contrato-toolbar-btns {
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+    .modal-contrato-papel .hoja {
+        padding: 24px 18px;
+        font-size: 0.82rem;
+        line-height: 1.6;
+    }
+}
+
+/* Compatibilidad con modal legacy */
 .modal-contrato-card {
     background: var(--card);
     border: 1px solid var(--bd);
@@ -1119,13 +1272,13 @@ label { transition: color .5s }
 
 .modal-hoja-container {
     cursor: default;
-    max-width: 760px;
+    max-width: 630px;
     margin: 0 auto;
 }
 
 .modal-hoja-container .hoja {
     width: 100%;
-    max-width: 100%;
+    max-width: 630px;
     box-sizing: border-box;
     margin: 0 auto;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);

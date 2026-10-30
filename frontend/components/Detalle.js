@@ -283,49 +283,62 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
         </div>
       )}
 
-      {/* Visor de Contrato: no se corta, scroll completo y se cierra al hacer clic en cualquier lugar exterior */}
+      {/* Visor de Contrato: perspectiva natural tipo documento en escritorio, se sale al hacer clic en cualquier lugar fuera del papel */}
       {esAdmin && contratoVer && (
-        <div className="modal-contrato-backdrop" onClick={() => setContratoVer(null)}>
-          <div className="modal-contrato-card" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-contrato-header">
-              <h3><IcoDocumento /> Contrato de {contratoVer.c.tipo} — {i.nombre}</h3>
-              <div className="modal-contrato-acciones">
-                <button
-                  type="button"
-                  className="s"
-                  onClick={() => descargarContrato(contratoVer.c)}
-                  title="Descargar documento en PDF"
-                >
-                  <IcoDescargar /> Descargar PDF
-                </button>
-                <button
-                  type="button"
-                  className="s"
-                  onClick={() => window.print()}
-                  title="Imprimir contrato"
-                >
-                  <IcoImprimir /> Imprimir
-                </button>
-                <button
-                  type="button"
-                  className="l"
-                  onClick={() => setContratoVer(null)}
-                  title="Cerrar ventana (Esc)"
-                >
-                  <IcoCerrar /> Cerrar
-                </button>
-              </div>
+        <div
+          className="modal-contrato-visor-overlay"
+          onClick={() => setContratoVer(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Visor de contrato de ${contratoVer.c.tipo}`}
+        >
+          {/* Barra superior flotante de acciones */}
+          <div className="modal-contrato-toolbar" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-contrato-toolbar-info">
+              <span className="modal-contrato-toolbar-ico"><IcoDocumento /></span>
+              <span className="modal-contrato-toolbar-txt">
+                Contrato de {contratoVer.c.tipo} — <strong>{i.nombre}</strong>
+              </span>
             </div>
-            <div className="modal-contrato-body" onClick={() => setContratoVer(null)}>
-              <div className="modal-hoja-container" onClick={(e) => e.stopPropagation()}>
-                <Hoja modo={contratoVer.modo} S={contratoVer.S} />
-              </div>
-            </div>
-            <div className="modal-contrato-footer noprint">
-              <span className="mut">Haz clic fuera del documento o presiona Esc para cerrar</span>
-              <button type="button" className="s" onClick={() => setContratoVer(null)}>
-                <IcoCerrar /> Cerrar visor
+            <div className="modal-contrato-toolbar-btns">
+              <button
+                type="button"
+                className="s"
+                onClick={() => descargarContrato(contratoVer.c)}
+                title="Descargar documento en PDF"
+              >
+                <IcoDescargar /> Descargar PDF
               </button>
+              <button
+                type="button"
+                className="s"
+                onClick={() => window.print()}
+                title="Imprimir contrato"
+              >
+                <IcoImprimir /> Imprimir
+              </button>
+              <button
+                type="button"
+                className="l btn-cerrar-perspectiva"
+                onClick={() => setContratoVer(null)}
+                title="Salir de la perspectiva (Esc)"
+              >
+                <IcoCerrar /> Cerrar
+              </button>
+            </div>
+          </div>
+
+          {/* Escenario de lectura: solo el papel detiene el click; cualquier espacio exterior sale de la perspectiva */}
+          <div className="modal-contrato-escenario">
+            <div
+              className="modal-contrato-papel"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Hoja modo={contratoVer.modo} S={contratoVer.S} />
+            </div>
+
+            <div className="modal-contrato-hint-exterior noprint">
+              <span>Haz clic en cualquier área fuera del contrato o presiona Esc para salir de la perspectiva</span>
             </div>
           </div>
         </div>
