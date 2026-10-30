@@ -148,58 +148,90 @@ export default function PaginaFirma() {
         </div>
       )}
 
-      {vista.estado === 'en_firma' && !miTurno && (
-        <div className="card noprint fm-espera">
-          {vista.turno
-            ? <>Ahora le corresponde firmar a: <b>{vista.turno.rol}{vista.turno.nombre ? ` — ${vista.turno.nombre}` : ''}</b>. Recibirá su enlace privado.</>
-            : <>Todas las firmas fueron registradas; el acuerdo está cerrando.</>}
-          <ul className="fm-estados">
-            {vista.firmantes.map((f) => (
-              <li key={f.orden}>
-                <span className={`tag ${f.estado === 'firmada' ? 'Arrendada' : f.estado === 'rechazada' ? 'Vendida' : 'Sin'}`}>{f.estado}</span>
-                {f.rol} {f.nombre ? `— ${f.nombre}` : ''}
-              </li>
+      {/* 1. Vista previa del contrato primero */}
+      <div className="fm-contrato-wrapper">
+        <div
+          className="noprint"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            margin: '12px 0 16px',
+            flexWrap: 'wrap',
+            gap: 10,
+          }}
+        >
+          <span style={{ fontSize: '0.92rem', color: 'var(--mut)', fontWeight: 600 }}>
+            Vista previa del contrato:
+          </span>
+          {miTurno && (
+            <button
+              type="button"
+              className="s"
+              onClick={() => document.getElementById('seccion-firmar')?.scrollIntoView({ behavior: 'smooth' })}
+              style={{ fontSize: '0.84rem', padding: '6px 14px', borderRadius: 8 }}
+            >
+              Ir a opciones de firma ↓
+            </button>
+          )}
+        </div>
+
+        <div className="fm-contrato">
+          <Hoja modo={vista.tipo} S={vista.datos} firmas={firmasEnHoja} />
+        </div>
+      </div>
+
+      {/* 2. Opciones de firma después de la vista previa */}
+      <div id="seccion-firmar" style={{ scrollMarginTop: '24px' }}>
+        {vista.estado === 'en_firma' && !miTurno && (
+          <div className="card noprint fm-espera">
+            {vista.turno
+              ? <>Ahora le corresponde firmar a: <b>{vista.turno.rol}{vista.turno.nombre ? ` — ${vista.turno.nombre}` : ''}</b>. Recibirá su enlace privado.</>
+              : <>Todas las firmas fueron registradas; el acuerdo está cerrando.</>}
+            <ul className="fm-estados">
+              {vista.firmantes.map((f) => (
+                <li key={f.orden}>
+                  <span className={`tag ${f.estado === 'firmada' ? 'Arrendada' : f.estado === 'rechazada' ? 'Vendida' : 'Sin'}`}>{f.estado}</span>
+                  {f.rol} {f.nombre ? `— ${f.nombre}` : ''}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {miTurno && (
+          <FirmaFlujo vista={vista} token={token} avisar={avisar} firmado={firmado} />
+        )}
+
+        {vista.miEstado === 'firmada' && vista.estado === 'en_firma' && (
+          <div className="card noprint" style={{ borderLeft: '4px solid var(--ac)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <span className="tag Arrendada"><IcoCheck /> Firma registrada</span>
+              <b>Has firmado satisfactoriamente</b>
+            </div>
+            <p className="mut" style={{ margin: '0 0 12px' }}>
+              Tu firma quedó registrada con evidencia técnica y hash criptográfico SHA-256. Puedes descargar tu copia del contrato en cualquier momento.
+            </p>
+            <div className="row" style={{ margin: 0 }}>
+              <button type="button" className="s" onClick={descargarCopiaBorrador} disabled={descargandoBorrador}>
+                <IcoDescargar /> Descargar copia de mi contrato
+              </button>
+              <button type="button" onClick={() => window.print()}>
+                <IcoImprimir /> Imprimir contrato
+              </button>
+            </div>
+          </div>
+        )}
+
+        {vista.estado === 'rechazado' && (
+          <div className="card noprint fm-rechazado">
+            <b>Acuerdo rechazado</b>
+            {vista.firmantes.filter((f) => f.rechazo).map((f) => (
+              <p key={f.rol} className="mut">Observaciones de {f.rol}: “{f.rechazo.observaciones}”</p>
             ))}
-          </ul>
-        </div>
-      )}
-
-      {miTurno && (
-        <FirmaFlujo vista={vista} token={token} avisar={avisar} firmado={firmado} />
-      )}
-
-      {vista.miEstado === 'firmada' && vista.estado === 'en_firma' && (
-        <div className="card noprint" style={{ borderLeft: '4px solid var(--ac)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-            <span className="tag Arrendada"><IcoCheck /> Firma registrada</span>
-            <b>Has firmado satisfactoriamente</b>
+            <p className="mut">Las firmas ya registradas se conservan como evidencia. Puedes descargar el PDF del estado final.</p>
           </div>
-          <p className="mut" style={{ margin: '0 0 12px' }}>
-            Tu firma quedó registrada con evidencia técnica y hash criptográfico SHA-256. Puedes descargar tu copia del contrato en cualquier momento.
-          </p>
-          <div className="row" style={{ margin: 0 }}>
-            <button type="button" className="s" onClick={descargarCopiaBorrador} disabled={descargandoBorrador}>
-              <IcoDescargar /> Descargar copia de mi contrato
-            </button>
-            <button type="button" onClick={() => window.print()}>
-              <IcoImprimir /> Imprimir contrato
-            </button>
-          </div>
-        </div>
-      )}
-
-      {vista.estado === 'rechazado' && (
-        <div className="card noprint fm-rechazado">
-          <b>Acuerdo rechazado</b>
-          {vista.firmantes.filter((f) => f.rechazo).map((f) => (
-            <p key={f.rol} className="mut">Observaciones de {f.rol}: “{f.rechazo.observaciones}”</p>
-          ))}
-          <p className="mut">Las firmas ya registradas se conservan como evidencia. Puedes descargar el PDF del estado final.</p>
-        </div>
-      )}
-
-      <div className="fm-contrato">
-        <Hoja modo={vista.tipo} S={vista.datos} firmas={firmasEnHoja} />
+        )}
       </div>
 
       <EvidenciaTabla firmantes={vista.firmantes} contratoHash={vista.contratoHash} />
