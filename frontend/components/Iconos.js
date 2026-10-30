@@ -11,12 +11,12 @@ export const IcoSol = () => (<svg {...base}><circle cx="12" cy="12" r="4" /><pat
 export const IcoLuna = () => (<svg {...base}><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>);
 
 // Isotipo: casas modernas con techos a dos aguas enmarcadas en un cuadrado.
-// Azul marino sobre blanco hueso (identidad "Habitat Capital").
+// Tono arena / bronce sobre blanco cálido (identidad "Habitat Capital").
 export const Logo = () => (
   <svg width="36" height="36" viewBox="0 0 36 36" role="img" aria-label="Habitat Capital">
-    <rect width="36" height="36" rx="9" fill="#faf8f3" />
-    <rect x="1.4" y="1.4" width="33.2" height="33.2" rx="7.8" fill="none" stroke="#13294b" strokeWidth="1.4" opacity="0.18" />
-    <g fill="none" stroke="#13294b" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="36" height="36" rx="9" fill="#faf5ee" />
+    <rect x="1.4" y="1.4" width="33.2" height="33.2" rx="7.8" fill="none" stroke="currentColor" strokeWidth="1.4" opacity="0.22" />
+    <g fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       {/* casa principal */}
       <path d="M7.5 16.6 13.8 11l6.3 5.6V26h-12.6z" />
       <path d="M11.6 26v-5.2h4.4V26" />

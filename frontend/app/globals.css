@@ -1,48 +1,50 @@
 /* ===== Habitat Capital — sistema visual =====
-   Verde pino como color de marca, ámbar para acciones destacadas.
+   Paleta Arena y Tierra cálida con acentos ámbar y terracota.
    Tipografías: Bricolage Grotesque (títulos) y Figtree (texto), cargadas en layout.js */
 :root {
     box-sizing: border-box;
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    --bg: #eff3f1;
+    --bg: #f8f5f0;
     --card: #ffffff;
-    --tx: #14201d;
-    --mut: #5b6b66;
-    --bd: #dbe3e0;
-    --ac: #0f4c43;
-    --ac2: #176b5e;
+    --tx: #241c15;
+    --mut: #6e6358;
+    --bd: #e6decb;
+    --ac: #a86e2e;
+    --ac2: #c48c46;
     --onac: #ffffff;
-    --amb: #e7a41f;
-    --red: #c92a2a;
-    --st-sin-bg: #e2e9f3;     --st-sin-tx: #2f4468;
-    --st-arr-bg: #d3eedd;     --st-arr-tx: #0b5a33;
-    --st-ven-bg: #fbe6bb;     --st-ven-tx: #6b4200;
-    --st-vdd-bg: #e8def5;     --st-vdd-tx: #4a2a7a;
-    --sh: 0 1px 2px rgba(15, 40, 35, .06), 0 6px 20px rgba(15, 40, 35, .06);
-    --sh2: 0 2px 4px rgba(15, 40, 35, .08), 0 16px 36px rgba(15, 40, 35, .14);
-    --ring: rgba(15, 76, 67, .22);
+    --amb: #df8f2d;
+    --red: #c84b31;
+    --st-sin-bg: #ede5d5;     --st-sin-tx: #5a462d;
+    --st-arr-bg: #d7ecdc;     --st-arr-tx: #14592e;
+    --st-ven-bg: #fcebd2;     --st-ven-tx: #7d440d;
+    --st-vdd-bg: #eedfcf;     --st-vdd-tx: #673719;
+    --st-pv-bg: #fae0d7;      --st-pv-tx: #9e2a14;
+    --sh: 0 1px 2px rgba(45, 30, 15, .06), 0 6px 20px rgba(45, 30, 15, .06);
+    --sh2: 0 2px 4px rgba(45, 30, 15, .08), 0 16px 36px rgba(45, 30, 15, .12);
+    --ring: rgba(168, 110, 46, .24);
 }
 
 @media (prefers-color-scheme:dark) {
     :root:not([data-theme="light"]) {
         color-scheme: dark;
-        --bg: #0c1412;
-        --card: #131f1c;
-        --tx: #e8f0ed;
-        --mut: #92a59f;
-        --bd: #25352f;
-        --ac: #4fc3ad;
-        --ac2: #6fd6c2;
-        --onac: #06201b;
-        --red: #ff8787;
-        --st-sin-bg: #22324d;  --st-sin-tx: #c3d3f0;
-        --st-arr-bg: #17402c;  --st-arr-tx: #b6ecc9;
-        --st-ven-bg: #4d3a10;  --st-ven-tx: #fbe0a2;
-        --st-vdd-bg: #3a2b57;  --st-vdd-tx: #dccdf5;
+        --bg: #171310;
+        --card: #221c17;
+        --tx: #f5ede2;
+        --mut: #a89c8e;
+        --bd: #383028;
+        --ac: #d8a462;
+        --ac2: #e8ba7d;
+        --onac: #1c140d;
+        --red: #ff917d;
+        --st-sin-bg: #32281c;  --st-sin-tx: #e8dccb;
+        --st-arr-bg: #1c3826;  --st-arr-tx: #b8eec8;
+        --st-ven-bg: #3f2913;  --st-ven-tx: #f8dab4;
+        --st-vdd-bg: #382418;  --st-vdd-tx: #f3d4c3;
+        --st-pv-bg: #431f18;   --st-pv-tx: #ffc4b8;
         --sh: 0 1px 2px rgba(0, 0, 0, .4), 0 6px 20px rgba(0, 0, 0, .3);
         --sh2: 0 2px 4px rgba(0, 0, 0, .5), 0 16px 36px rgba(0, 0, 0, .45);
-        --ring: rgba(79, 195, 173, .3);
+        --ring: rgba(216, 164, 98, .3);
     }
 }
 
@@ -466,13 +468,13 @@ input:focus, textarea:focus, select:focus { outline: 0; border-color: var(--ac);
 /* ---------- Pantalla de inicio de sesión ---------- */
 .login-main { position: relative; min-height: 100vh; max-width: none; margin: 0; padding: 8vh 24px 72px; display: flex; justify-content: center; align-items: center }
 
-/* Fondo corporativo sutil: navy + gris oscuro con sombras arquitectónicas y reflejos de cristal (16:9, minimalista) */
+/* Fondo corporativo sutil: arena y piedra cálida con sombras arquitectónicas y reflejos (16:9, minimalista) */
 .login-fondo {
     position: fixed; inset: 0; z-index: -1; overflow: hidden;
     background:
-        radial-gradient(120% 90% at 15% 8%, rgba(46, 68, 110, .55), transparent 55%),
-        radial-gradient(100% 80% at 88% 92%, rgba(30, 44, 74, .5), transparent 60%),
-        linear-gradient(135deg, #0b1f3a 0%, #101826 52%, #1c2330 100%);
+        radial-gradient(120% 90% at 15% 8%, rgba(160, 110, 50, .45), transparent 55%),
+        radial-gradient(100% 80% at 88% 92%, rgba(120, 75, 30, .4), transparent 60%),
+        linear-gradient(135deg, #241a12 0%, #17110c 52%, #221810 100%);
 }
 /* Sombras geométricas arquitectónicas */
 .login-fondo::before {
@@ -578,35 +580,32 @@ input:focus, textarea:focus, select:focus { outline: 0; border-color: var(--ac);
 
 
 /* =====================================================================
-   REDISEÑO — paleta azul real + cian + ámbar, y movimiento "respirado"
-   Va al final a propósito: sobrescribe reglas anteriores sin cambiar sus
-   nombres de clase. Todo el movimiento se apaga con prefers-reduced-motion
-   (regla general más arriba), así que es seguro para quien lo necesite.
+   REDISEÑO — paleta Arena cálida + bronce dorado + ámbar terroso
    ===================================================================== */
 
 /* ---------- Paleta ---------- */
 :root {
-    --bg: #edf2fc;
+    --bg: #f8f5f0;
     --card: #ffffff;
-    --tx: #0e1a3d;
-    --mut: #56668d;
-    --bd: #d6def0;
-    --ac: #1d4ed8;
-    --ac2: #2f6dff;
+    --tx: #241c15;
+    --mut: #6e6358;
+    --bd: #e6decb;
+    --ac: #a86e2e;
+    --ac2: #c48c46;
     --onac: #ffffff;
-    --amb: #f5a524;
-    --red: #d92d4a;
-    --st-sin-bg: #e2e8f7;  --st-sin-tx: #293e7a;
-    --st-arr-bg: #cff3e3;  --st-arr-tx: #0a6945;
-    --st-ven-bg: #fde6bd;  --st-ven-tx: #7a4500;
-    --st-vdd-bg: #e9defb;  --st-vdd-tx: #54299c;
-    --st-pv-bg: #ffdccf;   --st-pv-tx: #a02f0b;
-    --sh: 0 1px 2px rgba(18, 38, 105, .07), 0 8px 24px rgba(18, 38, 105, .08);
-    --sh2: 0 2px 4px rgba(18, 38, 105, .10), 0 18px 40px rgba(18, 38, 105, .16);
-    --ring: rgba(37, 99, 235, .26);
-    --grad: linear-gradient(135deg, #1a3cb8 0%, #2563eb 55%, #17a6df 100%);
-    --grad-amb: linear-gradient(135deg, #ffbc3b 0%, #f08a0c 100%);
-    --glow: rgba(37, 99, 235, .45);
+    --amb: #df8f2d;
+    --red: #c84b31;
+    --st-sin-bg: #ede5d5;  --st-sin-tx: #5a462d;
+    --st-arr-bg: #d7ecdc;  --st-arr-tx: #14592e;
+    --st-ven-bg: #fcebd2;  --st-ven-tx: #7d440d;
+    --st-vdd-bg: #eedfcf;  --st-vdd-tx: #673719;
+    --st-pv-bg: #fae0d7;   --st-pv-tx: #9e2a14;
+    --sh: 0 1px 2px rgba(45, 30, 15, .06), 0 8px 24px rgba(45, 30, 15, .07);
+    --sh2: 0 2px 4px rgba(45, 30, 15, .08), 0 18px 40px rgba(45, 30, 15, .12);
+    --ring: rgba(168, 110, 46, .26);
+    --grad: linear-gradient(135deg, #996226 0%, #b87d3a 52%, #d89f55 100%);
+    --grad-amb: linear-gradient(135deg, #f0b452 0%, #d47e1e 100%);
+    --glow: rgba(184, 125, 59, .38);
     --suave: cubic-bezier(.37, 0, .63, 1);     /* ritmo de respiración: entra y sale despacio */
     --ease: cubic-bezier(.22, .61, .36, 1);
     --rebote: cubic-bezier(.34, 1.25, .5, 1);
@@ -614,36 +613,36 @@ input:focus, textarea:focus, select:focus { outline: 0; border-color: var(--ac);
 }
 @media (prefers-color-scheme:dark) {
     :root:not([data-theme="light"]) {
-        --bg: #0a1022; --card: #121a34; --tx: #e8edfb; --mut: #94a1c6; --bd: #243055;
-        --ac: #6ea2ff; --ac2: #8fb9ff; --onac: #07122e; --red: #ff8a9b;
-        --st-sin-bg: #1f2d54; --st-sin-tx: #c5d3f5;
-        --st-arr-bg: #123d2d; --st-arr-tx: #b4f0d4;
-        --st-ven-bg: #4d3a10; --st-ven-tx: #fbe0a2;
-        --st-vdd-bg: #33295a; --st-vdd-tx: #d9cdf8;
-        --st-pv-bg: #4d2418;  --st-pv-tx: #ffc9b5;
+        --bg: #171310; --card: #221c17; --tx: #f5ede2; --mut: #a89c8e; --bd: #383028;
+        --ac: #d8a462; --ac2: #e8ba7d; --onac: #1c140d; --red: #ff917d;
+        --st-sin-bg: #32281c; --st-sin-tx: #e8dccb;
+        --st-arr-bg: #1c3826; --st-arr-tx: #b8eec8;
+        --st-ven-bg: #3f2913; --st-ven-tx: #f8dab4;
+        --st-vdd-bg: #382418; --st-vdd-tx: #f3d4c3;
+        --st-pv-bg: #431f18;  --st-pv-tx: #ffc4b8;
         --sh: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .32);
         --sh2: 0 2px 4px rgba(0, 0, 0, .5), 0 18px 40px rgba(0, 0, 0, .5);
-        --ring: rgba(110, 162, 255, .32);
-        --grad: linear-gradient(135deg, #3b74f0 0%, #5b9bff 55%, #4fd0f0 100%);
-        --glow: rgba(110, 162, 255, .45);
+        --ring: rgba(216, 164, 98, .32);
+        --grad: linear-gradient(135deg, #c08740 0%, #dca45b 55%, #f0c37f 100%);
+        --glow: rgba(216, 164, 98, .42);
     }
 }
 /* El botón de tema pone data-theme="dark" aunque el sistema esté en claro:
    este bloque hace que ese modo oscuro funcione siempre. */
 :root[data-theme="dark"] {
     color-scheme: dark;
-    --bg: #0a1022; --card: #121a34; --tx: #e8edfb; --mut: #94a1c6; --bd: #243055;
-    --ac: #6ea2ff; --ac2: #8fb9ff; --onac: #07122e; --red: #ff8a9b;
-    --st-sin-bg: #1f2d54; --st-sin-tx: #c5d3f5;
-    --st-arr-bg: #123d2d; --st-arr-tx: #b4f0d4;
-    --st-ven-bg: #4d3a10; --st-ven-tx: #fbe0a2;
-    --st-vdd-bg: #33295a; --st-vdd-tx: #d9cdf8;
-    --st-pv-bg: #4d2418;  --st-pv-tx: #ffc9b5;
+    --bg: #171310; --card: #221c17; --tx: #f5ede2; --mut: #a89c8e; --bd: #383028;
+    --ac: #d8a462; --ac2: #e8ba7d; --onac: #1c140d; --red: #ff917d;
+    --st-sin-bg: #32281c; --st-sin-tx: #e8dccb;
+    --st-arr-bg: #1c3826; --st-arr-tx: #b8eec8;
+    --st-ven-bg: #3f2913; --st-ven-tx: #f8dab4;
+    --st-vdd-bg: #382418; --st-vdd-tx: #f3d4c3;
+    --st-pv-bg: #431f18;  --st-pv-tx: #ffc4b8;
     --sh: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .32);
     --sh2: 0 2px 4px rgba(0, 0, 0, .5), 0 18px 40px rgba(0, 0, 0, .5);
-    --ring: rgba(110, 162, 255, .32);
-    --grad: linear-gradient(135deg, #3b74f0 0%, #5b9bff 55%, #4fd0f0 100%);
-    --glow: rgba(110, 162, 255, .45);
+    --ring: rgba(216, 164, 98, .32);
+    --grad: linear-gradient(135deg, #c08740 0%, #dca45b 55%, #f0c37f 100%);
+    --glow: rgba(216, 164, 98, .42);
 }
 
 html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 100px) }
@@ -687,7 +686,7 @@ header {
     -webkit-backdrop-filter: saturate(1.5) blur(14px);
     backdrop-filter: saturate(1.5) blur(14px);
     border-bottom: 1px solid color-mix(in srgb, var(--bd) 80%, transparent);
-    box-shadow: 0 12px 30px -22px rgba(18, 38, 105, .5)
+    box-shadow: 0 12px 30px -22px rgba(50, 35, 20, .3)
 }
 header .marca {
     display: inline-flex;
@@ -715,6 +714,7 @@ header .header-der {
 }
 header .marca svg {
     width: 46px; height: 46px; border-radius: 12px;
+    color: var(--ac);
     box-shadow: 0 6px 16px -6px var(--glow);
     transition: transform .8s var(--suave), box-shadow .6s var(--suave)
 }
@@ -809,37 +809,37 @@ button.tema-btn:hover:not(:disabled) { transform: rotate(-14deg) scale(1.08) }
 .nom { transition: color .6s var(--suave) }
 .item:hover .nom { color: var(--ac) }
 
-/* Fotos y fondos de las tarjetas con la nueva paleta */
-.thumb, .foto-picker { background: linear-gradient(180deg, #123c9c, #2f78e6) }
-.thumb.Apartamento, .foto-picker.Apartamento { background: linear-gradient(180deg, #2b2a8c, #6a63e6) }
+/* Fotos y fondos de las tarjetas con la paleta arena cálida */
+.thumb, .foto-picker { background: linear-gradient(180deg, #6c4b26, #b07d42) }
+.thumb.Apartamento, .foto-picker.Apartamento { background: linear-gradient(180deg, #443224, #87623c) }
 
-/* ---------- Portada con movimiento lento ---------- */
+/* ---------- Portada con tonos duna y arena cálida ---------- */
 .portada {
     border-radius: 28px;
     padding: 46px 46px 40px;
-    background: linear-gradient(125deg, #0b1747 0%, #12308f 36%, #1f5bdc 70%, #0f2f86 100%);
+    background: linear-gradient(125deg, #2a1c10 0%, #523720 36%, #825429 70%, #3e2614 100%);
     background-size: 220% 220%;
     animation: aurora 34s ease-in-out infinite, subir 1s var(--ease) both;
-    box-shadow: 0 30px 60px -32px rgba(11, 23, 71, .85)
+    box-shadow: 0 30px 60px -32px rgba(42, 28, 16, .85)
 }
 .portada::before {
     content: ""; position: absolute; right: -70px; top: -130px; width: 380px; height: 380px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(245, 165, 36, .45), transparent 66%);
+    background: radial-gradient(circle, rgba(223, 168, 95, .45), transparent 66%);
     animation: flotar 22s ease-in-out infinite; pointer-events: none
 }
 .portada::after {
     content: ""; position: absolute; left: -90px; bottom: -150px; width: 360px; height: 360px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(34, 190, 240, .4), transparent 66%);
+    background: radial-gradient(circle, rgba(245, 185, 90, .35), transparent 66%);
     animation: flotar 26s ease-in-out infinite reverse; pointer-events: none
 }
-.skyline { color: #c4dbff; animation: flotar 28s ease-in-out infinite reverse }
+.skyline { color: #e8d0af; animation: flotar 28s ease-in-out infinite reverse }
 .portada h2 { animation: subir 1s var(--ease) .15s backwards }
 .portada > p { animation: subir 1s var(--ease) .3s backwards }
 .stats > div { animation: subir 1s var(--ease) backwards; transition: transform .8s var(--suave) }
 .stats > div:nth-child(1) { animation-delay: .45s } .stats > div:nth-child(2) { animation-delay: .6s }
 .stats > div:nth-child(3) { animation-delay: .75s } .stats > div:nth-child(4) { animation-delay: .9s }
 .stats > div:hover { transform: translateY(-4px) scale(1.06) }
-.stats dd { background: linear-gradient(180deg, #fff, #cfe4ff); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent }
+.stats dd { background: linear-gradient(180deg, #ffffff, #faecd6); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent }
 @media(max-width:700px) { .portada { padding: 30px 22px 26px } }
 
 /* ---------- Pestañas, datos, contratos ---------- */

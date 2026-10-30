@@ -27,7 +27,7 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
     <div className="view">
       <section className="portada noprint">
         <Skyline />
-        <h2>Tu portafolio inmobiliario, siempre al día</h2>
+        <h2>Habitat Capital, siempre al día</h2>
         <p>Consulta el estado de cada casa y apartamento, controla los vencimientos y genera contratos listos para firmar.</p>
         <dl className="stats">
           {stats.map(([t, v]) => (<div key={t}><dd>{v}</dd><dt>{t}</dt></div>))}

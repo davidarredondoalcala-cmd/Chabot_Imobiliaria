@@ -63,7 +63,7 @@
 
 /* Encabezado */
 .hc-chat-header {
-  background: linear-gradient(135deg, #0a332d 0%, var(--ac, #0f4c43) 100%);
+  background: linear-gradient(135deg, #2b1d12 0%, var(--ac, #a86e2e) 100%);
   color: #ffffff;
   padding: 14px 16px;
   display: flex;
@@ -86,7 +86,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6fd6c2;
+  color: #f2cb8b;
 }
 
 .hc-bot-info h3 {
@@ -306,7 +306,7 @@
 }
 
 .hc-prop-header {
-  background: linear-gradient(135deg, #0d3832 0%, var(--ac, #0f4c43) 100%);
+  background: linear-gradient(135deg, #2b1d12 0%, var(--ac, #a86e2e) 100%);
   color: #ffffff;
   padding: 10px 12px;
 }
@@ -346,7 +346,7 @@
 .hc-prop-price {
   font-size: 0.95rem;
   font-weight: 800;
-  color: #6fd6c2;
+  color: #f2cb8b;
   margin-top: 2px;
 }
 
