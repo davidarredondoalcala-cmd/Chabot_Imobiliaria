@@ -3,6 +3,29 @@ import React from 'react';
 import PropertyCard from './PropertyCard';
 import { IcoChatBot, IcoChatUser, IcoChatWhatsApp } from './IconosChat';
 
+/**
+ * Parsea el texto del mensaje para renderizar en negrita (**texto**) sin mostrar asteriscos,
+ * garantizando que el nombre del asistente virtual y términos destacados se vean en negrilla limpia.
+ */
+function renderizarContenido(texto) {
+  if (!texto || typeof texto !== 'string') return texto;
+
+  // Divide por delimitadores **texto**
+  const partes = texto.split(/(\*\*.*?\*\*)/g);
+
+  return partes.map((parte, index) => {
+    if (parte.startsWith('**') && parte.endsWith('**') && parte.length >= 4) {
+      const textoNegrita = parte.slice(2, -2);
+      return (
+        <strong key={index} style={{ fontWeight: 700, color: 'inherit' }}>
+          {textoNegrita}
+        </strong>
+      );
+    }
+    return parte;
+  });
+}
+
 export default function ChatMessage({ message }) {
   const isUser = message.role === 'user';
 
@@ -16,7 +39,7 @@ export default function ChatMessage({ message }) {
 
       <div className={`hc-msg-bubble-wrap ${isUser ? 'user' : 'bot'}`}>
         <div className={`hc-msg-bubble ${isUser ? 'user' : 'bot'}`}>
-          {message.content}
+          {renderizarContenido(message.content)}
         </div>
 
         {/* Tarjetas de propiedades */}

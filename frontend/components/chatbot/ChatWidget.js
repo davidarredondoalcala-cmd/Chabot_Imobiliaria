@@ -34,7 +34,7 @@ export default function ChatWidget() {
               data.messages.map((m) => ({
                 id: m.id,
                 role: m.role,
-                content: m.content,
+                content: (m.content || '').replace(/Valentina/gi, 'Jarvis'),
                 properties: m.metadata?.properties,
                 whatsappUrl: m.metadata?.whatsappUrl,
               }))
@@ -61,7 +61,7 @@ export default function ChatWidget() {
       {
         id: 'welcome',
         role: 'assistant',
-        content: `${saludo} Un gusto saludarte. Soy **Valentina**, asesora inmobiliaria de Habitat Capital en Ibagué.\n\nEstoy aquí para orientarte en la búsqueda de tu próximo inmueble (casas y apartamentos en arriendo o en venta).\n\nCuéntame qué estás buscando o selecciona una opción rápida:`,
+        content: `${saludo} Un gusto saludarte. Soy **Jarvis**, asesor inmobiliario de Habitat Capital en Ibagué.\n\nEstoy aquí para orientarte en la búsqueda de tu próximo inmueble (casas y apartamentos en arriendo o en venta).\n\nCuéntame qué estás buscando o selecciona una opción rápida:`,
       },
     ]);
   };
@@ -160,7 +160,9 @@ export default function ChatWidget() {
           aria-label="Abrir asistente inmobiliario"
         >
           <IcoChatBubble size={24} />
-          <span className="hc-trigger-badge">Valentina • Asesora IA</span>
+          <span className="hc-trigger-badge">
+            <strong>Jarvis</strong> • Asesor IA
+          </span>
         </button>
       )}
 
@@ -174,7 +176,9 @@ export default function ChatWidget() {
                 <IcoChatBot size={20} />
               </div>
               <div className="hc-bot-info">
-                <h3>Valentina • Habitat Capital</h3>
+                <h3>
+                  <strong style={{ fontWeight: 800 }}>Jarvis</strong> • Habitat Capital
+                </h3>
                 <span className="hc-bot-status">
                   <span className="hc-status-dot" /> En línea • Ibagué, Tolima
                 </span>
