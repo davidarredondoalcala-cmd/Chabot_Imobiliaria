@@ -29,12 +29,12 @@ export const IcoWhatsApp = () => (<svg {...base}><path d="M21 11.5a8.38 8.38 0 0
 export const IcoSparkle = () => (<svg {...base}><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z" /></svg>);
 
 // Isotipo: casas modernas con techos a dos aguas enmarcadas en un cuadrado.
-// Tono arena / bronce sobre blanco cálido (identidad "Habitat Capital").
+// Tono adaptable automáticamente según el tema activo (claro u oscuro).
 export const Logo = () => (
-  <svg width="36" height="36" viewBox="0 0 36 36" role="img" aria-label="Habitat Capital">
-    <rect width="36" height="36" rx="9" fill="#faf5ee" />
-    <rect x="1.4" y="1.4" width="33.2" height="33.2" rx="7.8" fill="none" stroke="currentColor" strokeWidth="1.4" opacity="0.22" />
-    <g fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+  <svg className="logo-svg" width="36" height="36" viewBox="0 0 36 36" role="img" aria-label="Habitat Capital">
+    <rect className="logo-bg" width="36" height="36" rx="9" fill="var(--logo-bg, #faf5ee)" />
+    <rect className="logo-border" x="1.4" y="1.4" width="33.2" height="33.2" rx="7.8" fill="none" stroke="var(--logo-border, rgba(168, 110, 46, 0.3))" strokeWidth="1.4" />
+    <g className="logo-casas" fill="none" stroke="var(--logo-stroke, #945e1f)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M7.5 16.6 13.8 11l6.3 5.6V26h-12.6z" />
       <path d="M11.6 26v-5.2h4.4V26" />
       <path d="M20.4 17.4 25 13.6l4.6 3.8V26H20.4z" />

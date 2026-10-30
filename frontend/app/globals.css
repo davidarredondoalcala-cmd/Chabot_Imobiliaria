@@ -33,6 +33,12 @@
     --gold-shimmer: linear-gradient(90deg, #996515 0%, #c9933e 22%, #fae69e 48%, #ffd700 52%, #c9933e 78%, #996515 100%);
     --gold-glow: rgba(212, 175, 55, 0.42);
     --gold-border: rgba(212, 175, 55, 0.35);
+
+    /* Logo adaptable modo claro */
+    --logo-bg: #faf5ee;
+    --logo-border: rgba(168, 110, 46, 0.28);
+    --logo-stroke: #9d6520;
+    --logo-glow: rgba(168, 110, 46, 0.22);
 }
 
 @media (prefers-color-scheme:dark) {
@@ -65,6 +71,12 @@
         --gold-shimmer: linear-gradient(90deg, #b87e28 0%, #dca45b 22%, #fae69e 48%, #ffe58f 52%, #dca45b 78%, #b87e28 100%);
         --gold-glow: rgba(240, 195, 127, 0.45);
         --gold-border: rgba(240, 195, 127, 0.38);
+
+        /* Logo adaptable modo oscuro */
+        --logo-bg: #271f18;
+        --logo-border: rgba(240, 195, 127, 0.45);
+        --logo-stroke: #ffd700;
+        --logo-glow: rgba(240, 195, 127, 0.45);
     }
 }
 
@@ -690,6 +702,12 @@ input:focus, textarea:focus, select:focus { outline: 0; border-color: var(--ac);
     --ease: cubic-bezier(.22, .61, .36, 1);
     --rebote: cubic-bezier(.34, 1.25, .5, 1);
     --resp: 4s;                                 /* duración de un "respiro" completo */
+
+    /* Logo adaptable modo claro */
+    --logo-bg: #faf5ee;
+    --logo-border: rgba(168, 110, 46, 0.28);
+    --logo-stroke: #9d6520;
+    --logo-glow: rgba(168, 110, 46, 0.22);
 }
 @media (prefers-color-scheme:dark) {
     :root:not([data-theme="light"]) {
@@ -705,6 +723,12 @@ input:focus, textarea:focus, select:focus { outline: 0; border-color: var(--ac);
         --ring: rgba(216, 164, 98, .32);
         --grad: linear-gradient(135deg, #c08740 0%, #dca45b 55%, #f0c37f 100%);
         --glow: rgba(216, 164, 98, .42);
+
+        /* Logo adaptable modo oscuro */
+        --logo-bg: #271f18;
+        --logo-border: rgba(240, 195, 127, 0.45);
+        --logo-stroke: #ffd700;
+        --logo-glow: rgba(240, 195, 127, 0.45);
     }
 }
 /* El botón de tema pone data-theme="dark" aunque el sistema esté en claro:
@@ -731,6 +755,12 @@ input:focus, textarea:focus, select:focus { outline: 0; border-color: var(--ac);
     --gold-shimmer: linear-gradient(90deg, #b87e28 0%, #dca45b 22%, #fae69e 48%, #ffe58f 52%, #dca45b 78%, #b87e28 100%);
     --gold-glow: rgba(240, 195, 127, 0.45);
     --gold-border: rgba(240, 195, 127, 0.38);
+
+    /* Logo adaptable modo oscuro */
+    --logo-bg: #271f18;
+    --logo-border: rgba(240, 195, 127, 0.45);
+    --logo-stroke: #ffd700;
+    --logo-glow: rgba(240, 195, 127, 0.45);
 }
 
 html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 100px) }
@@ -800,16 +830,27 @@ header .header-der {
     align-items: center;
     gap: 18px;
 }
-header .marca svg {
+header .marca svg, .logo-svg {
     width: 46px; height: 46px; border-radius: 12px;
-    color: var(--gold);
-    box-shadow: 0 6px 16px -6px var(--gold-glow);
+    box-shadow: 0 6px 16px -6px var(--logo-glow);
     transition: transform .8s var(--suave), box-shadow .6s var(--suave), filter .6s var(--suave);
 }
-header .marca:hover svg {
+.logo-bg {
+    fill: var(--logo-bg);
+    transition: fill .4s ease;
+}
+.logo-border {
+    stroke: var(--logo-border);
+    transition: stroke .4s ease;
+}
+.logo-casas {
+    stroke: var(--logo-stroke);
+    transition: stroke .4s ease;
+}
+header .marca:hover svg, header .marca:hover .logo-svg {
     transform: rotate(-8deg) scale(1.1);
-    box-shadow: 0 12px 26px -6px var(--gold-glow);
-    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.55));
+    box-shadow: 0 12px 26px -6px var(--logo-glow);
+    filter: drop-shadow(0 0 10px var(--logo-glow));
 }
 header h1 {
     font-size: clamp(1.5rem, 2.4vw, 2rem);
