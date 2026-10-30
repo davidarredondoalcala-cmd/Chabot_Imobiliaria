@@ -9,6 +9,7 @@ const ADMIN_POR_DEFECTO = [
   'macanabernal@gmail.com',
   'montoyaherreracarlosmario@gmail.com',
   'davidarredondoalcala@gmail.com',
+  'david.arredondo@estudiantesunibague.edu.co',
 ];
 
 export const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || ADMIN_POR_DEFECTO.join(','))
