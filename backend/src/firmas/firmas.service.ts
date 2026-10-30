@@ -74,7 +74,17 @@ export class FirmasService {
       firmantes: conOrden,
     });
 
-    // Envío automático de correos a firmantes y codeudores
+    // Generación del PDF borrador oficial para adjuntarlo al correo automático de Brevo
+    let pdfBuffer: Buffer | undefined;
+    const cleanDir = (snapshot.dir || 'Inmueble').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const pdfNombre = `Contrato_${tipo === 'arriendo' ? 'Arrendamiento' : 'Compraventa'}_${cleanDir}.pdf`;
+    try {
+      pdfBuffer = await generarPdfBorrador(tipo, snapshot);
+    } catch (e: any) {
+      console.warn('No se pudo generar buffer PDF borrador para adjunto:', e.message);
+    }
+
+    // Envío automático de correos con Brevo API a firmantes y codeudores
     const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     for (const f of conOrden) {
       if (f.email && typeof f.email === 'string' && f.email.includes('@')) {
@@ -86,6 +96,8 @@ export class FirmasService {
           urlFirma: `${baseUrl}/firma/${f.token}`,
           inmuebleNombre: snapshot.nombre || snapshot.dir || 'Inmueble Habitat Capital',
           direccion: snapshot.dir ? `${snapshot.dir}${snapshot.bar ? ` · Barrio ${snapshot.bar}` : ''}` : undefined,
+          pdfBuffer,
+          pdfNombre,
         }).catch((err) => console.error(`Error al despachar correo a ${f.email}:`, err));
       }
     }
@@ -248,13 +260,34 @@ export class FirmasService {
       acuerdo.cerradoEn = new Date();
       await acuerdo.save();
       await this.marcarInmueble(acuerdo);
-      // Congela el PDF final en GridFS
+      // Congela el PDF final en GridFS y envía copia firmada oficial por correo con Brevo
       try {
         const buffer = await generarPdf(acuerdo);
         acuerdo.pdfGridId = await guardarEnGridFS(buffer, `acuerdo-${acuerdo._id}.pdf`, this.conn.db);
         await acuerdo.save();
+
+        const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+        const pdfNombre = `Contrato_Firmado_${acuerdo.tipo === 'arriendo' ? 'Arrendamiento' : 'Compraventa'}_${acuerdo._id}.pdf`;
+
+        // Notificar por correo a cada parte con el PDF oficial firmado
+        for (const f of acuerdo.firmantes) {
+          const email = f.datos?.email || f.email;
+          if (email && typeof email === 'string' && email.includes('@')) {
+            this.correo.enviarContratoFinalFirmado({
+              destinatario: email.trim(),
+              nombre: f.datos?.nombre || f.nombre || 'Estimado(a) firmante',
+              rol: f.rol,
+              tipoContrato: acuerdo.tipo,
+              inmuebleNombre: acuerdo.datos?.nombre || acuerdo.datos?.dir || 'Inmueble Habitat Capital',
+              direccion: acuerdo.datos?.dir ? `${acuerdo.datos.dir}${acuerdo.datos.bar ? ` · Barrio ${acuerdo.datos.bar}` : ''}` : undefined,
+              urlVerificacion: `${baseUrl}/firma/${f.token}`,
+              pdfBuffer: buffer,
+              pdfNombre,
+            }).catch((err) => console.error(`Error al enviar contrato final firmado a ${email}:`, err));
+          }
+        }
       } catch (e: any) {
-        console.error('No se pudo archivar el PDF en GridFS:', e.message);
+        console.error('No se pudo archivar el PDF en GridFS o enviar correos finales:', e.message);
       }
     } else {
       await acuerdo.save();
