@@ -44,20 +44,21 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
       </div>
       {items.length === 0 && <div className="card vacio">Ningún inmueble coincide con los filtros. Amplía los rangos o cambia de pestaña.</div>}
       <div className="lista">
+        {items.map((i) => <Tarjeta key={i._id} i={i} abrir={() => abrir(i._id)} />)}
         {esAdmin && (
           <article
             className="card item nuevo-item"
             role="button"
             tabIndex={0}
-            aria-label="Agregar inmueble"
-            title="Agregar inmueble"
+            aria-label={`Agregar ${tab === 'Casa' ? 'casa' : 'apartamento'}`}
+            title={`Agregar ${tab === 'Casa' ? 'casa' : 'apartamento'}`}
             onClick={nuevo}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nuevo(); } }}
           >
             <span className="nuevo-mas" aria-hidden="true">+</span>
+            <span className="nuevo-txt">Agregar {tab === 'Casa' ? 'casa' : 'apartamento'}</span>
           </article>
         )}
-        {items.map((i) => <Tarjeta key={i._id} i={i} abrir={() => abrir(i._id)} />)}
       </div>
     </div>
   );

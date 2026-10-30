@@ -162,7 +162,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 28px 24px 72px }
 }
 
 /* ---------- Lista de inmuebles ---------- */
-.lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px }
+.lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px }
 .lista .card { margin: 0 }
 .item {
     display: flex;
@@ -175,7 +175,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 28px 24px 72px }
 .item:hover:not(.estatica) { transform: translateY(-3px); box-shadow: var(--sh2); border-color: var(--ac) }
 .item:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; border-color: var(--ac) }
 
-.thumb { position: relative; height: 168px; overflow: hidden; background: linear-gradient(180deg, #0e4a41, #1e7667) }
+.thumb { position: relative; height: 145px; overflow: hidden; background: linear-gradient(180deg, #0e4a41, #1e7667) }
 .thumb.Apartamento { background: linear-gradient(180deg, #1b3558, #34628f) }
 .thumb svg { display: block; width: 100%; height: 100% }
 .thumb .foto-thumb { display: block; width: 100%; height: 100%; object-fit: cover }
@@ -238,27 +238,27 @@ main { max-width: 1120px; margin: 0 auto; padding: 28px 24px 72px }
 }
 .foto-quitar:hover { background: var(--red); color: #fff; border: 0 }
 
-.info { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1 }
-.nom { margin: 0 0 2px; font-size: 1.2rem; font-weight: 700 }
-.dir { margin: 0 0 10px; color: var(--mut); font-size: .9rem }
-.meta { margin: 8px 0 0; color: var(--mut); font-size: .85rem }
-.caract { display: flex; gap: 8px 18px; flex-wrap: wrap; margin: 0; font-size: .9rem; font-weight: 500 }
-.caract span { display: inline-flex; align-items: center; gap: 6px }
-.caract svg { color: var(--ac) }
+.info { padding: 14px 16px 16px; display: flex; flex-direction: column; flex: 1 }
+.nom { margin: 0 0 2px; font-size: 1.05rem; font-weight: 700; line-height: 1.25 }
+.dir { margin: 0 0 8px; color: var(--mut); font-size: .84rem }
+.meta { margin: 6px 0 0; color: var(--mut); font-size: .8rem }
+.caract { display: flex; gap: 6px 14px; flex-wrap: wrap; margin: 0; font-size: .84rem; font-weight: 500 }
+.caract span { display: inline-flex; align-items: center; gap: 5px }
+.caract svg { color: var(--ac); width: 15px; height: 15px }
 .precio {
     margin: auto 0 0;
-    padding-top: 14px;
+    padding-top: 10px;
     font-family: var(--f-display), sans-serif;
-    font-size: 1.4rem;
+    font-size: 1.22rem;
     font-weight: 700;
     letter-spacing: -.01em;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap
 }
-.info .caract + .precio, .info .meta + .precio { margin-top: 16px }
-.precio small { margin-left: 2px; font-family: var(--f-body), sans-serif; font-size: .82rem; font-weight: 500; color: var(--mut) }
+.info .caract + .precio, .info .meta + .precio { margin-top: 12px }
+.precio small { margin-left: 2px; font-family: var(--f-body), sans-serif; font-size: .78rem; font-weight: 500; color: var(--mut) }
 .precio .tag.grande { margin-left: auto }
 .info > .precio { border-top: 0 }
 
@@ -278,7 +278,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 28px 24px 72px }
 .tag.Vendida { background: var(--st-vdd-bg); color: var(--st-vdd-tx) }
 .tag.pulse { background: var(--amb); color: #2b1b00; animation: pulse 2.4s infinite }
 /* Etiqueta de estado grande, junto al costo (tarjeta de catálogo y ficha) */
-.tag.grande { font-size: .95rem; padding: 7px 16px; font-weight: 700 }
+.tag.grande { font-size: .82rem; padding: 5px 12px; font-weight: 700 }
 @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(231, 164, 31, .55) }
     70% { box-shadow: 0 0 0 9px rgba(231, 164, 31, 0) }
@@ -557,17 +557,23 @@ input:focus, textarea:focus, select:focus { outline: 0; border-color: var(--ac);
 
 
 .nuevo-item {
-    min-height: 260px; align-items: center; justify-content: center;
-    background: transparent; border: 2px dashed var(--bd); box-shadow: none
+    min-height: 220px; align-items: center; justify-content: center;
+    background: transparent; border: 2px dashed var(--bd); box-shadow: none;
+    gap: 12px; padding: 20px; text-align: center;
 }
 .nuevo-item:hover:not(.estatica) { border-color: var(--ac); background: var(--card) }
 .nuevo-mas {
-    width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; padding-bottom: 6px;
+    width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center; padding-bottom: 4px;
     background: var(--bg); color: var(--ac); border: 2px solid var(--bd);
-    font-size: 3.4rem; font-weight: 300; line-height: 1;
+    font-size: 2.4rem; font-weight: 300; line-height: 1;
     transition: transform .2s ease, background .2s ease, color .2s ease, border-color .2s ease
 }
-.nuevo-item:hover .nuevo-mas, .nuevo-item:focus-visible .nuevo-mas { transform: scale(1.1) rotate(90deg); background: var(--ac); color: var(--onac); border-color: var(--ac) }
+.nuevo-item:hover .nuevo-mas, .nuevo-item:focus-visible .nuevo-mas { transform: scale(1.08) rotate(90deg); background: var(--ac); color: var(--onac); border-color: var(--ac) }
+.nuevo-txt {
+    font-size: .88rem; font-weight: 600; color: var(--mut);
+    transition: color .2s ease;
+}
+.nuevo-item:hover .nuevo-txt { color: var(--ac) }
 
 
 
@@ -785,7 +791,7 @@ button.tema-btn:hover:not(:disabled) { transform: rotate(-14deg) scale(1.08) }
 /* ---------- Tarjetas ---------- */
 .card { border-radius: 20px; margin-bottom: 24px }
 .card:not(.item):not(.ficha) { padding: 28px }   /* las tarjetas de inmueble y la ficha llevan la foto a sangre (padding 0) */
-.lista { gap: 26px }
+.lista { gap: 18px }
 .lista > * { animation: subir .9s var(--ease) backwards }   /* "backwards": no bloquea el hover */
 .lista > :nth-child(1) { animation-delay: .05s }  .lista > :nth-child(2) { animation-delay: .15s }
 .lista > :nth-child(3) { animation-delay: .25s }  .lista > :nth-child(4) { animation-delay: .35s }
@@ -793,7 +799,7 @@ button.tema-btn:hover:not(:disabled) { transform: rotate(-14deg) scale(1.08) }
 .lista > :nth-child(7) { animation-delay: .65s }  .lista > :nth-child(8) { animation-delay: .75s }
 .lista > :nth-child(n+9) { animation-delay: .85s }
 
-.item { border-radius: 22px; transition: transform .7s var(--suave), box-shadow .7s var(--suave), border-color .5s var(--suave) }
+.item { border-radius: 18px; transition: transform .7s var(--suave), box-shadow .7s var(--suave), border-color .5s var(--suave) }
 .item:hover:not(.estatica) { transform: translateY(-8px); box-shadow: 0 24px 46px -18px var(--glow), var(--sh2) }
 .item:active:not(.estatica) { transform: translateY(-3px) scale(.99); transition-duration: .2s }
 .item .thumb > svg, .item .foto-thumb { transition: transform 1.4s var(--ease) }
