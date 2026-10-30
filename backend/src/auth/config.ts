@@ -10,12 +10,17 @@ const ADMIN_POR_DEFECTO = [
   'montoyaherreracarlosmario@gmail.com',
   'davidarredondoalcala@gmail.com',
   'david.arredondo@estudiantesunibague.edu.co',
+  'juan.robayo1@estudiantesunibague.edu.co',
 ];
 
-export const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || ADMIN_POR_DEFECTO.join(','))
+const envAdmins = (process.env.ADMIN_EMAILS || '')
   .split(',')
   .map((e) => normalizar(e))
   .filter(Boolean);
+
+export const ADMIN_EMAILS = Array.from(
+  new Set([...ADMIN_POR_DEFECTO.map(normalizar), ...envAdmins])
+);
 
 // Normaliza un correo para comparar siempre en minúsculas y sin espacios.
 export function normalizar(email: string) {
