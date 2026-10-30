@@ -26,7 +26,7 @@ function renderizarContenido(texto) {
   });
 }
 
-export default function ChatMessage({ message }) {
+export default function ChatMessage({ message, onRetomar, onNueva }) {
   const isUser = message.role === 'user';
 
   return (
@@ -41,6 +41,35 @@ export default function ChatMessage({ message }) {
         <div className={`hc-msg-bubble ${isUser ? 'user' : 'bot'}`}>
           {renderizarContenido(message.content)}
         </div>
+
+        {/* Opciones interactivas para retomar o iniciar nueva conversación */}
+        {message.isResumePrompt && (
+          <div className="hc-resume-card">
+            <div className="hc-resume-card-title">¿Cómo deseas continuar?</div>
+            <button
+              type="button"
+              onClick={onRetomar}
+              className="hc-resume-btn-primary"
+            >
+              <span className="hc-resume-btn-icon">💬</span>
+              <div className="hc-resume-btn-content">
+                <strong>Retomar conversación</strong>
+                <small>Continuar donde quedaste con Jarvis</small>
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={onNueva}
+              className="hc-resume-btn-secondary"
+            >
+              <span className="hc-resume-btn-icon">✨</span>
+              <div className="hc-resume-btn-content">
+                <strong>Empezar una nueva</strong>
+                <small>Iniciar una nueva consulta desde cero</small>
+              </div>
+            </button>
+          </div>
+        )}
 
         {/* Tarjetas de propiedades */}
         {!isUser && message.properties && message.properties.length > 0 && (

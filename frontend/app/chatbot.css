@@ -70,6 +70,17 @@
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--gold-border, rgba(255, 255, 255, 0.15));
+  cursor: pointer;
+  user-select: none;
+  transition: filter 0.18s ease, background 0.18s ease;
+}
+
+.hc-chat-header:hover {
+  filter: brightness(1.12);
+}
+
+.hc-chat-header:active {
+  filter: brightness(0.96);
 }
 
 .hc-header-brand {
@@ -119,6 +130,22 @@
   gap: 6px;
 }
 
+.hc-header-collapse-btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.hc-chat-header:hover .hc-header-collapse-btn {
+  background: rgba(255, 255, 255, 0.28);
+  transform: translateY(1.5px);
+}
+
 .hc-btn-icon-subtle,
 .hc-btn-icon-close {
   background: transparent;
@@ -139,6 +166,95 @@
 .hc-btn-icon-close:hover {
   background: rgba(255, 255, 255, 0.18);
   color: #ffffff;
+}
+
+/* Tarjeta de opciones para Retomar o Empezar nueva conversación */
+.hc-resume-card {
+  background: var(--card, #ffffff);
+  border: 1px solid var(--bd, #dbe3e0);
+  border-left: 4px solid var(--ac, #a86e2e);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hc-resume-card-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--mut, #5b6b66);
+  margin-bottom: 2px;
+}
+
+.hc-resume-btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #a86e2e 0%, #996515 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 8px rgba(153, 101, 21, 0.25);
+  width: 100%;
+}
+
+.hc-resume-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(153, 101, 21, 0.35);
+}
+
+.hc-resume-btn-secondary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg, #eff3f1);
+  color: var(--tx, #14201d);
+  border: 1px solid var(--bd, #dbe3e0);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  width: 100%;
+}
+
+.hc-resume-btn-secondary:hover {
+  background: #ffffff;
+  border-color: var(--ac, #a86e2e);
+  transform: translateY(-1px);
+}
+
+.hc-resume-btn-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.hc-resume-btn-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.hc-resume-btn-content strong {
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.hc-resume-btn-content small {
+  font-size: 0.72rem;
+  opacity: 0.85;
+  margin-top: 2px;
+  line-height: 1.2;
 }
 
 /* Área de mensajes */
@@ -548,5 +664,22 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .hc-prop-badges .hc-badge-op {
     background: rgba(0, 0, 0, 0.4);
+  }
+  :root:not([data-theme="light"]) .hc-resume-card {
+    background: #1e1713;
+    border-color: rgba(242, 203, 139, 0.25);
+    border-left-color: var(--gold, #d4af37);
+  }
+  :root:not([data-theme="light"]) .hc-resume-card-title {
+    color: #f2cb8b;
+  }
+  :root:not([data-theme="light"]) .hc-resume-btn-secondary {
+    background: #2b221c;
+    color: #f3f4f6;
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  :root:not([data-theme="light"]) .hc-resume-btn-secondary:hover {
+    background: #382c23;
+    border-color: #d4af37;
   }
 }
