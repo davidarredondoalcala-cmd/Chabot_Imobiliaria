@@ -1,0 +1,4 @@
+# Dependencias para Servidor y Cliente MCP - Habitat Capital
+mcp>=2.3.0
+httpx>=0.28.0
+pytest>=9.0.0
