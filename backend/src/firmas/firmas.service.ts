@@ -6,6 +6,7 @@ import { hashContrato, hashCadena, generarToken, ipDe, tokenSeguro } from './has
 import { generarPdf, generarPdfBorrador, guardarEnGridFS, leerDeGridFS } from './pdf';
 import { ErrorFirma } from './errores';
 import { InmueblesService } from '../inmuebles/inmuebles.service';
+import { CorreoService } from './correo.service';
 
 const METODOS = ['tipografica', 'canvas', 'imagen'];
 const MAX_FIRMA = Number(process.env.MAX_FIRMA_BYTES || 1000000);
@@ -31,9 +32,10 @@ export class FirmasService {
     @InjectModel(NOMBRE_ACUERDO) private readonly acuerdos: Model<any>,
     @InjectConnection() private readonly conn: Connection,
     private readonly inmuebles: InmueblesService,
+    private readonly correo: CorreoService,
   ) {}
 
-  // ===== Crear acuerdo: genera los 3 tokens y el hash del contrato =====
+  // ===== Crear acuerdo: genera los tokens y el hash del contrato =====
   async crearAcuerdo({ inmueble, tipo, datos, firmantes }: any) {
     if (!['arriendo', 'venta'].includes(tipo)) throw new ErrorFirma(400, 'Tipo de contrato inválido');
     if (!datos || typeof datos !== 'object') throw new ErrorFirma(400, 'Faltan los datos del contrato');
@@ -53,6 +55,8 @@ export class FirmasService {
         estado: 'pendiente',
         token: generarToken(),
         nombre: f.nombre || '',
+        email: f.email || '',
+        cedula: f.cedula || '',
         datos: null,
         imagen: null,
         evidencia: null,
@@ -70,6 +74,22 @@ export class FirmasService {
       firmantes: conOrden,
     });
 
+    // Envío automático de correos a firmantes y codeudores
+    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    for (const f of conOrden) {
+      if (f.email && typeof f.email === 'string' && f.email.includes('@')) {
+        this.correo.enviarEnlaceFirma({
+          destinatario: f.email.trim(),
+          nombre: f.nombre || '',
+          rol: f.rol,
+          tipoContrato: tipo,
+          urlFirma: `${baseUrl}/firma/${f.token}`,
+          inmuebleNombre: snapshot.nombre || snapshot.dir || 'Inmueble Habitat Capital',
+          direccion: snapshot.dir ? `${snapshot.dir}${snapshot.bar ? ` · Barrio ${snapshot.bar}` : ''}` : undefined,
+        }).catch((err) => console.error(`Error al despachar correo a ${f.email}:`, err));
+      }
+    }
+
     return this.pactoPublico(acuerdo);
   }
 
@@ -79,6 +99,7 @@ export class FirmasService {
       rol: f.rol,
       orden: f.orden,
       nombre: f.nombre || '',
+      email: f.email || '',
       token: f.token,
       url: `/firma/${f.token}`,
       estado: f.estado,
@@ -92,6 +113,7 @@ export class FirmasService {
       firmantes: acuerdo.firmantes.map((f: any) => ({
         rol: f.rol, orden: f.orden, estado: f.estado,
         nombre: f.nombre || f.datos?.nombre || '',
+        email: f.email || '',
         tieneImagen: !!f.imagen,
         rechazo: f.rechazo || null,
       })),
@@ -157,6 +179,13 @@ export class FirmasService {
     const acuerdo = await this.acuerdos.findById(id);
     if (!acuerdo) return false;
     return !!buscarPorToken(acuerdo, token);
+  }
+
+  // Verifica si un token pertenece a cualquier acuerdo activo (para autorizar previsualización o borrador)
+  async validarTokenFirmante(token: string) {
+    if (!token || token.length < 10) return false;
+    const acuerdo = await this.acuerdos.findOne({ 'firmantes.token': token });
+    return !!acuerdo;
   }
 
   // ===== Firmar: valida el TURNO en servidor, registra evidencia y encadena hashes =====

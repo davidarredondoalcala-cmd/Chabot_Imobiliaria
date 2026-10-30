@@ -81,13 +81,14 @@ export async function descargarPdfFinal(id, tokenFirmante) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-// Administrativo: descarga directa del PDF del contrato en borrador (sin firmas).
-// Hace POST con la sesión y dispara la descarga del archivo recibido.
-export async function descargarPdfBorrador(tipo, datos) {
-  const r = await fetch(`${API}/api/firmas/borrador/pdf`, {
+// Descarga del PDF del contrato en borrador (sin firmas).
+// Accesible para administradores (con sesión) o firmantes (con tokenFirmante).
+export async function descargarPdfBorrador(tipo, datos, tokenFirmante) {
+  const q = tokenFirmante ? `?token=${encodeURIComponent(tokenFirmante)}` : '';
+  const r = await fetch(`${API}/api/firmas/borrador/pdf${q}`, {
     method: 'POST',
     headers: conAuth({ 'Content-Type': 'application/json' }),
-    body: JSON.stringify({ tipo, datos }),
+    body: JSON.stringify({ tipo, datos, token: tokenFirmante }),
   });
   sesionExpirada(r);
   if (!r.ok) {

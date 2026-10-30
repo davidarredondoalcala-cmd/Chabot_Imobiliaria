@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { IcoChatPin, IcoChatBed, IcoChatBath, IcoChatArea, IcoChatWhatsApp } from './IconosChat';
+import { IcoChatPin, IcoChatBed, IcoChatBath, IcoChatArea, IcoChatWhatsApp, IcoChatExternal } from './IconosChat';
 
 export default function PropertyCard({ property, whatsappUrl }) {
   if (!property) return null;
@@ -90,8 +90,10 @@ export default function PropertyCard({ property, whatsappUrl }) {
             className="hc-prop-btn-view"
             onClick={abrirEnPlataforma}
             title="Abrir detalles de la propiedad en la plataforma"
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
           >
-            🏠 Ver en la plataforma
+            <IcoChatExternal size={14} />
+            <span>Ver en la plataforma</span>
           </button>
 
           <a

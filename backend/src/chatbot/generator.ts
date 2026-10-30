@@ -32,7 +32,7 @@ export function generateDeterministicSearchReply(
     const sector = (criterios?.barrios && criterios.barrios.length > 0)
       ? ` en ${criterios.barrios.join(', ')}`
       : ' en Ibagué';
-    return `Revisé con detalle nuestro inventario y en este momento no encontré propiedades disponibles con esas características exactas${sector}. 🏡\n\n¿Te gustaría que miremos en un sector cercano o con un rango de presupuesto un poco más amplio? ¡Con gusto te busco más alternativas!`;
+    return `Revisé con detalle nuestro inventario y en este momento no encontré propiedades disponibles con esas características exactas${sector}.\n\n¿Te gustaría que miremos en un sector cercano o con un rango de presupuesto un poco más amplio? Con gusto te busco más alternativas.`;
   }
 
   const lines: string[] = [];
@@ -47,7 +47,7 @@ export function generateDeterministicSearchReply(
     : criterios?.tipo === 'apartamento'
       ? 'apartamentos'
       : 'propiedades';
-  lines.push(`¡Qué alegría! Encontré estas excelentes opciones de ${tipoInm} que te van a encantar${sector}:`);
+  lines.push(`Encontré estas excelentes opciones de ${tipoInm} disponibles${sector}:`);
 
   items.slice(0, 3).forEach((item, idx) => {
     const p = item.inmueble;
@@ -56,11 +56,11 @@ export function generateDeterministicSearchReply(
     const details = [habText, banText, `${p.area_m2} m²`].filter(Boolean).join(' • ');
 
     lines.push(
-      `${idx + 1}. **${p.titulo}** (${p.codigo})\n   📍 Barrio ${p.barrio} | 💰 ${formatCOP(p.precio)}\n   📐 ${details}${item.razon ? `\n   ✨ ${item.razon}` : ''}`
+      `${idx + 1}. **${p.titulo}** (${p.codigo})\n   • Barrio: ${p.barrio} | Valor: ${formatCOP(p.precio)}\n   • Detalles: ${details}${item.razon ? `\n   • Destacado: ${item.razon}` : ''}`
     );
   });
 
-  lines.push('💡 Puedes hacer clic en el botón **"🏠 Ver en la plataforma"** de cualquier tarjeta para ver su ficha completa, o si prefieres, podemos coordinar una visita presencial por WhatsApp. ¿Cuál te llama más la atención?');
+  lines.push('Puedes hacer clic en el botón **"Ver en la plataforma"** de cualquier tarjeta para ver su ficha completa, o si prefieres, podemos coordinar una visita presencial. ¿Cuál te llama más la atención?');
   return lines.join('\n\n');
 }
 

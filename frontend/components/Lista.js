@@ -1,7 +1,7 @@
 import { filtrar, porVencer } from '../lib/utils';
 import Filtros from './Filtros';
 import Tarjeta from './Tarjeta';
-import { IcoCasa, IcoEdificio } from './Iconos';
+import { IcoCasa, IcoEdificio, IcoTodos } from './Iconos';
 
 const Skyline = () => (
   <svg className="skyline" viewBox="0 0 400 200" preserveAspectRatio="xMaxYMax meet" aria-hidden="true">
@@ -15,8 +15,8 @@ const Skyline = () => (
 export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, nuevo, esAdmin }) {
   const base = filtrar(data, filtros);
   const n = (t) => base.filter((i) => i.tipo === t).length;
-  const items = base.filter((i) => i.tipo === tab);
-  const idx = tab === 'Casa' ? 0 : 1;
+  const items = tab === 'Todos' ? base : base.filter((i) => i.tipo === tab);
+  const idx = tab === 'Todos' ? 0 : tab === 'Casa' ? 1 : 2;
   const stats = esAdmin
     ? [
         ['Inmuebles', data.length],
@@ -44,14 +44,15 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
           {stats.map(([t, v]) => (<div key={t}><dd>{v}</dd><dt>{t}</dt></div>))}
         </dl>
       </section>
-      <div className="tabs" role="tablist">
-        <span className="pill" style={{ transform: `translateX(${idx * 100}%)` }} />
-        <button role="tab" aria-selected={idx === 0} className={idx === 0 ? 'on' : ''} onClick={() => setTab('Casa')}><IcoCasa /> Casas ({n('Casa')})</button>
-        <button role="tab" aria-selected={idx === 1} className={idx === 1 ? 'on' : ''} onClick={() => setTab('Apartamento')}><IcoEdificio /> Apartamentos ({n('Apartamento')})</button>
+      <div className="tabs tabs-tres" role="tablist">
+        <span className="pill" style={{ transform: `translateX(${idx * 100}%)`, width: 'calc(33.333% - 4px)' }} />
+        <button role="tab" aria-selected={tab === 'Todos'} className={tab === 'Todos' ? 'on' : ''} onClick={() => setTab('Todos')}><IcoTodos /> Todos ({data.length})</button>
+        <button role="tab" aria-selected={tab === 'Casa'} className={tab === 'Casa' ? 'on' : ''} onClick={() => setTab('Casa')}><IcoCasa /> Casas ({n('Casa')})</button>
+        <button role="tab" aria-selected={tab === 'Apartamento'} className={tab === 'Apartamento' ? 'on' : ''} onClick={() => setTab('Apartamento')}><IcoEdificio /> Apartamentos ({n('Apartamento')})</button>
       </div>
       <Filtros f={filtros} setF={setFiltros} total={data.length} mostrados={base.length} />
       <div className="toolbar">
-        <h2>{tab === 'Casa' ? 'Casas' : 'Apartamentos'}</h2>
+        <h2>{tab === 'Todos' ? 'Todos los inmuebles' : tab === 'Casa' ? 'Casas' : 'Apartamentos'}</h2>
       </div>
       {items.length === 0 && <div className="card vacio">Ningún inmueble coincide con los filtros. Amplía los rangos o cambia de pestaña.</div>}
       <div className="lista">
@@ -61,13 +62,13 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
             className="card item nuevo-item"
             role="button"
             tabIndex={0}
-            aria-label={`Agregar ${tab === 'Casa' ? 'casa' : 'apartamento'}`}
-            title={`Agregar ${tab === 'Casa' ? 'casa' : 'apartamento'}`}
+            aria-label={`Agregar ${tab === 'Apartamento' ? 'apartamento' : tab === 'Casa' ? 'casa' : 'inmueble'}`}
+            title={`Agregar ${tab === 'Apartamento' ? 'apartamento' : tab === 'Casa' ? 'casa' : 'inmueble'}`}
             onClick={nuevo}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nuevo(); } }}
           >
             <span className="nuevo-mas" aria-hidden="true">+</span>
-            <span className="nuevo-txt">Agregar {tab === 'Casa' ? 'casa' : 'apartamento'}</span>
+            <span className="nuevo-txt">Agregar {tab === 'Apartamento' ? 'apartamento' : tab === 'Casa' ? 'casa' : 'inmueble'}</span>
           </article>
         )}
       </div>

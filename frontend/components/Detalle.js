@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import Caract from './Caract';
 import Ilustra from './Ilustra';
 import Hoja from './Hoja';
@@ -7,6 +7,7 @@ import { fd, fmt, cls, porVencer, estaPorVencer } from '../lib/utils';
 import { subirImagen, urlImagen } from '../lib/apiImagenes';
 import { setFotoInmueble } from '../lib/api';
 import { descargarPdfBorrador } from '../lib/apiFirmas';
+import { IcoOjo, IcoDescargar, IcoImprimir, IcoCerrar, IcoDocumento, IcoSparkle, IcoWhatsApp, IcoCamara, IcoCheck } from './Iconos';
 
 // Tarjeta del contrato con acciones de ver, descargar y renovar (exclusivo para administradores)
 const Pdf = ({ c, renovar, porVencer: vence, onVer, onDescargar, descargando, esAdmin }) => {
@@ -21,7 +22,7 @@ const Pdf = ({ c, renovar, porVencer: vence, onVer, onDescargar, descargando, es
       <div className="pdf-acciones">
         {vence && <span className="tag pulse">Por vencer</span>}
         <button type="button" className="s" onClick={() => onVer(c)} title="Ver contrato">
-          👁️ Ver contrato
+          <IcoOjo /> Ver contrato
         </button>
         <button
           type="button"
@@ -30,7 +31,7 @@ const Pdf = ({ c, renovar, porVencer: vence, onVer, onDescargar, descargando, es
           disabled={descargando}
           title="Descargar contrato en PDF"
         >
-          {descargando ? 'Generando…' : '📥 Descargar PDF'}
+          <IcoDescargar /> {descargando ? 'Generando…' : 'Descargar PDF'}
         </button>
         {renovar && (
           <button className="o" onClick={renovar}>Renovar contrato</button>
@@ -48,6 +49,15 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
   const [imgErr, setImgErr] = useState(false);
   const [contratoVer, setContratoVer] = useState(null);
   const [descargandoId, setDescargandoId] = useState(null);
+  const [fotoPrevia, setFotoPrevia] = useState(null); // { file, previewUrl }
+
+  // Cierra el visor de contrato con Escape
+  useEffect(() => {
+    if (!contratoVer) return;
+    const onTecla = (e) => { if (e.key === 'Escape') setContratoVer(null); };
+    window.addEventListener('keydown', onTecla);
+    return () => window.removeEventListener('keydown', onTecla);
+  }, [contratoVer]);
 
   const prepararContratoS = (c) => {
     const modo = (c.tipo || '').toLowerCase().includes('compra') || (c.tipo || '').toLowerCase().includes('venta')
@@ -100,22 +110,37 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
     }
   };
 
-  const elegirFoto = async (e) => {
+  // Previsualización antes de subir: primero muestra la foto en pantalla para confirmación
+  const elegirFoto = (e) => {
     if (!esAdmin) return;
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
+    const previewUrl = URL.createObjectURL(file);
+    setFotoPrevia({ file, previewUrl });
+  };
+
+  const confirmarSubidaFoto = async () => {
+    if (!fotoPrevia?.file) return;
     setSubiendo(true);
+    avisar?.('Subiendo imagen al servidor…');
     try {
-      const { url } = await subirImagen(file, i.tipo === 'Casa' ? 'casa' : 'apartamento');
+      const { url } = await subirImagen(fotoPrevia.file, i.tipo === 'Casa' ? 'casa' : 'apartamento');
       const act = await setFotoInmueble(i._id, url);
       actualizar?.(act);
-      avisar?.('Foto actualizada');
+      avisar?.('Foto del inmueble actualizada con éxito');
+      if (fotoPrevia.previewUrl) URL.revokeObjectURL(fotoPrevia.previewUrl);
+      setFotoPrevia(null);
     } catch (er) {
       avisar?.(er.message || 'No se pudo subir la foto');
     } finally {
       setSubiendo(false);
     }
+  };
+
+  const cancelarFotoPrevia = () => {
+    if (fotoPrevia?.previewUrl) URL.revokeObjectURL(fotoPrevia.previewUrl);
+    setFotoPrevia(null);
   };
 
   // La foto es clicable para administradores: abre el selector y sube/cambia la imagen.
@@ -206,7 +231,7 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
           ) : (
             <div className="ficha-cliente-box">
               <div className="ficha-cliente-header">
-                <span className="ficha-cliente-icono">✨</span>
+                <span className="ficha-cliente-icono"><IcoSparkle /></span>
                 <div>
                   <h4>¿Te interesa este inmueble?</h4>
                   <p>Consulta especificaciones, disponibilidad y agenda tu cita con un asesor de Habitat Capital.</p>
@@ -219,7 +244,7 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
                   rel="noopener noreferrer"
                   className="g btn-cliente-wa"
                 >
-                  💬 Contactar por WhatsApp
+                  <IcoWhatsApp /> Contactar por WhatsApp
                 </a>
                 <span className="ficha-cliente-disponibilidad">
                   Disponibilidad: <strong>{i.estado}</strong> · {i.tipo} en {i.barrio || 'Ibagué'}
@@ -230,11 +255,40 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
         </div>
       </div>
 
+      {/* Previsualización antes de subir la foto */}
+      {fotoPrevia && (
+        <div className="modal-contrato-backdrop" onClick={cancelarFotoPrevia}>
+          <div className="card modal-previa-foto" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-contrato-header">
+              <h3><IcoCamara /> Previsualización antes de subir foto</h3>
+              <button type="button" className="l" onClick={cancelarFotoPrevia} title="Cancelar">
+                <IcoCerrar />
+              </button>
+            </div>
+            <div style={{ padding: '20px 24px' }}>
+              <p className="mut" style={{ margin: '0 0 14px' }}>Revisa la calidad y encuadre antes de confirmar y subirla al catálogo:</p>
+              <div className="previa-foto-wrap">
+                <img src={fotoPrevia.previewUrl} alt="Previsualización" className="previa-foto-img" />
+              </div>
+              <div className="row" style={{ justifyContent: 'flex-end', marginTop: 20 }}>
+                <button type="button" onClick={cancelarFotoPrevia} disabled={subiendo}>
+                  <IcoCerrar /> Cancelar
+                </button>
+                <button type="button" className="g" onClick={confirmarSubidaFoto} disabled={subiendo}>
+                  <IcoCheck /> {subiendo ? 'Subiendo imagen…' : 'Confirmar y subir foto'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Visor de Contrato: no se corta, scroll completo y se cierra al hacer clic en cualquier lugar exterior */}
       {esAdmin && contratoVer && (
         <div className="modal-contrato-backdrop" onClick={() => setContratoVer(null)}>
           <div className="modal-contrato-card" onClick={(e) => e.stopPropagation()}>
             <div className="modal-contrato-header">
-              <h3>📄 Contrato de {contratoVer.c.tipo} — {i.nombre}</h3>
+              <h3><IcoDocumento /> Contrato de {contratoVer.c.tipo} — {i.nombre}</h3>
               <div className="modal-contrato-acciones">
                 <button
                   type="button"
@@ -242,7 +296,7 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
                   onClick={() => descargarContrato(contratoVer.c)}
                   title="Descargar documento en PDF"
                 >
-                  📥 Descargar PDF
+                  <IcoDescargar /> Descargar PDF
                 </button>
                 <button
                   type="button"
@@ -250,20 +304,28 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
                   onClick={() => window.print()}
                   title="Imprimir contrato"
                 >
-                  🖨️ Imprimir
+                  <IcoImprimir /> Imprimir
                 </button>
                 <button
                   type="button"
                   className="l"
                   onClick={() => setContratoVer(null)}
-                  title="Cerrar ventana"
+                  title="Cerrar ventana (Esc)"
                 >
-                  ✕ Cerrar
+                  <IcoCerrar /> Cerrar
                 </button>
               </div>
             </div>
-            <div className="modal-contrato-body">
-              <Hoja modo={contratoVer.modo} S={contratoVer.S} />
+            <div className="modal-contrato-body" onClick={() => setContratoVer(null)}>
+              <div className="modal-hoja-container" onClick={(e) => e.stopPropagation()}>
+                <Hoja modo={contratoVer.modo} S={contratoVer.S} />
+              </div>
+            </div>
+            <div className="modal-contrato-footer noprint">
+              <span className="mut">Haz clic fuera del documento o presiona Esc para cerrar</span>
+              <button type="button" className="s" onClick={() => setContratoVer(null)}>
+                <IcoCerrar /> Cerrar visor
+              </button>
             </div>
           </div>
         </div>

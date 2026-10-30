@@ -55,13 +55,19 @@ export class FirmasController {
     return this.svc.verificar(id);
   }
 
-  // PDF de un contrato en borrador (sin firmas). Exclusivo para administradores.
+  // PDF de un contrato en borrador (sin firmas). Accesible para administradores o firmantes con token válido.
+  @Public()
   @Post('borrador/pdf')
   @HttpCode(200)
-  async pdfBorrador(@Body() body: any, @Req() req: any, @Res() res: any) {
+  async pdfBorrador(@Body() body: any, @Query('token') queryToken: string, @Req() req: any, @Res() res: any) {
     const usuario = req.usuario || (await this.auth.usuarioDe(req));
-    if (!usuario?.admin) {
-      return res.status(403).json({ error: 'Solo los administradores pueden generar y descargar borradores de contratos' });
+    const token = body?.token || queryToken;
+    let esFirmante = false;
+    if (token) {
+      esFirmante = await this.svc.validarTokenFirmante(token);
+    }
+    if (!usuario?.admin && !esFirmante) {
+      return res.status(403).json({ error: 'Solo los administradores o firmantes autorizados pueden generar y descargar borradores de contratos' });
     }
     const { tipo, datos } = body || {};
     const buffer = await this.svc.pdfBorrador(tipo, datos);

@@ -22,13 +22,15 @@ const RechazoSchema = new Schema({
   ip: String,
 }, { _id: false });
 
-// ===== Un firmante (comprador, vendedor o administrador) =====
+// ===== Un firmante (comprador, vendedor, administrador, arrendatario o codeudor) =====
 const FirmaSchema = new Schema({
-  rol: { type: String, required: true },   // comprador | vendedor | administrador | arrendador | arrendatario
-  orden: { type: Number, required: true }, // 1, 2 o 3 — la secuencia la controla el servidor
+  rol: { type: String, required: true },   // comprador | vendedor | administrador | arrendador | arrendatario | codeudor
+  orden: { type: Number, required: true }, // 1, 2, 3… — la secuencia la controla el servidor
   estado: { type: String, enum: ['pendiente', 'firmada', 'rechazada'], default: 'pendiente' },
   token: { type: String, required: true, unique: true, index: true },
   nombre: String,                          // nombre esperado (puede cambiarse al firmar)
+  email: String,                           // correo electrónico para envío automático
+  cedula: String,                          // cédula ingresada al crear contrato
   datos: { nombre: String, cedula: String, email: String },
   imagen: String,                          // dataURL PNG normalizado 600x240 (fondo transparente)
   evidencia: EvidenciaSchema,

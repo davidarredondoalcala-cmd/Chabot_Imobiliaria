@@ -61,7 +61,7 @@ export default function ChatWidget() {
       {
         id: 'welcome',
         role: 'assistant',
-        content: `${saludo} Qué alegría saludarte. Soy **Valentina**, asesora de Habitat Capital en Ibagué. 🏡✨\n\nEstoy aquí para acompañarte a encontrar tu próximo hogar o inversión ideal (casas y apartamentos en arriendo o en venta).\n\nCuéntame qué estás buscando o elige una de estas opciones rápidas:`,
+        content: `${saludo} Un gusto saludarte. Soy **Valentina**, asesora inmobiliaria de Habitat Capital en Ibagué.\n\nEstoy aquí para orientarte en la búsqueda de tu próximo inmueble (casas y apartamentos en arriendo o en venta).\n\nCuéntame qué estás buscando o selecciona una opción rápida:`,
       },
     ]);
   };

@@ -8,6 +8,14 @@ const MIN = [['', 'Cualquiera'], ['1', '1+'], ['2', '2+'], ['3', '3+'], ['4', '4
 
 const ESTADOS = [['', 'Todos'], ['Arrendada', 'Arrendada'], ['Por vencer', 'Por vencer'], ['Sin arrendar', 'Sin arrendar'], ['Para la venta', 'Para la venta'], ['Vendida', 'Vendida']];
 
+const TIEMPOS_ARRIENDO = [
+  ['', 'Cualquiera'],
+  ['3', 'Más de 3 meses'],
+  ['6', 'Más de 6 meses'],
+  ['12', 'Más de 1 año'],
+  ['24', 'Más de 2 años'],
+];
+
 // Selector desplegable: un botón que, al pulsarlo, despliega las opciones como píldoras.
 function Desplegable({ valor, opciones, onChange, etiqueta, otro = false }) {
   const [abierto, setAbierto] = useState(false);
@@ -91,6 +99,7 @@ export default function Filtros({ f, setF, total, mostrados }) {
         <div><label className="filtro-lbl">Tamaño (m²)</label>{rango('areaMin', 'areaMax', 'Área')}</div>
         <div><label className="filtro-lbl">Rango de precio ($)</label>{rango('pMin', 'pMax', 'Precio')}</div>
         <div><label className="filtro-lbl">Estado</label>{lista('estado', ESTADOS, 'Estado')}</div>
+        <div><label className="filtro-lbl">Tiempo arrendada</label>{lista('tiempoArriendo', TIEMPOS_ARRIENDO, 'Tiempo arrendada')}</div>
       </div>
       {hayFiltros(f) && <div className="row"><button className="l" onClick={() => setF(FILTROS0)}>Limpiar filtros</button></div>}
     </div>

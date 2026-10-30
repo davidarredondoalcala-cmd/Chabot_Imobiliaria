@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Caract from './Caract';
 import Ilustra from './Ilustra';
-import { fd, fmt, cls, sufijo, estaPorVencer } from '../lib/utils';
+import { fd, fmt, cls, sufijo, estaPorVencer, tiempoArrendadaTexto } from '../lib/utils';
 import { urlImagen } from '../lib/apiImagenes';
 
 // Tarjeta de un inmueble (la usan la lista y la vista previa del formulario)
@@ -30,7 +30,14 @@ export default function Tarjeta({ i, abrir, esAdmin }) {
         <h3 className="nom">{i.nombre}</h3>
         {(i.dir || i.barrio) && <p className="dir">{[i.dir, i.barrio].filter(Boolean).join(' · ')}</p>}
         <Caract i={i} />
-        {esAdmin && i.venc && <p className="meta">Contrato vence el {fd(i.venc)} · pago el día {i.diaPago}{estaPorVencer(i) && <span className="tag PorVencer">Por vencer</span>}</p>}
+        {esAdmin && i.estado === 'Arrendada' && (
+          <p className="meta">
+            Lleva arrendada {tiempoArrendadaTexto(i)}{i.venc ? ` · vence ${fd(i.venc)}` : ''}{estaPorVencer(i) && <span className="tag PorVencer">Por vencer</span>}
+          </p>
+        )}
+        {esAdmin && i.estado !== 'Arrendada' && i.venc && (
+          <p className="meta">Contrato vence el {fd(i.venc)} · pago el día {i.diaPago}</p>
+        )}
         <p className="precio">{fmt(i.valor)}<small>{sufijo(i)}</small><span className={`tag grande ${cls(i.estado)}`}>{i.estado}</span></p>
       </div>
     </article>

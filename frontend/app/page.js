@@ -8,7 +8,7 @@ import InmuebleForm from '../components/InmuebleForm';
 import Login from '../components/Login';
 import { FILTROS0 } from '../lib/utils';
 import { getSesion, salir, yo, esAdminEmail } from '../lib/auth';
-import { Logo } from '../components/Iconos';
+import { Logo, IcoEscudo, IcoUsuario } from '../components/Iconos';
 import TemaBtn from '../components/TemaBtn';
 
 export default function Home() {
@@ -16,7 +16,7 @@ export default function Home() {
   const [listo, setListo] = useState(false);
   const [data, setData] = useState(null);
   const [err, setErr] = useState('');
-  const [tab, setTab] = useState('Casa');
+  const [tab, setTab] = useState('Todos');
   const [filtros, setFiltros] = useState(FILTROS0);
   const [vista, setVista] = useState({ n: 'lista' });
   const [oculto, setOculto] = useState(false);
@@ -162,7 +162,11 @@ export default function Home() {
               }}
               title={modoClienteSimulado ? 'Clic para volver a modo Administrador' : 'Clic para probar la vista exacta como cliente'}
             >
-              {modoClienteSimulado ? '👁️ Viendo como Cliente (volver a Admin)' : '🛡️ Administrador (probar vista cliente)'}
+              {modoClienteSimulado ? (
+                <><IcoUsuario /> Viendo como Cliente (volver a Admin)</>
+              ) : (
+                <><IcoEscudo /> Administrador (probar vista cliente)</>
+              )}
             </button>
           ) : (
             <span className="tag-rol tag-usuario">Modo Cliente</span>

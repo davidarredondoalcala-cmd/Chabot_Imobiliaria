@@ -4,7 +4,8 @@ import { useParams } from 'next/navigation';
 import Hoja from '../../../components/Hoja';
 import FirmaFlujo from '../../../components/firmas/FirmaFlujo';
 import EvidenciaTabla from '../../../components/firmas/EvidenciaTabla';
-import { porToken, verificar, descargarPdfFinal } from '../../../lib/apiFirmas';
+import { porToken, verificar, descargarPdfFinal, descargarPdfBorrador } from '../../../lib/apiFirmas';
+import { IcoImprimir, IcoDescargar, IcoCheck, IcoDocumento } from '../../../components/Iconos';
 import './firma.css';
 
 export default function PaginaFirma() {
@@ -13,6 +14,7 @@ export default function PaginaFirma() {
   const [err, setErr] = useState('');
   const [toast, setToast] = useState('');
   const [verif, setVerif] = useState(null);
+  const [descargandoBorrador, setDescargandoBorrador] = useState(false);
 
   const avisar = (t) => { setToast(t); setTimeout(() => setToast(''), 2600); };
   const cargar = useCallback(() => porToken(token).then(setVista).catch((e) => setErr(e.message)), [token]);
@@ -20,6 +22,20 @@ export default function PaginaFirma() {
 
   const descargar = async (id) => {
     try { await descargarPdfFinal(id, token); } catch (e) { avisar(e.message); }
+  };
+
+  const descargarCopiaBorrador = async () => {
+    if (!vista?.datos) return;
+    setDescargandoBorrador(true);
+    avisar('Generando copia en PDF del contrato…');
+    try {
+      await descargarPdfBorrador(vista.tipo, vista.datos, token);
+      avisar('Copia de contrato descargada con éxito');
+    } catch (e) {
+      avisar(e.message || 'No se pudo descargar la copia');
+    } finally {
+      setDescargandoBorrador(false);
+    }
   };
 
   // Al registrar la firma: si fue la última, el acuerdo queda cerrado y se baja el PDF firmado
@@ -58,7 +74,9 @@ export default function PaginaFirma() {
     <main className="fm-main">
       <div className="fm-cab noprint">
         <div>
-          <h2 style={{ marginBottom: 4 }}>Firma electrónica</h2>
+          <h2 style={{ marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <IcoDocumento /> Firma electrónica
+          </h2>
           <p className="mut">
             Contrato de {vista.tipo === 'venta' ? 'compraventa' : 'arriendo'} — estado:{' '}
             <span className={`tag ${vista.estado === 'firmado' ? 'Arrendada' : vista.estado === 'rechazado' ? 'Vendida' : 'pulse'}`}>
@@ -66,10 +84,27 @@ export default function PaginaFirma() {
             </span>
           </p>
         </div>
-        <div className="row" style={{ margin: 0 }}>
-          <button type="button" onClick={() => window.print()}>Imprimir / PDF</button>
-          {vista.pdfDisponible && <button type="button" className="btn-pdf" onClick={() => descargar(vista.id)}>Descargar PDF firmado</button>}
-          <button type="button" onClick={comprobar}>Verificar integridad</button>
+        <div className="row" style={{ margin: 0, gap: 10 }}>
+          <button type="button" onClick={() => window.print()} title="Imprimir o guardar como PDF">
+            <IcoImprimir /> Imprimir
+          </button>
+          <button
+            type="button"
+            className="s"
+            onClick={descargarCopiaBorrador}
+            disabled={descargandoBorrador}
+            title="Descargar copia del contrato en PDF"
+          >
+            <IcoDescargar /> {descargandoBorrador ? 'Generando…' : 'Descargar mi copia en PDF'}
+          </button>
+          {vista.pdfDisponible && (
+            <button type="button" className="btn-pdf" onClick={() => descargar(vista.id)}>
+              <IcoDescargar /> Descargar PDF final firmado
+            </button>
+          )}
+          <button type="button" onClick={comprobar} title="Verificar validez legal del documento">
+            <IcoCheck /> Verificar integridad
+          </button>
         </div>
       </div>
 
@@ -104,9 +139,22 @@ export default function PaginaFirma() {
       )}
 
       {vista.miEstado === 'firmada' && vista.estado === 'en_firma' && (
-        <div className="card noprint">
-          <b>Firmaste correctamente.</b>
-          <p className="mut">Tu firma quedó registrada con evidencia técnica. Espera las firmas pendientes; el PDF final quedará disponible al cerrar el acuerdo.</p>
+        <div className="card noprint" style={{ borderLeft: '4px solid var(--ac)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+            <span className="tag Arrendada"><IcoCheck /> Firma registrada</span>
+            <b>Has firmado satisfactoriamente</b>
+          </div>
+          <p className="mut" style={{ margin: '0 0 12px' }}>
+            Tu firma quedó registrada con evidencia técnica y hash criptográfico SHA-256. Puedes descargar tu copia del contrato en cualquier momento.
+          </p>
+          <div className="row" style={{ margin: 0 }}>
+            <button type="button" className="s" onClick={descargarCopiaBorrador} disabled={descargandoBorrador}>
+              <IcoDescargar /> Descargar copia de mi contrato
+            </button>
+            <button type="button" onClick={() => window.print()}>
+              <IcoImprimir /> Imprimir contrato
+            </button>
+          </div>
         </div>
       )}
 
