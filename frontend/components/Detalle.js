@@ -8,34 +8,37 @@ import { subirImagen, urlImagen } from '../lib/apiImagenes';
 import { setFotoInmueble } from '../lib/api';
 import { descargarPdfBorrador } from '../lib/apiFirmas';
 
-// Tarjeta del contrato con acciones de ver, descargar y renovar
-const Pdf = ({ c, renovar, porVencer: vence, onVer, onDescargar, descargando, esAdmin }) => (
-  <div className="pdf">
-    <div className="pdfico">PDF</div>
-    <div className="pdf-info">
-      <b>{c.tipo}</b>
-      <div className="mut">Firmado el {fd(c.fecha)} · Firmantes: {c.firm?.join(', ')}</div>
+// Tarjeta del contrato con acciones de ver, descargar y renovar (exclusivo para administradores)
+const Pdf = ({ c, renovar, porVencer: vence, onVer, onDescargar, descargando, esAdmin }) => {
+  if (!esAdmin) return null;
+  return (
+    <div className="pdf">
+      <div className="pdfico">PDF</div>
+      <div className="pdf-info">
+        <b>{c.tipo}</b>
+        <div className="mut">Firmado el {fd(c.fecha)} · Firmantes: {c.firm?.join(', ')}</div>
+      </div>
+      <div className="pdf-acciones">
+        {vence && <span className="tag pulse">Por vencer</span>}
+        <button type="button" className="s" onClick={() => onVer(c)} title="Ver contrato">
+          👁️ Ver contrato
+        </button>
+        <button
+          type="button"
+          className="s"
+          onClick={() => onDescargar(c)}
+          disabled={descargando}
+          title="Descargar contrato en PDF"
+        >
+          {descargando ? 'Generando…' : '📥 Descargar PDF'}
+        </button>
+        {renovar && (
+          <button className="o" onClick={renovar}>Renovar contrato</button>
+        )}
+      </div>
     </div>
-    <div className="pdf-acciones">
-      {vence && <span className="tag pulse">Por vencer</span>}
-      <button type="button" className="s" onClick={() => onVer(c)} title="Ver contrato">
-        👁️ Ver contrato
-      </button>
-      <button
-        type="button"
-        className="s"
-        onClick={() => onDescargar(c)}
-        disabled={descargando}
-        title="Descargar contrato en PDF"
-      >
-        {descargando ? 'Generando…' : '📥 Descargar PDF'}
-      </button>
-      {esAdmin && renovar && (
-        <button className="o" onClick={renovar}>Renovar contrato</button>
-      )}
-    </div>
-  </div>
-);
+  );
+};
 
 export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esAdmin }) {
   const vig = i.contratos.find((c) => c.vig);
@@ -74,11 +77,16 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
   };
 
   const verContrato = (c) => {
+    if (!esAdmin) return;
     const { modo, S } = prepararContratoS(c);
     setContratoVer({ c, modo, S });
   };
 
   const descargarContrato = async (c) => {
+    if (!esAdmin) {
+      avisar?.('Acceso restringido: solo los administradores pueden descargar contratos.');
+      return;
+    }
     const { modo, S } = prepararContratoS(c);
     setDescargandoId(c.fecha || c.tipo);
     avisar?.('Generando PDF del contrato…');
@@ -163,7 +171,7 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
               <button onClick={() => crear('venta')}>Descargar formato de compraventa</button>
             </div>
           )}
-          {esAdmin && (
+          {esAdmin ? (
             <>
               {vig && (
                 <>
@@ -195,11 +203,34 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
                 <p className="mut">Sin contratos vencidos.</p>
               )}
             </>
+          ) : (
+            <div className="ficha-cliente-box">
+              <div className="ficha-cliente-header">
+                <span className="ficha-cliente-icono">✨</span>
+                <div>
+                  <h4>¿Te interesa este inmueble?</h4>
+                  <p>Consulta especificaciones, disponibilidad y agenda tu cita con un asesor de Habitat Capital.</p>
+                </div>
+              </div>
+              <div className="ficha-cliente-acciones">
+                <a
+                  href={`https://wa.me/573100000000?text=${encodeURIComponent(`Hola Habitat Capital, me interesa el inmueble "${i.nombre}" (${i.tipo} en ${i.barrio || 'Ibagué'}). ¿Está disponible para visita?`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="g btn-cliente-wa"
+                >
+                  💬 Contactar por WhatsApp
+                </a>
+                <span className="ficha-cliente-disponibilidad">
+                  Disponibilidad: <strong>{i.estado}</strong> · {i.tipo} en {i.barrio || 'Ibagué'}
+                </span>
+              </div>
+            </div>
           )}
         </div>
       </div>
 
-      {contratoVer && (
+      {esAdmin && contratoVer && (
         <div className="modal-contrato-backdrop" onClick={() => setContratoVer(null)}>
           <div className="modal-contrato-card" onClick={(e) => e.stopPropagation()}>
             <div className="modal-contrato-header">

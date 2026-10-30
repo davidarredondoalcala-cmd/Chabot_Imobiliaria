@@ -61,6 +61,8 @@ export default function Home() {
   const sel = data?.find((i) => i._id === vista.id);
   const emailUsuario = (sesion?.usuario?.email || '').trim().toLowerCase();
   const esAdmin = esAdminEmail(emailUsuario);
+  const [modoClienteSimulado, setModoClienteSimulado] = useState(false);
+  const esAdminEfectivo = esAdmin && !modoClienteSimulado;
 
   // Abre un inmueble directamente cuando el usuario hace clic en una recomendación del chatbot
   useEffect(() => {
@@ -149,9 +151,22 @@ export default function Home() {
           <h1>Habitat Capital</h1>
         </button>
         <div className="header-der">
-          <span className={`tag-rol ${esAdmin ? 'tag-admin' : 'tag-usuario'}`}>
-            {esAdmin ? 'Administrador' : 'Modo Cliente'}
-          </span>
+          {esAdmin ? (
+            <button
+              type="button"
+              className={`tag-admin-toggle ${modoClienteSimulado ? 'modo-cliente-activo' : ''}`}
+              onClick={() => {
+                const siguiente = !modoClienteSimulado;
+                setModoClienteSimulado(siguiente);
+                avisar(siguiente ? 'Vista cambiada a Modo Cliente (solo consulta)' : 'Vista cambiada a Administrador');
+              }}
+              title={modoClienteSimulado ? 'Clic para volver a modo Administrador' : 'Clic para probar la vista exacta como cliente'}
+            >
+              {modoClienteSimulado ? '👁️ Viendo como Cliente (volver a Admin)' : '🛡️ Administrador (probar vista cliente)'}
+            </button>
+          ) : (
+            <span className="tag-rol tag-usuario">Modo Cliente</span>
+          )}
           <p>Gestión de inmuebles y contratos</p>
           <TemaBtn />
           <div className="usuario">
@@ -171,9 +186,9 @@ export default function Home() {
             setTab={setTab}
             filtros={filtros}
             setFiltros={setFiltros}
-            esAdmin={esAdmin}
+            esAdmin={esAdminEfectivo}
             nuevo={() => {
-              if (!esAdmin) return;
+              if (!esAdminEfectivo) return;
               scrollTo(0, 0);
               setVista({ n: 'nuevo' });
             }}
@@ -181,7 +196,7 @@ export default function Home() {
           />
         )}
         {data && vista.n === 'nuevo' && (
-          esAdmin ? (
+          esAdminEfectivo ? (
             <InmuebleForm
               tipo0={tab}
               avisar={avisar}
@@ -201,19 +216,19 @@ export default function Home() {
         {data && vista.n === 'detalle' && sel && (
           <Detalle
             inm={sel}
-            esAdmin={esAdmin}
+            esAdmin={esAdminEfectivo}
             avisar={avisar}
             actualizar={(act) => setData((d) => d.map((x) => (x._id === act._id ? act : x)))}
             volver={() => setVista({ n: 'lista' })}
             crear={(modo) => {
-              if (!esAdmin) return;
+              if (!esAdminEfectivo) return;
               scrollTo(0, 0);
               setVista({ n: 'form', id: sel._id, modo });
             }}
           />
         )}
         {data && vista.n === 'form' && sel && (
-          esAdmin ? (
+          esAdminEfectivo ? (
             <ContratoForm
               inm={sel}
               modo0={vista.modo}

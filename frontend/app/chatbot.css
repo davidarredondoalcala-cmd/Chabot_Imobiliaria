@@ -13,19 +13,19 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: linear-gradient(135deg, var(--ac, #0f4c43) 0%, var(--ac2, #176b5e) 100%);
+  background: var(--gold-grad, linear-gradient(135deg, #a46d2a 0%, #c9933e 50%, #d89f47 100%));
   color: #ffffff;
-  border: none;
+  border: 1px solid rgba(250, 230, 158, 0.4);
   border-radius: 9999px;
   padding: 12px 18px;
-  box-shadow: 0 8px 24px rgba(15, 76, 67, 0.35);
+  box-shadow: 0 8px 24px var(--gold-glow, rgba(212, 175, 55, 0.4));
   cursor: pointer;
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
 }
 
 .hc-chat-trigger-btn:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 12px 28px rgba(15, 76, 67, 0.45);
+  box-shadow: 0 12px 28px var(--gold-glow, rgba(212, 175, 55, 0.55));
 }
 
 .hc-trigger-badge {
@@ -43,7 +43,7 @@
   background: var(--card, #ffffff);
   color: var(--tx, #14201d);
   border-radius: 20px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18), 0 0 0 1px var(--bd, #dbe3e0);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18), 0 0 0 1px var(--gold-border, #dbe3e0);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -63,13 +63,13 @@
 
 /* Encabezado */
 .hc-chat-header {
-  background: linear-gradient(135deg, #2b1d12 0%, var(--ac, #a86e2e) 100%);
+  background: linear-gradient(135deg, #2b1d12 0%, var(--gold-dark, #996515) 50%, var(--ac, #a86e2e) 100%);
   color: #ffffff;
   padding: 14px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--gold-border, rgba(255, 255, 255, 0.15));
 }
 
 .hc-header-brand {
