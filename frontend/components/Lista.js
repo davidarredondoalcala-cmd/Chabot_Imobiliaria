@@ -45,10 +45,16 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
         </dl>
       </section>
       <div className="tabs tabs-tres" role="tablist">
-        <span className="pill" style={{ transform: `translateX(${idx * 100}%)`, width: 'calc(33.333% - 4px)' }} />
-        <button role="tab" aria-selected={tab === 'Todos'} className={tab === 'Todos' ? 'on' : ''} onClick={() => setTab('Todos')}><IcoTodos /> Todos ({data.length})</button>
-        <button role="tab" aria-selected={tab === 'Casa'} className={tab === 'Casa' ? 'on' : ''} onClick={() => setTab('Casa')}><IcoCasa /> Casas ({n('Casa')})</button>
-        <button role="tab" aria-selected={tab === 'Apartamento'} className={tab === 'Apartamento' ? 'on' : ''} onClick={() => setTab('Apartamento')}><IcoEdificio /> Apartamentos ({n('Apartamento')})</button>
+        <span className="pill" style={{ transform: `translateX(${idx * 100}%)` }} />
+        <button role="tab" aria-selected={tab === 'Todos'} className={tab === 'Todos' ? 'on' : ''} onClick={() => setTab('Todos')}>
+          <IcoTodos /> Todos ({base.length})
+        </button>
+        <button role="tab" aria-selected={tab === 'Casa'} className={tab === 'Casa' ? 'on' : ''} onClick={() => setTab('Casa')}>
+          <IcoCasa /> Casas ({n('Casa')})
+        </button>
+        <button role="tab" aria-selected={tab === 'Apartamento'} className={tab === 'Apartamento' ? 'on' : ''} onClick={() => setTab('Apartamento')}>
+          <IcoEdificio /> Apartamentos ({n('Apartamento')})
+        </button>
       </div>
       <Filtros f={filtros} setF={setFiltros} total={data.length} mostrados={base.length} />
       <div className="toolbar">

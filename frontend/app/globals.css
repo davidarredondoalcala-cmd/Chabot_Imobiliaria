@@ -137,44 +137,100 @@ main { max-width: 1120px; margin: 0 auto; padding: 28px 24px 72px }
 .tabs {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    width: min(460px, 100%);
+    width: min(480px, 100%);
     gap: 0;
     background: var(--card);
-    border: 1px solid var(--bd);
-    padding: 5px;
-    border-radius: 14px;
-    margin: 0 0 20px;
-    position: relative
+    border: 1.5px solid var(--bd);
+    padding: 6px;
+    border-radius: 18px;
+    margin: 0 0 24px;
+    position: relative;
+    box-shadow: 0 6px 24px -6px rgba(160, 110, 50, .14), 0 1px 3px rgba(0, 0, 0, .04);
 }
 .tabs.tabs-tres {
-    grid-template-columns: 1fr 1fr 1fr;
-    width: min(580px, 100%);
+    grid-template-columns: repeat(3, 1fr);
+    width: min(620px, 100%);
 }
 .tabs button {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 9px;
     border: 0;
-    background: none;
-    padding: 10px 14px;
-    border-radius: 10px;
+    background: transparent;
+    padding: 12px 14px;
+    border-radius: 14px;
     color: var(--mut);
-    transition: color .25s
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    line-height: 1.2;
+    white-space: nowrap;
+    user-select: none;
+    transition: color .25s ease, opacity .2s ease;
 }
-.tabs button:hover { color: var(--ac); border: 0 }
-.tabs button.on { color: var(--onac) }
+.tabs button:hover:not(.on) {
+    color: var(--tx);
+    border: 0;
+    background: transparent;
+}
+.tabs button.on {
+    color: #ffffff !important;
+    font-weight: 700;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .3);
+}
+.tabs button.on svg {
+    transform: scale(1.08);
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .3));
+}
+.tabs button svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    transition: transform .25s ease;
+}
 .pill {
     position: absolute;
-    top: 5px;
-    bottom: 5px;
-    left: 5px;
-    width: calc(50% - 5px) !important;
-    border-radius: 10px;
-    background: var(--ac);
-    transition: transform .35s cubic-bezier(.65, 0, .35, 1)
+    top: 6px;
+    bottom: 6px;
+    left: 6px;
+    width: calc((100% - 12px) / 2);
+    border-radius: 14px;
+    background: var(--gold-grad);
+    box-shadow: 0 4px 16px -2px var(--gold-glow), 0 2px 6px rgba(0, 0, 0, .12);
+    border: 1px solid rgba(255, 255, 255, .35);
+    transition: transform .35s cubic-bezier(.34, 1.25, .64, 1);
+    pointer-events: none;
+    z-index: 1;
+}
+.tabs.tabs-tres .pill {
+    width: calc((100% - 12px) / 3);
+}
+@media(max-width: 640px) {
+    .tabs.tabs-tres {
+        width: 100%;
+        padding: 4px;
+        border-radius: 14px;
+    }
+    .tabs.tabs-tres button {
+        padding: 10px 4px;
+        font-size: .82rem;
+        gap: 4px;
+        border-radius: 10px;
+    }
+    .tabs.tabs-tres button svg {
+        width: 15px;
+        height: 15px;
+    }
+    .tabs.tabs-tres .pill {
+        top: 4px;
+        bottom: 4px;
+        left: 4px;
+        width: calc((100% - 8px) / 3);
+        border-radius: 10px;
+    }
 }
 
 /* ---------- Tarjetas base ---------- */
@@ -832,7 +888,6 @@ button.tema-btn:hover:not(:disabled) { transform: rotate(-14deg) scale(1.08) }
 .modo button.on, .fm-tabs button.on { background: var(--gold-grad); border-color: transparent }
 .modo button { transition: background .5s var(--suave), color .5s var(--suave) }
 .chip.on { background: var(--gold-grad); border-color: transparent; box-shadow: 0 5px 14px -5px var(--gold-glow) }
-.pill { background: var(--gold-grad); box-shadow: 0 8px 18px -8px var(--gold-glow); transition: transform .7s var(--suave) }
 .btn-pdf { background: var(--gold-grad); border-color: transparent }
 
 /* ---------- Tarjetas ---------- */
@@ -900,9 +955,6 @@ button.tema-btn:hover:not(:disabled) { transform: rotate(-14deg) scale(1.08) }
 @media(max-width:700px) { .portada { padding: 30px 22px 26px } }
 
 /* ---------- Pestañas, datos, contratos ---------- */
-.tabs { border-radius: 16px; padding: 6px; box-shadow: var(--sh) }
-.tabs button { padding: 12px 16px; transition: color .6s var(--suave) }
-.tabs button:hover:not(.on) { color: var(--ac) }
 .dato { border-radius: 14px; transition: transform .7s var(--suave), box-shadow .7s var(--suave) }
 .dato:hover { transform: translateY(-3px); box-shadow: var(--sh) }
 .pdf { transition: transform .7s var(--suave), border-color .5s, box-shadow .7s var(--suave) }
