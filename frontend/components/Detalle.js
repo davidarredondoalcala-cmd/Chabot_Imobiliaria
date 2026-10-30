@@ -136,6 +136,16 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
           <h2 className="titulo">{i.nombre}</h2>
           <p className="dir">{i.dir} · {i.barrio}</p>
           <Caract i={i} />
+          {(() => {
+            const desc = (i.descripcion && i.descripcion.trim()) ||
+              `${i.tipo === 'Casa' ? 'Acogedora casa' : 'Excelente apartamento'} en el sector de ${i.barrio || 'la ciudad'}, cuenta con ${i.habitaciones ? i.habitaciones + ' habitaciones' : 'amplios espacios'}, ${i.banos ? i.banos + ' baños' : 'buena distribución'} y ${i.area ? i.area + ' m² construidos' : 'área cómoda'}, con excelente iluminación natural, ventilación y fácil acceso a vías principales.`;
+            return (
+              <div className="ficha-desc">
+                <h3>Descripción del inmueble</h3>
+                <p>{desc}</p>
+              </div>
+            );
+          })()}
           <div className="datos">
             <div className="dato precio-dato">
               <span>{i.estado === 'Para la venta' || i.estado === 'Vendida' ? 'Precio de venta' : 'Valor mensual'}</span>

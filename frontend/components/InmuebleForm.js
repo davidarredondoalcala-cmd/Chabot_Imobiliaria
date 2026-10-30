@@ -6,7 +6,7 @@ import Tarjeta from './Tarjeta';
 import Ilustra from './Ilustra';
 
 export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
-  const [S, setS] = useState({ tipo: tipo0 || 'Casa', nombre: '', estado: 'Sin arrendar', dir: '', barrio: '', lind: '', habitaciones: '', banos: '', area: '', valor: '', venc: '', dia: 5, foto: '' });
+  const [S, setS] = useState({ tipo: tipo0 || 'Casa', nombre: '', descripcion: '', estado: 'Sin arrendar', dir: '', barrio: '', lind: '', habitaciones: '', banos: '', area: '', valor: '', venc: '', dia: 5, foto: '' });
   const [env, setEnv] = useState(false);
   const [subiendoFoto, setSubiendoFoto] = useState(false);
   const fileRef = useRef(null);
@@ -50,6 +50,8 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
             <button className={S.tipo === 'Apartamento' ? 'on' : ''} onClick={() => setS({ ...S, tipo: 'Apartamento' })}>Apartamento</button>
           </div>
           {campo('nombre', 'Nombre *', 'text', 'Ej: Casa Piedra Pintada')}
+          <label>Descripción del inmueble</label>
+          <textarea rows="3" placeholder="Resumen del inmueble, iluminación, distribución y entorno..." value={S.descripcion} onChange={set('descripcion')} />
           <label>Estado</label>
           <select value={S.estado} onChange={set('estado')}><option>Sin arrendar</option><option>Para la venta</option><option>Arrendada</option></select>
           {campo('dir', 'Dirección *', 'text', 'Ej: Cll 10 # 5 - 20')}

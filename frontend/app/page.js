@@ -103,6 +103,7 @@ export default function Home() {
           _id: prop.id || prop.codigo || `prop-${Date.now()}`,
           tipo: (prop.tipo || 'Casa').toLowerCase() === 'apartamento' ? 'Apartamento' : 'Casa',
           nombre: prop.titulo || prop.nombre || 'Inmueble seleccionado',
+          descripcion: prop.descripcion || '',
           dir: prop.direccion_aproximada || prop.dir || `Sector ${prop.barrio || 'Ibagué'}`,
           barrio: prop.barrio || 'Ibagué',
           lind: 'Al norte con predio vecino, al sur con vía pública, al oriente y occidente con propiedad privada.',

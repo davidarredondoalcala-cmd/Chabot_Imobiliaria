@@ -25,6 +25,7 @@ export class Inmueble {
   @Prop() banos: number;
   @Prop() area: number; // metros cuadrados
   @Prop() foto: string; // URL pública de la foto (opcional)
+  @Prop({ default: '' }) descripcion: string;
   @Prop({ type: [ContratoSchema], default: [] }) contratos: Contrato[];
 }
 export type InmuebleDoc = HydratedDocument<Inmueble>;
