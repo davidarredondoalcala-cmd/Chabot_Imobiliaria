@@ -25,6 +25,16 @@ export async function obtenerAcuerdo(id) {
   return j(r);
 }
 
+// Obtiene el acuerdo más reciente de un inmueble (para visor con firmas y datos completos)
+export async function obtenerAcuerdoPorInmueble(inmuebleId) {
+  const r = await fetch(`${API}/api/firmas/acuerdos/inmueble/${inmuebleId}`, {
+    cache: 'no-store',
+    headers: conAuth(),
+  });
+  if (!r.ok) return null;
+  return r.json().catch(() => null);
+}
+
 // Público: el firmante externo abre su enlace sin sesión.
 export async function porToken(token) {
   const r = await fetch(`${API}/api/firmas/t/${token}`, { cache: 'no-store' });

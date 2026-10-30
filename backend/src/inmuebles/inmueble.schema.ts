@@ -7,6 +7,9 @@ export class Contrato {
   @Prop() vig: boolean; // contrato vigente
   @Prop() fecha: string;
   @Prop([String]) firm: string[];
+  @Prop() acuerdoId?: string;
+  @Prop({ type: Object }) datos?: any;
+  @Prop({ type: Object }) firmas?: any;
 }
 export const ContratoSchema = SchemaFactory.createForClass(Contrato);
 

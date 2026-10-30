@@ -6,7 +6,8 @@ import Hoja from './Hoja';
 import { fd, fmt, cls, porVencer, estaPorVencer } from '../lib/utils';
 import { subirImagen, urlImagen } from '../lib/apiImagenes';
 import { setFotoInmueble } from '../lib/api';
-import { descargarPdfBorrador } from '../lib/apiFirmas';
+import { INMOBILIARIA_INFO } from '../lib/firmaInmobiliaria';
+import { descargarPdfBorrador, descargarPdfFinal, obtenerAcuerdo, obtenerAcuerdoPorInmueble } from '../lib/apiFirmas';
 import { IcoOjo, IcoDescargar, IcoImprimir, IcoCerrar, IcoDocumento, IcoSparkle, IcoWhatsApp, IcoCamara, IcoCheck } from './Iconos';
 
 // Tarjeta del contrato con acciones de ver, descargar y renovar (exclusivo para administradores)
@@ -63,15 +64,42 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
     const modo = (c.tipo || '').toLowerCase().includes('compra') || (c.tipo || '').toLowerCase().includes('venta')
       ? 'venta'
       : 'arriendo';
+
+    if (c.datos && typeof c.datos === 'object') {
+      const S = { ...c.datos };
+      if (modo === 'arriendo') S.arr = INMOBILIARIA_INFO.nombre;
+      else S.vend = INMOBILIARIA_INFO.nombre;
+      return { modo, S, firmas: c.firmas || null, acuerdoId: c.acuerdoId };
+    }
+
     const firmantes = Array.isArray(c.firm) ? c.firm : [];
     const fecha = c.fecha
       ? new Date(c.fecha).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })
       : '';
+
+    // Si firmantes[0] es la Inmobiliaria, la contraparte (arrendatario/comprador) es firmantes[1]
+    let arr = INMOBILIARIA_INFO.nombre;
+    let vend = INMOBILIARIA_INFO.nombre;
+    let contraparte = modo === 'venta' ? 'Comprador' : 'Arrendatario';
+    let cods = [];
+
+    if (firmantes.length > 0) {
+      const p = (firmantes[0] || '').toLowerCase();
+      const primerFirmanteEsInm = p.includes('habitat capital') || p.includes('inmobiliaria');
+      if (primerFirmanteEsInm) {
+        contraparte = firmantes[1] || (modo === 'venta' ? 'Comprador' : 'Arrendatario');
+        cods = firmantes.slice(2);
+      } else {
+        contraparte = firmantes[0];
+        cods = firmantes.slice(1);
+      }
+    }
+
     const S = {
-      arr: 'Habitat Capital Inmobiliaria',
-      ate: firmantes[0] || 'Arrendatario',
-      vend: 'Habitat Capital Inmobiliaria',
-      comp: firmantes[0] || 'Comprador',
+      arr,
+      ate: contraparte,
+      vend,
+      comp: contraparte,
       ciu: 'Ibagué',
       dir: i.dir || '',
       bar: i.barrio || '',
@@ -81,15 +109,77 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
       dia: i.diaPago || 5,
       pago: 'De contado',
       fecha,
-      cods: firmantes.slice(1),
+      cods,
     };
-    return { modo, S };
+    return { modo, S, firmas: c.firmas || null, acuerdoId: c.acuerdoId };
   };
 
-  const verContrato = (c) => {
+  const verContrato = async (c) => {
     if (!esAdmin) return;
-    const { modo, S } = prepararContratoS(c);
-    setContratoVer({ c, modo, S });
+    const { modo, S, firmas, acuerdoId } = prepararContratoS(c);
+    setContratoVer({ c, modo, S, firmas: firmas || null, acuerdoId });
+
+    // Carga en segundo plano el acuerdo para traer las firmas gráficas reales del arrendatario / codeudores
+    try {
+      let acuerdo = null;
+      if (c.acuerdoId) {
+        acuerdo = await obtenerAcuerdo(c.acuerdoId);
+      } else if (i._id) {
+        acuerdo = await obtenerAcuerdoPorInmueble(i._id);
+      }
+
+      if (acuerdo && acuerdo.firmantes) {
+        const firmasObj = { codeudores: [] };
+        let ateNombre = '';
+        let ateCedula = '';
+        let ateEmail = '';
+        const codsNombres = [];
+
+        for (const f of acuerdo.firmantes) {
+          if (f.rol === 'arrendatario' || f.rol === 'comprador') {
+            if (f.imagen) firmasObj[f.rol] = f.imagen;
+            ateNombre = f.nombre || f.datos?.nombre || '';
+            ateCedula = f.cedula || f.datos?.cedula || '';
+            ateEmail = f.email || f.datos?.email || '';
+          } else if (f.rol === 'arrendador' || f.rol === 'vendedor') {
+            if (f.imagen) firmasObj[f.rol] = f.imagen;
+          } else if (f.rol === 'codeudor') {
+            if (f.imagen) firmasObj.codeudores.push(f.imagen);
+            codsNombres.push(f.nombre || f.datos?.nombre || '');
+          }
+        }
+
+        setContratoVer((prev) => {
+          if (!prev) return null;
+          const datosAcuerdo = acuerdo.datos || {};
+          const nuevoS = {
+            ...prev.S,
+            ...datosAcuerdo,
+            arr: INMOBILIARIA_INFO.nombre,
+            vend: INMOBILIARIA_INFO.nombre,
+            ate: ateNombre || datosAcuerdo.ate || prev.S.ate,
+            ateCedula: ateCedula || datosAcuerdo.ateCedula || prev.S.ateCedula,
+            ateEmail: ateEmail || datosAcuerdo.ateEmail || prev.S.ateEmail,
+            comp: ateNombre || datosAcuerdo.comp || prev.S.comp,
+            cods: codsNombres.length > 0 ? codsNombres : (datosAcuerdo.cods || prev.S.cods),
+          };
+          return {
+            ...prev,
+            S: nuevoS,
+            acuerdoId: acuerdo.id || prev.acuerdoId,
+            firmas: {
+              arrendador: firmasObj.arrendador || prev.firmas?.arrendador,
+              arrendatario: firmasObj.arrendatario || prev.firmas?.arrendatario,
+              vendedor: firmasObj.vendedor || prev.firmas?.vendedor,
+              comprador: firmasObj.comprador || prev.firmas?.comprador,
+              codeudores: firmasObj.codeudores?.length > 0 ? firmasObj.codeudores : (prev.firmas?.codeudores || []),
+            },
+          };
+        });
+      }
+    } catch (err) {
+      console.warn('No se pudieron obtener firmas remotas del acuerdo:', err);
+    }
   };
 
   const descargarContrato = async (c) => {
@@ -97,14 +187,25 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
       avisar?.('Acceso restringido: solo los administradores pueden descargar contratos.');
       return;
     }
-    const { modo, S } = prepararContratoS(c);
-    setDescargandoId(c.fecha || c.tipo);
-    avisar?.('Generando PDF del contrato…');
+    const { modo, S, acuerdoId } = prepararContratoS(c);
+    const targetAcuerdoId = contratoVer?.acuerdoId || acuerdoId || c.acuerdoId;
+    const descId = c.fecha || c.tipo;
+    setDescargandoId(descId);
+    avisar?.('Descargando contrato en PDF…');
     try {
-      await descargarPdfBorrador(modo, S);
-      avisar?.('PDF descargado con éxito');
+      if (targetAcuerdoId) {
+        await descargarPdfFinal(targetAcuerdoId);
+      } else {
+        await descargarPdfBorrador(modo, S);
+      }
+      avisar?.('Contrato descargado en PDF');
     } catch (err) {
-      avisar?.(err.message || 'No se pudo descargar el PDF');
+      try {
+        await descargarPdfBorrador(modo, S);
+        avisar?.('Contrato descargado en PDF');
+      } catch (e2) {
+        avisar?.(err.message || 'No se pudo descargar el contrato');
+      }
     } finally {
       setDescargandoId(null);
     }
@@ -334,7 +435,7 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
               className="modal-contrato-papel"
               onClick={(e) => e.stopPropagation()}
             >
-              <Hoja modo={contratoVer.modo} S={contratoVer.S} />
+              <Hoja modo={contratoVer.modo} S={contratoVer.S} firmas={contratoVer.firmas} />
             </div>
 
             <div className="modal-contrato-hint-exterior noprint">

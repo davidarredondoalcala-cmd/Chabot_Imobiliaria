@@ -221,16 +221,26 @@ export class InmueblesService implements OnModuleInit {
     if (!i) throw new NotFoundException('Inmueble no encontrado');
     const fecha = new Date().toISOString().slice(0, 10);
     const firm = (b.firmantes || []).filter(Boolean);
+    const contratoData: any = {
+      tipo: b.modo === 'arriendo' ? 'Arriendo' : 'Compraventa',
+      vig: b.modo === 'arriendo',
+      fecha,
+      firm,
+      acuerdoId: b.acuerdoId ? String(b.acuerdoId) : undefined,
+      datos: b.datos || undefined,
+      firmas: b.firmas || undefined,
+    };
     if (b.modo === 'arriendo') {
       i.contratos.forEach((c) => (c.vig = false));
-      i.contratos.unshift({ tipo: 'Arriendo', vig: true, fecha, firm });
+      i.contratos.unshift(contratoData);
       const v = new Date();
       v.setMonth(v.getMonth() + Number(b.dur || 12));
       i.estado = 'Arrendada';
       i.venc = v.toISOString().slice(0, 10);
       i.diaPago = Number(b.dia || 5);
     } else {
-      i.contratos.unshift({ tipo: 'Compraventa', vig: false, fecha, firm });
+      contratoData.vig = false;
+      i.contratos.unshift(contratoData);
       i.estado = 'Vendida';
       i.venc = '';
     }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Connection, Model } from 'mongoose';
+import { Connection, Model, Types, isValidObjectId } from 'mongoose';
 import { NOMBRE_ACUERDO } from './model';
 import { hashContrato, hashCadena, generarToken, ipDe, tokenSeguro } from './hash';
 import { generarPdf, generarPdfBorrador, guardarEnGridFS, leerDeGridFS } from './pdf';
@@ -343,11 +343,22 @@ export class FirmasService {
   private async marcarInmueble(acuerdo: any) {
     if (!acuerdo.inmueble) return;
     const d = acuerdo.datos || {};
+    const firmasObj: any = { codeudores: [] };
+    for (const f of acuerdo.firmantes || []) {
+      if (f.rol === 'codeudor') {
+        firmasObj.codeudores.push(f.imagen || null);
+      } else {
+        firmasObj[f.rol] = f.imagen || null;
+      }
+    }
     try {
       await this.inmuebles.crearContrato(String(acuerdo.inmueble), {
         modo: acuerdo.tipo,
+        acuerdoId: String(acuerdo._id),
         firmantes: acuerdo.firmantes.map((f: any) => f.datos?.nombre || f.nombre),
         dur: d.dur, dia: d.dia, val: d.val, dir: d.dir, bar: d.bar, lin: d.lin,
+        datos: d,
+        firmas: firmasObj,
       });
     } catch (e: any) {
       console.error('No se pudo actualizar el estado del inmueble:', e.message);
@@ -444,5 +455,47 @@ export class FirmasService {
     if (!['arriendo', 'venta'].includes(tipo)) throw new ErrorFirma(400, 'Tipo de contrato inválido');
     if (!datos || typeof datos !== 'object') throw new ErrorFirma(400, 'Faltan los datos del contrato');
     return generarPdfBorrador(tipo, datos);
+  }
+
+  // ===== Obtener acuerdo más reciente de un inmueble (para visor de contrato con firmas) =====
+  async obtenerPorInmueble(inmuebleId: string) {
+    if (!inmuebleId) return null;
+    const conds: any[] = [{ inmueble: inmuebleId }];
+    if (isValidObjectId(inmuebleId)) {
+      conds.push({ inmueble: new Types.ObjectId(inmuebleId) });
+    }
+    const acuerdo: any = await this.acuerdos
+      .findOne({ $or: conds })
+      .sort({ createdAt: -1 });
+
+    if (!acuerdo) return null;
+
+    const firmasObj: any = { codeudores: [] };
+    for (const f of acuerdo.firmantes || []) {
+      if (f.rol === 'codeudor') {
+        firmasObj.codeudores.push(f.imagen || null);
+      } else {
+        firmasObj[f.rol] = f.imagen || null;
+      }
+    }
+
+    return {
+      id: String(acuerdo._id),
+      tipo: acuerdo.tipo,
+      estado: acuerdo.estado,
+      datos: acuerdo.datos,
+      firmantes: (acuerdo.firmantes || []).map((f: any) => ({
+        rol: f.rol,
+        orden: f.orden,
+        estado: f.estado,
+        nombre: f.nombre || f.datos?.nombre || '',
+        cedula: f.cedula || f.datos?.cedula || '',
+        email: f.email || f.datos?.email || '',
+        imagen: f.imagen || null,
+      })),
+      firmas: firmasObj,
+      fechaContrato: acuerdo.fechaContrato,
+      cerradoEn: acuerdo.cerradoEn,
+    };
   }
 }

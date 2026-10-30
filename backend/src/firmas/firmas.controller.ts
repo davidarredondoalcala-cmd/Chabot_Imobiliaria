@@ -26,6 +26,13 @@ export class FirmasController {
     return this.svc.obtenerAcuerdo(id);
   }
 
+  // Obtener acuerdo más reciente de un inmueble (para visor y contratos vigentes)
+  @Public()
+  @Get('acuerdos/inmueble/:inmuebleId')
+  obtenerPorInmueble(@Param('inmuebleId') inmuebleId: string) {
+    return this.svc.obtenerPorInmueble(inmuebleId);
+  }
+
   // Datos públicos para la pantalla de firma (contrato, turno, rol)
   // Público: el firmante externo llega por enlace privado, sin sesión de administrador.
   @Public()
