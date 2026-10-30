@@ -10,18 +10,23 @@
   display: inline-block;
   font-weight: 600;
   font-size: .92rem;
-  border: 1.5px solid var(--ac);
-  background: var(--ac);
-  color: var(--onac);
+  border: 1.5px solid rgba(56, 189, 248, 0.6);
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #38bdf8 100%);
+  color: #ffffff;
   border-radius: 10px;
   padding: 10px 18px;
   text-decoration: none;
-  transition: background .15s, box-shadow .15s
+  box-shadow: 0 0 16px rgba(37, 99, 235, 0.45);
+  transition: all .2s ease;
 }
-.btn-pdf:hover { background: var(--ac2); border-color: var(--ac2); box-shadow: 0 6px 16px var(--ring) }
+.btn-pdf:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 45%, #00f0ff 100%);
+  border-color: #00f0ff;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.65), 0 0 40px rgba(37, 99, 235, 0.4);
+}
 
 /* ---------- Verificación e estados ---------- */
-.fm-verif { border-left: 4px solid var(--ac) }
+.fm-verif { border-left: 4px solid var(--ac); box-shadow: 0 0 16px rgba(37, 99, 235, 0.15) }
 .fm-verif.mal { border-left-color: var(--red) }
 .fm-espera .fm-estados { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 8px }
 .fm-espera .fm-estados li { display: flex; align-items: center; gap: 10px; font-size: .92rem }
@@ -36,23 +41,29 @@
 
 /* ---------- Pestañas de método ---------- */
 .fm-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 6px 0 18px }
-.fm-tabs button { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; text-align: left }
+.fm-tabs button { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; text-align: left; transition: all .2s ease }
 .fm-tabs button small { color: var(--mut); font-weight: 400; font-size: .78rem }
-.fm-tabs button.on { background: var(--ac); border-color: var(--ac); color: var(--onac) }
-.fm-tabs button.on small { color: rgba(255, 255, 255, .78) }
+.fm-tabs button.on {
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #38bdf8 100%);
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.5);
+}
+.fm-tabs button.on small { color: rgba(255, 255, 255, .88) }
 @media (max-width: 700px) { .fm-tabs { grid-template-columns: 1fr } }
 
 /* ---------- Áreas de dibujo y preview ---------- */
 .fm-caja {
   background: #fff;
-  border: 1.5px dashed var(--bd);
+  border: 1.5px dashed rgba(56, 189, 248, 0.55);
   border-radius: 12px;
   min-height: 170px;
   display: grid;
   place-items: center;
   padding: 12px;
   background-image: radial-gradient(var(--bd) 1px, transparent 1px);
-  background-size: 18px 18px
+  background-size: 18px 18px;
+  box-shadow: 0 0 15px rgba(37, 99, 235, 0.12);
 }
 .fm-prev img { max-width: 100%; height: auto; max-height: 180px }
 .fm-lienzo {
@@ -61,10 +72,11 @@
   touch-action: none;
   cursor: crosshair;
   background: #fff;
-  border: 1.5px dashed var(--bd);
+  border: 1.5px dashed rgba(56, 189, 248, 0.55);
   border-radius: 12px;
   background-image: radial-gradient(var(--bd) 1px, transparent 1px);
-  background-size: 18px 18px
+  background-size: 18px 18px;
+  box-shadow: 0 0 18px rgba(37, 99, 235, 0.15);
 }
 
 /* ---------- Fuentes tipográficas ---------- */

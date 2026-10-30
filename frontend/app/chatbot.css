@@ -13,19 +13,20 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--gold-grad, linear-gradient(135deg, #a46d2a 0%, #c9933e 50%, #d89f47 100%));
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 55%, #38bdf8 100%);
   color: #ffffff;
-  border: 1px solid rgba(250, 230, 158, 0.4);
+  border: 1.5px solid rgba(56, 189, 248, 0.7);
   border-radius: 9999px;
   padding: 12px 18px;
-  box-shadow: 0 8px 24px var(--gold-glow, rgba(212, 175, 55, 0.4));
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.6), 0 0 35px rgba(56, 189, 248, 0.35);
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .hc-chat-trigger-btn:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 12px 28px var(--gold-glow, rgba(212, 175, 55, 0.55));
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 28px rgba(0, 240, 255, 0.75), 0 0 50px rgba(37, 99, 235, 0.5);
+  border-color: #00f0ff;
 }
 
 .hc-trigger-badge {
@@ -43,7 +44,8 @@
   background: var(--card, #ffffff);
   color: var(--tx, #14201d);
   border-radius: 20px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18), 0 0 0 1px var(--gold-border, #dbe3e0);
+  border: 1.5px solid rgba(56, 189, 248, 0.45);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(37, 99, 235, 0.35);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -63,16 +65,17 @@
 
 /* Encabezado */
 .hc-chat-header {
-  background: linear-gradient(135deg, #2b1d12 0%, var(--gold-dark, #996515) 50%, var(--ac, #a86e2e) 100%);
+  background: linear-gradient(135deg, #050c20 0%, #0d2259 45%, #1d4ed8 85%, #2563eb 100%);
   color: #ffffff;
   padding: 14px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--gold-border, rgba(255, 255, 255, 0.15));
+  border-bottom: 1.5px solid rgba(56, 189, 248, 0.55);
   cursor: pointer;
   user-select: none;
   transition: filter 0.18s ease, background 0.18s ease;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.35);
 }
 
 .hc-chat-header:hover {
@@ -92,12 +95,14 @@
 .hc-bot-avatar-badge {
   width: 36px;
   height: 36px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(56, 189, 248, 0.2);
+  border: 1px solid rgba(56, 189, 248, 0.45);
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #f2cb8b;
+  color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
 }
 
 .hc-bot-info h3 {
@@ -118,10 +123,10 @@
 .hc-status-dot {
   width: 7px;
   height: 7px;
-  background: #34d399;
+  background: #00f0ff;
   border-radius: 50%;
   display: inline-block;
-  box-shadow: 0 0 8px #34d399;
+  box-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
 }
 
 .hc-header-actions {
@@ -131,18 +136,20 @@
 }
 
 .hc-header-collapse-btn {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(56, 189, 248, 0.2);
   color: #ffffff;
+  border: 1px solid rgba(56, 189, 248, 0.4);
   border-radius: 8px;
   padding: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.18s ease, transform 0.18s ease;
+  transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .hc-chat-header:hover .hc-header-collapse-btn {
-  background: rgba(255, 255, 255, 0.28);
+  background: rgba(0, 240, 255, 0.3);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
   transform: translateY(1.5px);
 }
 
@@ -171,12 +178,12 @@
 /* Tarjeta de opciones para Retomar o Empezar nueva conversación */
 .hc-resume-card {
   background: var(--card, #ffffff);
-  border: 1px solid var(--bd, #dbe3e0);
-  border-left: 4px solid var(--ac, #a86e2e);
+  border: 1px solid var(--bd, #cbdcf8);
+  border-left: 4px solid #38bdf8;
   border-radius: 12px;
   padding: 12px 14px;
   margin-top: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 16px rgba(37, 99, 235, 0.2);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -187,7 +194,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--mut, #5b6b66);
+  color: #1d4ed8;
   margin-bottom: 2px;
 }
 
@@ -195,41 +202,43 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: linear-gradient(135deg, #a86e2e 0%, #996515 100%);
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #38bdf8 100%);
   color: #ffffff;
-  border: none;
+  border: 1px solid rgba(56, 189, 248, 0.5);
   border-radius: 10px;
   padding: 10px 12px;
   cursor: pointer;
   text-align: left;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 2px 8px rgba(153, 101, 21, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  box-shadow: 0 0 14px rgba(37, 99, 235, 0.35);
   width: 100%;
 }
 
 .hc-resume-btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(153, 101, 21, 0.35);
+  border-color: #00f0ff;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
 }
 
 .hc-resume-btn-secondary {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--bg, #eff3f1);
-  color: var(--tx, #14201d);
-  border: 1px solid var(--bd, #dbe3e0);
+  background: var(--bg, #f0f5ff);
+  color: var(--tx, #0a1936);
+  border: 1px solid var(--bd, #cbdcf8);
   border-radius: 10px;
   padding: 10px 12px;
   cursor: pointer;
   text-align: left;
-  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
   width: 100%;
 }
 
 .hc-resume-btn-secondary:hover {
   background: #ffffff;
-  border-color: var(--ac, #a86e2e);
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
   transform: translateY(-1px);
 }
 
@@ -666,20 +675,22 @@
     background: rgba(0, 0, 0, 0.4);
   }
   :root:not([data-theme="light"]) .hc-resume-card {
-    background: #1e1713;
-    border-color: rgba(242, 203, 139, 0.25);
-    border-left-color: var(--gold, #d4af37);
+    background: #0a142c;
+    border-color: rgba(56, 189, 248, 0.35);
+    border-left-color: #00f0ff;
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.35);
   }
   :root:not([data-theme="light"]) .hc-resume-card-title {
-    color: #f2cb8b;
+    color: #38bdf8;
   }
   :root:not([data-theme="light"]) .hc-resume-btn-secondary {
-    background: #2b221c;
-    color: #f3f4f6;
-    border-color: rgba(255, 255, 255, 0.15);
+    background: #0f1d3d;
+    color: #f0f6ff;
+    border-color: rgba(56, 189, 248, 0.3);
   }
   :root:not([data-theme="light"]) .hc-resume-btn-secondary:hover {
-    background: #382c23;
-    border-color: #d4af37;
+    background: #152752;
+    border-color: #00f0ff;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
   }
 }
