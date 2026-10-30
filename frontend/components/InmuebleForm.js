@@ -5,6 +5,12 @@ import { subirImagen, urlImagen } from '../lib/apiImagenes';
 import Tarjeta from './Tarjeta';
 import Ilustra from './Ilustra';
 import { IcoCamara, IcoCerrar, IcoCheck } from './Iconos';
+import {
+  soloNumeros,
+  limpiarDireccion,
+  limpiarTexto,
+  esNombreValido,
+} from '../lib/validadores';
 
 export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
   const [S, setS] = useState({ tipo: tipo0 || 'Casa', nombre: '', descripcion: '', estado: 'Sin arrendar', dir: '', barrio: '', lind: '', habitaciones: '', banos: '', area: '', valor: '', venc: '', dia: 5, foto: '' });
@@ -13,9 +19,33 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
   const [env, setEnv] = useState(false);
   const [subiendoFoto, setSubiendoFoto] = useState(false);
   const fileRef = useRef(null);
-  const set = (k) => (e) => setS({ ...S, [k]: e.target.value });
-  // Función (no componente) para que el input no pierda el foco al escribir
-  const campo = (k, l, t, p, min) => (<><label>{l}</label><input type={t || 'text'} min={min} placeholder={p} value={S[k]} onChange={set(k)} /></>);
+
+  const actualizarCampo = (k, valorRaw) => {
+    let valor = valorRaw;
+    if (k === 'nombre') valor = limpiarTexto(valorRaw, 60);
+    else if (k === 'dir') valor = limpiarDireccion(valorRaw, 80);
+    else if (k === 'barrio') valor = limpiarTexto(valorRaw, 50);
+    else if (k === 'descripcion') valor = limpiarTexto(valorRaw, 300);
+    else if (k === 'lind') valor = limpiarTexto(valorRaw, 500);
+    else if (k === 'habitaciones' || k === 'banos') valor = soloNumeros(valorRaw, 2);
+    else if (k === 'area') valor = soloNumeros(valorRaw, 5);
+    else if (k === 'valor') valor = soloNumeros(valorRaw, 12);
+    else if (k === 'dia') valor = soloNumeros(valorRaw, 2);
+    setS((prev) => ({ ...prev, [k]: valor }));
+  };
+
+  const campo = (k, l, t, p, maxLen) => (
+    <>
+      <label>{l}</label>
+      <input
+        type={t || 'text'}
+        placeholder={p}
+        maxLength={maxLen}
+        value={S[k] || ''}
+        onChange={(e) => actualizarCampo(k, e.target.value)}
+      />
+    </>
+  );
 
   // Previsualización local inmediata antes de subir
   const elegirFoto = (e) => {
@@ -56,7 +86,23 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
   };
 
   const guardar = async () => {
-    if (!S.nombre.trim() || !S.dir.trim() || S.valor === '') return avisar?.('Completa nombre, dirección y valor');
+    if (!esNombreValido(S.nombre)) {
+      return avisar?.('El nombre del inmueble debe tener al menos 3 letras válidas');
+    }
+    if (!S.dir.trim() || S.dir.trim().length < 5) {
+      return avisar?.('Ingresa una dirección válida para el inmueble (mínimo 5 caracteres)');
+    }
+    const valNum = Number(S.valor);
+    if (isNaN(valNum) || valNum <= 0) {
+      return avisar?.('Ingresa un valor económico válido mayor a cero');
+    }
+    if (S.estado === 'Arrendada') {
+      const diaNum = Number(S.dia);
+      if (isNaN(diaNum) || diaNum < 1 || diaNum > 31) {
+        return avisar?.('El día de pago debe ser un número entre 1 y 31');
+      }
+    }
+
     setEnv(true);
     try {
       let urlFotoFinal = S.foto;
@@ -96,21 +142,42 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
             <button className={S.tipo === 'Casa' ? 'on' : ''} onClick={() => setS({ ...S, tipo: 'Casa' })}>Casa</button>
             <button className={S.tipo === 'Apartamento' ? 'on' : ''} onClick={() => setS({ ...S, tipo: 'Apartamento' })}>Apartamento</button>
           </div>
-          {campo('nombre', 'Nombre *', 'text', 'Ej: Casa Piedra Pintada')}
+          {campo('nombre', 'Nombre *', 'text', 'Ej: Casa Piedra Pintada', 60)}
           <label>Descripción del inmueble</label>
-          <textarea rows="3" placeholder="Resumen del inmueble, iluminación, distribución y entorno..." value={S.descripcion} onChange={set('descripcion')} />
+          <textarea
+            rows="3"
+            placeholder="Resumen del inmueble, iluminación, distribución y entorno..."
+            maxLength={300}
+            value={S.descripcion}
+            onChange={(e) => actualizarCampo('descripcion', e.target.value)}
+          />
           <label>Estado</label>
-          <select value={S.estado} onChange={set('estado')}><option>Sin arrendar</option><option>Para la venta</option><option>Arrendada</option></select>
-          {campo('dir', 'Dirección *', 'text', 'Ej: Cll 10 # 5 - 20')}
-          {campo('barrio', 'Barrio')}
-          <label>Linderos</label><textarea rows="3" value={S.lind} onChange={set('lind')} />
+          <select value={S.estado} onChange={(e) => setS({ ...S, estado: e.target.value })}>
+            <option>Sin arrendar</option>
+            <option>Para la venta</option>
+            <option>Arrendada</option>
+          </select>
+          {campo('dir', 'Dirección *', 'text', 'Ej: Cll 10 # 5 - 20', 80)}
+          {campo('barrio', 'Barrio', 'text', 'Ej: Piedra Pintada', 50)}
+          <label>Linderos</label>
+          <textarea
+            rows="3"
+            value={S.lind}
+            maxLength={500}
+            onChange={(e) => actualizarCampo('lind', e.target.value)}
+          />
           <div className="grid3">
-            <div>{campo('habitaciones', 'Habitaciones', 'number', '0', 0)}</div>
-            <div>{campo('banos', 'Baños', 'number', '0', 0)}</div>
-            <div>{campo('area', 'Área (m²)', 'number', '0', 0)}</div>
+            <div>{campo('habitaciones', 'Habitaciones', 'text', '0', 2)}</div>
+            <div>{campo('banos', 'Baños', 'text', '0', 2)}</div>
+            <div>{campo('area', 'Área (m²)', 'text', '0', 5)}</div>
           </div>
-          {campo('valor', S.estado === 'Para la venta' ? 'Precio de venta *' : 'Valor mensual *', 'number', '', 0)}
-          {arrendada && <>{campo('venc', 'Vencimiento del contrato', 'date')}{campo('dia', 'Día de pago de cada mes', 'number', '', 1)}</>}
+          {campo('valor', S.estado === 'Para la venta' ? 'Precio de venta *' : 'Valor mensual *', 'text', 'Ej: 1500000', 12)}
+          {arrendada && (
+            <>
+              {campo('venc', 'Vencimiento del contrato', 'date')}
+              {campo('dia', 'Día de pago de cada mes (1-31)', 'text', '5', 2)}
+            </>
+          )}
           
           <label>Foto del inmueble con previsualización</label>
           <div

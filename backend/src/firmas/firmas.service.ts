@@ -95,14 +95,18 @@ export class FirmasService {
         };
       }
 
+      const nombreLimpio = String(f.nombre || '').trim();
+      const cedulaLimpia = String(f.cedula || '').replace(/\D/g, '').slice(0, 10);
+      const emailLimpio = String(f.email || '').trim().toLowerCase();
+
       return {
         rol: f.rol,
         orden: i + 1,
         estado: 'pendiente',
         token: generarToken(),
-        nombre: f.nombre || '',
-        email: f.email || '',
-        cedula: f.cedula || '',
+        nombre: nombreLimpio,
+        email: emailLimpio,
+        cedula: cedulaLimpia,
         datos: null,
         imagen: null,
         evidencia: null,
@@ -195,6 +199,8 @@ export class FirmasService {
       miOrden: propia.orden,
       miEstado: propia.estado,
       miNombre: propia.datos?.nombre || propia.nombre || '',
+      miCedula: propia.datos?.cedula || propia.cedula || '',
+      miEmail: propia.datos?.email || propia.email || '',
       turno: turno ? { rol: turno.rol, orden: turno.orden, nombre: turno.nombre || '' } : null,
       firmantes: acuerdo.firmantes.map((f: any) => ({
         rol: f.rol, orden: f.orden, estado: f.estado,
@@ -260,10 +266,11 @@ export class FirmasService {
     if (!METODOS.includes(metodo)) throw new ErrorFirma(400, 'Método de firma inválido');
     validarImagen(imagen);
 
-    const cedula = String(datos?.cedula || '').trim();
-    const nombre = String(datos?.nombre || '').trim();
+    const cedula = String(datos?.cedula || propia.cedula || propia.datos?.cedula || '').replace(/\D/g, '').slice(0, 10);
+    const nombre = String(datos?.nombre || propia.nombre || propia.datos?.nombre || '').trim();
+    const email = String(datos?.email || propia.email || propia.datos?.email || '').trim().toLowerCase();
     if (nombre.length < 3) throw new ErrorFirma(400, 'Escribe tu nombre completo');
-    if (cedula.length < 5) throw new ErrorFirma(400, 'Escribe tu número de cédula');
+    if (cedula.length < 5) throw new ErrorFirma(400, 'Número de cédula inválido');
 
     // Integridad: el hash guardado debe seguir coincidiendo con el snapshot
     const recomputado = hashContrato(acuerdo.datos);

@@ -4,6 +4,16 @@ import Hoja from './Hoja';
 import { crearAcuerdo, descargarPdfBorrador, obtenerAcuerdo } from '../lib/apiFirmas';
 import { IcoImprimir, IcoDescargar, IcoMail, IcoCheck, IcoMas, IcoBasura, IcoEditar, IcoDocumento } from './Iconos';
 import { INMOBILIARIA_INFO, FIRMA_INMOBILIARIA_DATA_URL } from '../lib/firmaInmobiliaria';
+import {
+  soloNumeros,
+  soloLetras,
+  limpiarEmail,
+  limpiarDireccion,
+  limpiarTexto,
+  esCedulaValida,
+  esNombreValido,
+  esEmailValido,
+} from '../lib/validadores';
 
 const CLAUSULAS_ARRIENDO_DEF = [
   { pre: 'PRIMERA – Objeto.', resto: 'EL ARRENDADOR entrega a título de arrendamiento el inmueble ubicado en la dirección indicada.' },
@@ -83,12 +93,43 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
     }));
   };
 
-  const set = (k) => (e) => setS({ ...S, [k]: e.target.value });
+  // Filtrado y sanitización estricta por campo para garantizar la seriedad de los datos
+  const actualizarCampo = (k, valorRaw) => {
+    let valor = valorRaw;
+    if (k === 'ate' || k === 'comp' || k === 'ciu') {
+      valor = soloLetras(valorRaw, 60);
+    } else if (k === 'ateCedula' || k === 'compCedula') {
+      valor = soloNumeros(valorRaw, 10);
+    } else if (k === 'ateEmail' || k === 'compEmail') {
+      valor = limpiarEmail(valorRaw, 80);
+    } else if (k === 'val') {
+      valor = soloNumeros(valorRaw, 12);
+    } else if (k === 'dur') {
+      valor = soloNumeros(valorRaw, 3);
+    } else if (k === 'dia') {
+      valor = soloNumeros(valorRaw, 2);
+    } else if (k === 'dir') {
+      valor = limpiarDireccion(valorRaw, 80);
+    } else if (k === 'bar') {
+      valor = limpiarTexto(valorRaw, 50);
+    } else if (k === 'lin') {
+      valor = limpiarTexto(valorRaw, 500);
+    } else if (k === 'pago') {
+      valor = limpiarTexto(valorRaw, 120);
+    }
+    setS((prev) => ({ ...prev, [k]: valor }));
+  };
 
-  const campo = (k, l, t, p) => (
+  const campo = (k, l, t, p, maxLen) => (
     <>
       <label>{l}</label>
-      <input type={t || 'text'} placeholder={p} value={S[k] || ''} onChange={set(k)} />
+      <input
+        type={t || 'text'}
+        placeholder={p}
+        maxLength={maxLen}
+        value={S[k] || ''}
+        onChange={(e) => actualizarCampo(k, e.target.value)}
+      />
     </>
   );
 
@@ -128,7 +169,15 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
     }));
   };
 
-  const actualizarCodeudor = (idx, campoArray, valor) => {
+  const actualizarCodeudor = (idx, campoArray, valorRaw) => {
+    let valor = valorRaw;
+    if (campoArray === 'cods') {
+      valor = soloLetras(valorRaw, 60);
+    } else if (campoArray === 'codsCedula') {
+      valor = soloNumeros(valorRaw, 10);
+    } else if (campoArray === 'codsEmail') {
+      valor = limpiarEmail(valorRaw, 80);
+    }
     setS((prev) => {
       const arr = Array.isArray(prev[campoArray]) ? [...prev[campoArray]] : [];
       arr[idx] = valor;
@@ -185,11 +234,59 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
 
   // Crea el acuerdo de firma en el backend y envía automáticamente los correos
   const enviar = async () => {
-    if (modo === 'arriendo' && !S.ate.trim()) {
-      return avisar?.('Escribe el nombre del arrendatario');
+    // 1. Validaciones lógicas y filtros de seriedad según el modo de contrato
+    if (modo === 'arriendo') {
+      if (!esNombreValido(S.ate)) {
+        return avisar?.('El nombre del arrendatario debe tener al menos 3 letras y ser un nombre válido');
+      }
+      if (!esCedulaValida(S.ateCedula)) {
+        return avisar?.('La cédula del arrendatario debe contener entre 6 y 10 dígitos numéricos válidos');
+      }
+      if (!esEmailValido(S.ateEmail)) {
+        return avisar?.('El correo del arrendatario no es válido (ej: cliente@dominio.com)');
+      }
+
+      // Validar codeudores registrados
+      for (let k = 0; k < (S.cods || []).length; k++) {
+        const nom = (S.cods[k] || '').trim();
+        const ced = (S.codsCedula?.[k] || '').trim();
+        const em = (S.codsEmail?.[k] || '').trim();
+        if (nom || ced || em) {
+          if (!esNombreValido(nom)) {
+            return avisar?.(`El nombre del codeudor #${k + 1} debe contener al menos 3 letras válidas`);
+          }
+          if (!esCedulaValida(ced)) {
+            return avisar?.(`La cédula del codeudor #${k + 1} debe contener entre 6 y 10 dígitos numéricos válidos`);
+          }
+          if (!esEmailValido(em)) {
+            return avisar?.(`El correo del codeudor #${k + 1} no tiene un formato válido (ej: codeudor@dominio.com)`);
+          }
+        }
+      }
+
+      const durNum = Number(S.dur);
+      if (isNaN(durNum) || durNum < 1 || durNum > 120) {
+        return avisar?.('La duración del contrato debe ser entre 1 y 120 meses');
+      }
+      const diaNum = Number(S.dia);
+      if (isNaN(diaNum) || diaNum < 1 || diaNum > 31) {
+        return avisar?.('El día de pago debe ser un número entre 1 y 31');
+      }
+    } else {
+      if (!esNombreValido(S.comp)) {
+        return avisar?.('El nombre del comprador debe tener al menos 3 letras y ser un nombre válido');
+      }
+      if (!esCedulaValida(S.compCedula)) {
+        return avisar?.('La cédula del comprador debe contener entre 6 y 10 dígitos numéricos válidos');
+      }
+      if (!esEmailValido(S.compEmail)) {
+        return avisar?.('El correo del comprador no es válido (ej: comprador@dominio.com)');
+      }
     }
-    if (modo === 'venta' && !S.comp.trim()) {
-      return avisar?.('Escribe el nombre del comprador');
+
+    const valNum = Number(S.val);
+    if (isNaN(valNum) || valNum <= 0) {
+      return avisar?.('El valor económico del contrato debe ser un número válido mayor a cero');
     }
 
     setCreando(true);
@@ -297,10 +394,10 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
                 </p>
               </div>
 
-              {campo('ate', 'Nombre del Arrendatario *', 'text', 'Ej: Andrés Gómez')}
+              {campo('ate', 'Nombre del Arrendatario *', 'text', 'Ej: Andrés Gómez', 60)}
               <div className="grid3" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                <div>{campo('ateCedula', 'Cédula Arrendatario', 'text', 'Ej: 1110543210')}</div>
-                <div>{campo('ateEmail', 'Correo Arrendatario', 'email', 'cliente@ejemplo.com')}</div>
+                <div>{campo('ateCedula', 'Cédula Arrendatario (6-10 dígitos) *', 'text', 'Ej: 1110543210', 10)}</div>
+                <div>{campo('ateEmail', 'Correo Arrendatario *', 'email', 'cliente@ejemplo.com', 80)}</div>
               </div>
 
               <div style={{ marginTop: 14, borderTop: '1px solid var(--bd)', paddingTop: 10 }}>
@@ -319,18 +416,22 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
                       style={{ marginTop: 6 }}
                       placeholder="Nombre completo del codeudor"
                       value={c}
+                      maxLength={60}
                       onChange={(e) => actualizarCodeudor(k, 'cods', e.target.value)}
                     />
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 6 }}>
                       <input
-                        placeholder="Cédula codeudor"
+                        placeholder="Cédula codeudor (6-10 dígitos)"
                         value={S.codsCedula?.[k] || ''}
+                        maxLength={10}
+                        inputMode="numeric"
                         onChange={(e) => actualizarCodeudor(k, 'codsCedula', e.target.value)}
                       />
                       <input
                         type="email"
                         placeholder="Correo para envío de firma"
                         value={S.codsEmail?.[k] || ''}
+                        maxLength={80}
                         onChange={(e) => actualizarCodeudor(k, 'codsEmail', e.target.value)}
                       />
                     </div>
@@ -364,28 +465,28 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
                 </p>
               </div>
 
-              {campo('comp', 'Nombre del Comprador *', 'text', 'Nombre completo')}
+              {campo('comp', 'Nombre del Comprador *', 'text', 'Nombre completo', 60)}
               <div className="grid3" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                <div>{campo('compCedula', 'Cédula Comprador', 'text', 'Cédula')}</div>
-                <div>{campo('compEmail', 'Correo Comprador', 'email', 'comprador@ejemplo.com')}</div>
+                <div>{campo('compCedula', 'Cédula Comprador (6-10 dígitos) *', 'text', 'Cédula sin puntos ni espacios', 10)}</div>
+                <div>{campo('compEmail', 'Correo Comprador *', 'email', 'comprador@ejemplo.com', 80)}</div>
               </div>
             </>
           )}
 
           <h3 style={{ margin: '22px 0 6px', fontSize: '1.05rem' }}>Datos del inmueble y términos</h3>
-          {campo('ciu', 'Ciudad')}
-          {campo('dir', 'Dirección del inmueble')}
-          {campo('bar', 'Barrio')}
+          {campo('ciu', 'Ciudad', 'text', 'Ej: Ibagué', 40)}
+          {campo('dir', 'Dirección del inmueble', 'text', 'Ej: Cra 5 # 38-12', 80)}
+          {campo('bar', 'Barrio', 'text', 'Ej: Piedra Pintada', 50)}
           <label>Linderos</label>
-          <textarea rows="3" value={S.lin} onChange={set('lin')} />
-          {campo('val', modo === 'arriendo' ? 'Valor mensual ($)' : 'Precio de venta ($)', 'number')}
+          <textarea rows="3" value={S.lin} maxLength={500} onChange={(e) => actualizarCampo('lin', e.target.value)} />
+          {campo('val', modo === 'arriendo' ? 'Valor mensual ($)' : 'Precio de venta ($)', 'text', 'Ej: 1500000', 12)}
           {modo === 'arriendo' ? (
             <div className="grid3" style={{ gridTemplateColumns: '1fr 1fr' }}>
-              <div>{campo('dur', 'Duración (meses)', 'number')}</div>
-              <div>{campo('dia', 'Día de pago de cada mes', 'number')}</div>
+              <div>{campo('dur', 'Duración (meses)', 'text', 'Ej: 12', 3)}</div>
+              <div>{campo('dia', 'Día de pago de cada mes (1-31)', 'text', 'Ej: 5', 2)}</div>
             </div>
           ) : (
-            campo('pago', 'Forma de pago')
+            campo('pago', 'Forma de pago', 'text', 'Ej: De contado contra firma', 120)
           )}
 
           {/* Editor de Cláusulas (Añadir y Modificar cláusulas) */}
