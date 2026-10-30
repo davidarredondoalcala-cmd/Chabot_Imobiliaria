@@ -186,7 +186,7 @@ export async function generarPdf(acuerdo: any) {
   dibujarCuerpo(doc, est, plantilla, fuentes);
 
   // ===== Bloque de firmas =====
-  est.y -= 30;
+  est.y -= 25;
   const filas: any[][] = [];
   let fila: any[] = [];
   // Codeudores que no estén ya incluidos en acuerdo.firmantes
@@ -202,34 +202,90 @@ export async function generarPdf(acuerdo: any) {
 
   const anchoCol = COL / 2 - 10;
   for (const fr of filas) {
-    if (est.y < 140) { est.pag = null; est.y = 0; } // fuerza página nueva
+    const tieneEvidenciaFila = fr.some((f: any) => f.evidencia);
+    const altoFila = tieneEvidenciaFila ? 120 : 95;
+    if (est.y - altoFila < M + 20) { est.pag = null; est.y = 0; } // fuerza página nueva si no cabe
     paginar(doc, est);
+
+    // Dejamos 50pt de margen vertical para que la firma descanse SOBRE la línea
+    const lineaY = est.y - 50;
+
     for (let i = 0; i < fr.length; i++) {
       const f = fr[i];
       const x = M + i * (anchoCol + 20);
-      // imagen de firma (PNG con fondo transparente, 600x240)
-      if (f.imagen && f.estado === 'firmada') {
+
+      // Si es Arrendador o Vendedor y no tiene imagen de firma propia, usar la firma corporativa
+      const esInmobiliaria = f.rol === 'Arrendador' || f.rol === 'Vendedor';
+      const imgData = (f.imagen && f.estado === 'firmada') ? f.imagen : (esInmobiliaria ? FIRMA_INMOBILIARIA_DATA_URL : null);
+
+      // 1. Imagen de firma descansando SOBRE la línea
+      if (imgData) {
         try {
-          const png = f.imagen.replace(/^data:image\/png;base64,/, '');
+          const png = imgData.replace(/^data:image\/png;base64,/, '');
           const embebida = await doc.embedPng(Buffer.from(png, 'base64'));
-          const wImg = 140;
-          const hImg = wImg * (embebida.height / embebida.width);
-          est.pag.drawImage(embebida, { x: x + (anchoCol - wImg) / 2, y: est.y - hImg + 16, width: wImg, height: hImg });
+          const maxW = Math.min(150, anchoCol - 20);
+          const maxH = 44;
+          const ratio = embebida.height / embebida.width;
+          let wImg = maxW;
+          let hImg = wImg * ratio;
+          if (hImg > maxH) {
+            hImg = maxH;
+            wImg = hImg / ratio;
+          }
+          const imgX = x + (anchoCol - wImg) / 2;
+          const imgY = lineaY + 3; // descansa 3pt exactamente sobre la línea de firma
+          est.pag.drawImage(embebida, { x: imgX, y: imgY, width: wImg, height: hImg });
         } catch { /* si el PNG falla, sigue con solo el nombre */ }
       }
-      // línea de firma
-      est.pag.drawLine({ start: { x, y: est.y }, end: { x: x + anchoCol, y: est.y }, thickness: 1, color: NEGRO });
+
+      // 2. Línea horizontal de firma
+      est.pag.drawLine({
+        start: { x: x + 10, y: lineaY },
+        end: { x: x + anchoCol - 10, y: lineaY },
+        thickness: 0.8,
+        color: NEGRO,
+      });
+
+      // 3. Nombre centrado
       const nombre = f.datos?.nombre || f.nombre || '____________________';
-      const nombreL = envolver(nombre, helv, 9.5, anchoCol)[0] || nombre;
-      est.pag.drawText(nombreL, { x, y: est.y - 14, size: 9.5, font: helv, color: NEGRO });
-      const rolTxt = f.sinFirma ? f.rol : `${f.rol}${f.estado === 'firmada' ? '' : ' (pendiente)'}`;
-      est.pag.drawText(rolTxt, { x, y: est.y - 26, size: 8.5, font: italica, color: GRIS });
+      const nombreL = envolver(nombre, helv, 9.5, anchoCol - 20)[0] || nombre;
+      const nomW = helv.widthOfTextAtSize(nombreL, 9.5);
+      const nomX = x + Math.max(0, (anchoCol - nomW) / 2);
+      est.pag.drawText(nombreL, { x: nomX, y: lineaY - 14, size: 9.5, font: helv, color: NEGRO });
+
+      // 4. Rol centrado
+      const baseRol = f.sinFirma ? f.rol : `${f.rol}${f.estado === 'firmada' ? '' : ' (pendiente)'}`;
+      const rolTxt = esInmobiliaria && !baseRol.includes('Firma autorizada') ? `${baseRol} (Firma autorizada del propietario)` : baseRol;
+      const rolW = italica.widthOfTextAtSize(rolTxt, 8.5);
+      const rolX = x + Math.max(0, (anchoCol - rolW) / 2);
+      est.pag.drawText(rolTxt, { x: rolX, y: lineaY - 25, size: 8.5, font: italica, color: GRIS });
+
+      // 5. Cédula centrada (si existe)
+      const ced = f.datos?.cedula || f.cedula;
+      let curY = lineaY - 35;
+      if (ced) {
+        const cedTxt = `C.C. ${ced}`;
+        const cedW = helv.widthOfTextAtSize(cedTxt, 8);
+        const cedX = x + Math.max(0, (anchoCol - cedW) / 2);
+        est.pag.drawText(cedTxt, { x: cedX, y: curY, size: 8, font: helv, color: GRIS });
+        curY -= 10;
+      }
+
+      // 6. Evidencia centrada (si existe)
       if (f.evidencia) {
-        est.pag.drawText(`${METODOS[f.evidencia.metodo] || f.evidencia.metodo}`, { x, y: est.y - 38, size: 7.5, font: italica, color: GRIS });
-        est.pag.drawText(fechaBogota(f.evidencia.fecha), { x, y: est.y - 48, size: 7.5, font: italica, color: GRIS });
+        const metTxt = `${METODOS[f.evidencia.metodo] || f.evidencia.metodo}`;
+        const metW = italica.widthOfTextAtSize(metTxt, 7.5);
+        const metX = x + Math.max(0, (anchoCol - metW) / 2);
+        est.pag.drawText(metTxt, { x: metX, y: curY, size: 7.5, font: italica, color: GRIS });
+        curY -= 9;
+
+        const fecTxt = fechaBogota(f.evidencia.fecha);
+        const fecW = italica.widthOfTextAtSize(fecTxt, 7.5);
+        const fecX = x + Math.max(0, (anchoCol - fecW) / 2);
+        est.pag.drawText(fecTxt, { x: fecX, y: curY, size: 7.5, font: italica, color: GRIS });
       }
     }
-    est.y -= 70;
+    est.y = lineaY - (tieneEvidenciaFila ? 65 : 45);
   }
 
   // ===== Anexo de evidencia (solo con al menos una firma) =====
@@ -364,7 +420,7 @@ export async function generarPdfBorrador(tipo: string, datos: any) {
   dibujarCuerpo(doc, est, plantilla, fuentes);
 
   // Bloque de firmas (nombres y roles, sin imagen ni evidencia)
-  est.y -= 30;
+  est.y -= 25;
   const filas: any[][] = [];
   let fila: any[] = [];
   for (const f of plantilla.firmas) {
@@ -375,8 +431,12 @@ export async function generarPdfBorrador(tipo: string, datos: any) {
 
   const anchoCol = COL / 2 - 10;
   for (const fr of filas) {
-    if (est.y < 140) { est.pag = null; est.y = 0; }
+    const altoFila = 95;
+    if (est.y - altoFila < M + 20) { est.pag = null; est.y = 0; }
     paginar(doc, est);
+
+    const lineaY = est.y - 50;
+
     for (let i = 0; i < fr.length; i++) {
       const f = fr[i];
       const x = M + i * (anchoCol + 20);
@@ -387,20 +447,48 @@ export async function generarPdfBorrador(tipo: string, datos: any) {
         try {
           const png = FIRMA_INMOBILIARIA_DATA_URL.replace(/^data:image\/png;base64,/, '');
           const embebida = await doc.embedPng(Buffer.from(png, 'base64'));
-          const wImg = 140;
-          const hImg = wImg * (embebida.height / embebida.width);
-          est.pag.drawImage(embebida, { x: x + (anchoCol - wImg) / 2, y: est.y - hImg + 16, width: wImg, height: hImg });
+          const maxW = Math.min(150, anchoCol - 20);
+          const maxH = 44;
+          const ratio = embebida.height / embebida.width;
+          let wImg = maxW;
+          let hImg = wImg * ratio;
+          if (hImg > maxH) {
+            hImg = maxH;
+            wImg = hImg / ratio;
+          }
+          const imgX = x + (anchoCol - wImg) / 2;
+          const imgY = lineaY + 3; // descansa 3pt exactamente sobre la línea de firma
+          est.pag.drawImage(embebida, { x: imgX, y: imgY, width: wImg, height: hImg });
         } catch { /* continuar si no carga */ }
       }
 
-      est.pag.drawLine({ start: { x, y: est.y }, end: { x: x + anchoCol, y: est.y }, thickness: 1, color: NEGRO });
+      est.pag.drawLine({
+        start: { x: x + 10, y: lineaY },
+        end: { x: x + anchoCol - 10, y: lineaY },
+        thickness: 0.8,
+        color: NEGRO,
+      });
+
       const nombre = f.nombre || '____________________';
-      const nombreL = envolver(nombre, helv, 9.5, anchoCol)[0] || nombre;
-      est.pag.drawText(nombreL, { x, y: est.y - 14, size: 9.5, font: helv, color: NEGRO });
+      const nombreL = envolver(nombre, helv, 9.5, anchoCol - 20)[0] || nombre;
+      const nomW = helv.widthOfTextAtSize(nombreL, 9.5);
+      const nomX = x + Math.max(0, (anchoCol - nomW) / 2);
+      est.pag.drawText(nombreL, { x: nomX, y: lineaY - 14, size: 9.5, font: helv, color: NEGRO });
+
       const rolTxt = esInmobiliaria ? `${f.rol} (Firma autorizada del propietario)` : String(f.rol || '');
-      est.pag.drawText(rolTxt, { x, y: est.y - 26, size: 8.5, font: italica, color: GRIS });
+      const rolW = italica.widthOfTextAtSize(rolTxt, 8.5);
+      const rolX = x + Math.max(0, (anchoCol - rolW) / 2);
+      est.pag.drawText(rolTxt, { x: rolX, y: lineaY - 25, size: 8.5, font: italica, color: GRIS });
+
+      const ced = f.cedula;
+      if (ced) {
+        const cedTxt = `C.C. ${ced}`;
+        const cedW = helv.widthOfTextAtSize(cedTxt, 8);
+        const cedX = x + Math.max(0, (anchoCol - cedW) / 2);
+        est.pag.drawText(cedTxt, { x: cedX, y: lineaY - 35, size: 8, font: helv, color: GRIS });
+      }
     }
-    est.y -= 70;
+    est.y = lineaY - 45;
   }
 
   return Buffer.from(await doc.save());

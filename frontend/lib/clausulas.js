@@ -198,6 +198,10 @@ export function normalizarClausula(c) {
     html = resto ? htmlDeTexto(resto) : '';
   }
 
+  // Corregir posibles palabras pegadas típicas de contratos (ej: ARRENDATARIOrestituirá)
+  html = html.replace(/(ARRENDATARIO|ARRENDADOR|INMOBILIARIA|COMPRADOR|VENDEDOR)([a-záéíóúñ])/gi, '$1 $2');
+  resto = resto.replace(/(ARRENDATARIO|ARRENDADOR|INMOBILIARIA|COMPRADOR|VENDEDOR)([a-záéíóúñ])/gi, '$1 $2');
+
   return { pre, resto, html, runs: htmlARuns(html) };
 }
 
