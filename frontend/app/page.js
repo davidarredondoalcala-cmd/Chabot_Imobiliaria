@@ -60,31 +60,59 @@ export default function Home() {
     const handler = (e) => {
       const prop = e.detail;
       if (!prop) return;
-      if (!data || data.length === 0) return;
 
-      // 1. Coincidencia por ID directo de MongoDB
-      let match = data.find((i) => i._id === prop.id || String(i._id) === String(prop.id));
+      const list = data || [];
 
-      // 2. Coincidencia por título o nombre
-      if (!match && prop.titulo) {
-        const cleanTitle = prop.titulo.toLowerCase().trim();
-        match = data.find((i) => i.nombre && i.nombre.toLowerCase().trim() === cleanTitle);
+      // 1. Coincidencia por ID directo de MongoDB o código
+      let match = list.find(
+        (i) => i._id === prop.id || String(i._id) === String(prop.id) || (prop.codigo && i._id === prop.codigo)
+      );
+
+      // 2. Coincidencia por título o nombre (exacto o aproximado)
+      if (!match && (prop.titulo || prop.nombre)) {
+        const cleanTitle = (prop.titulo || prop.nombre).toLowerCase().trim();
+        match = list.find((i) => {
+          const nom = (i.nombre || '').toLowerCase().trim();
+          return nom === cleanTitle || nom.includes(cleanTitle) || cleanTitle.includes(nom);
+        });
       }
 
       // 3. Coincidencia por barrio y tipo
       if (!match && prop.barrio) {
-        const propTipo = prop.tipo?.toLowerCase() === 'apartamento' ? 'Apartamento' : 'Casa';
-        match = data.find(
-          (i) => i.barrio && i.barrio.toLowerCase() === prop.barrio.toLowerCase() && i.tipo === propTipo
+        const propTipo = (prop.tipo || '').toLowerCase() === 'apartamento' ? 'Apartamento' : 'Casa';
+        match = list.find(
+          (i) => (i.barrio || '').toLowerCase() === prop.barrio.toLowerCase() && i.tipo === propTipo
         );
       }
 
       if (match) {
+        setTab(match.tipo);
         setVista({ n: 'detalle', id: match._id });
         window.scrollTo({ top: 0, behavior: 'smooth' });
         avisar(`Abriendo: ${match.nombre}`);
       } else {
-        avisar(`Inmueble: ${prop.titulo || prop.codigo}`);
+        // Si no existe aún en el catálogo local, se construye la ficha para mostrarla directamente
+        const nuevoInm = {
+          _id: prop.id || prop.codigo || `prop-${Date.now()}`,
+          tipo: (prop.tipo || 'Casa').toLowerCase() === 'apartamento' ? 'Apartamento' : 'Casa',
+          nombre: prop.titulo || prop.nombre || 'Inmueble seleccionado',
+          dir: prop.direccion_aproximada || prop.dir || `Sector ${prop.barrio || 'Ibagué'}`,
+          barrio: prop.barrio || 'Ibagué',
+          lind: 'Al norte con predio vecino, al sur con vía pública, al oriente y occidente con propiedad privada.',
+          habitaciones: Number(prop.habitaciones) || 2,
+          banos: Number(prop.banos) || 2,
+          area: Number(prop.area_m2) || Number(prop.area) || 75,
+          estado: prop.operacion === 'venta' ? 'Para la venta' : (prop.disponible === false ? 'Arrendada' : 'Sin arrendar'),
+          valor: Number(prop.precio) || Number(prop.valor) || 0,
+          diaPago: 5,
+          foto: prop.foto,
+          contratos: [],
+        };
+        setData((prev) => (prev ? [...prev, nuevoInm] : [nuevoInm]));
+        setTab(nuevoInm.tipo);
+        setVista({ n: 'detalle', id: nuevoInm._id });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        avisar(`Abriendo: ${nuevoInm.nombre}`);
       }
     };
 

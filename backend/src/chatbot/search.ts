@@ -15,7 +15,9 @@ export function getAllCatalogProperties(extraProperties?: Property[]): Property[
   } as Property));
 
   if (extraProperties && extraProperties.length > 0) {
-    return [...extraProperties, ...seedList];
+    const extraTitles = new Set(extraProperties.map(e => (e.titulo || '').toLowerCase().trim()));
+    const remainingSeeds = seedList.filter(s => !extraTitles.has((s.titulo || '').toLowerCase().trim()));
+    return [...extraProperties, ...remainingSeeds];
   }
   return seedList;
 }

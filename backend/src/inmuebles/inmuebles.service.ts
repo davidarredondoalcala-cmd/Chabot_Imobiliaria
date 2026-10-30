@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException, OnModuleInit } from
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Inmueble, InmuebleDoc } from './inmueble.schema';
+import { SEED_PROPERTIES } from '../chatbot/seed';
 
 const F = ['Pepito', 'Juanito', 'Andres'];
 const SEMILLA = [
@@ -18,7 +19,7 @@ const SEMILLA = [
 export class InmueblesService implements OnModuleInit {
   constructor(@InjectModel(Inmueble.name) private model: Model<InmuebleDoc>) {}
 
-  // Si la colección está vacía, carga datos de ejemplo
+  // Si la colección está vacía, carga datos de ejemplo y sincroniza las propiedades del chatbot
   async onModuleInit() {
     if ((await this.model.estimatedDocumentCount()) === 0) await this.model.insertMany(SEMILLA);
     // Bases ya creadas: completa habitaciones, baños y área en los inmuebles de ejemplo
@@ -27,6 +28,31 @@ export class InmueblesService implements OnModuleInit {
         { nombre: s.nombre, habitaciones: { $exists: false } },
         { $set: { habitaciones: s.habitaciones, banos: s.banos, area: s.area } },
       );
+    }
+
+    // Sincroniza todas las propiedades del chatbot para que existan en la base de datos
+    for (const sp of SEED_PROPERTIES) {
+      const existe = await this.model.findOne({
+        $or: [
+          { nombre: sp.titulo },
+          { dir: sp.direccion_aproximada },
+        ],
+      });
+      if (!existe) {
+        await this.model.create({
+          tipo: (sp.tipo || 'casa').toLowerCase() === 'apartamento' ? 'Apartamento' : 'Casa',
+          nombre: sp.titulo,
+          estado: sp.operacion === 'venta' ? 'Para la venta' : (sp.disponible ? 'Sin arrendar' : 'Arrendada'),
+          valor: sp.precio,
+          dir: sp.direccion_aproximada || `Sector ${sp.barrio}`,
+          barrio: sp.barrio,
+          lind: 'Al norte con predio vecino, al sur con vía pública, al oriente y occidente con propiedad privada.',
+          habitaciones: sp.habitaciones || 2,
+          banos: sp.banos || 2,
+          area: sp.area_m2 || 75,
+          contratos: [],
+        });
+      }
     }
   }
 

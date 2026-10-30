@@ -77,6 +77,16 @@ export default function ChatWidget() {
     }
   }, [isOpen, messages, isLoading]);
 
+  useEffect(() => {
+    const onAbrir = () => {
+      if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener('habitat-abrir-inmueble', onAbrir);
+    return () => window.removeEventListener('habitat-abrir-inmueble', onAbrir);
+  }, []);
+
   const handleSend = async (textToSend) => {
     const text = (textToSend || inputMessage).trim();
     if (!text || isLoading) return;
