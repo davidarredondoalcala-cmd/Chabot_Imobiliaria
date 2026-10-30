@@ -6,6 +6,20 @@ export const GOOGLE_CLIENT_ID =
   process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
   '305367642614-imcnroh46epfbp8cmr3bbhqu230aa0jf.apps.googleusercontent.com';
 
+// Los 4 únicos correos con permisos de Administrador en Habitat Capital:
+export const ADMIN_EMAILS = [
+  'macanabernal@gmail.com',
+  'montoyaherreracarlosmario@gmail.com',
+  'davidarredondoalcala@gmail.com',
+  'juan.robayo1@estudiantesunibague.edu.co',
+];
+
+export function esAdminEmail(email) {
+  if (!email) return false;
+  const clean = String(email).trim().toLowerCase();
+  return ADMIN_EMAILS.includes(clean);
+}
+
 export function getSesion() {
   if (typeof window === 'undefined') return null;
   try { return JSON.parse(localStorage.getItem(CLAVE) || 'null'); } catch { return null; }
@@ -53,6 +67,14 @@ export async function loginGoogle(credential) {
   }
   const j = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(j.error || 'No se pudo iniciar sesión');
+
+  // Garantiza que SOLO los 4 correos sean administradores
+  if (j.usuario) {
+    const admin = esAdminEmail(j.usuario.email);
+    j.usuario.admin = admin;
+    j.usuario.rol = admin ? 'admin' : 'usuario';
+  }
+
   guardarSesion(j);
   return j;
 }
@@ -71,6 +93,12 @@ export async function yo() {
   const j = await r.json().catch(() => ({}));
 
   if (!j.usuario) { limpiarSesion(); return null; }
+
+  // Garantiza que SOLO los 4 correos sean administradores
+  const admin = esAdminEmail(j.usuario.email);
+  j.usuario.admin = admin;
+  j.usuario.rol = admin ? 'admin' : 'usuario';
+
   return j.usuario;
 }
 

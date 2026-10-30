@@ -57,8 +57,7 @@ export default function Login({ onEntrar }) {
         <div className="marca login-marca"><Logo /><h1>Habitat Capital</h1></div>
         <h2 className="login-t">Inicia sesión</h2>
         <p className="mut login-sub">
-          Plataforma privada de gestión de inmuebles y contratos. Entra con la cuenta de
-          Google autorizada como administrador.
+          Plataforma de gestión de inmuebles y contratos. Inicia sesión con tu cuenta de Google para acceder al catálogo y a las herramientas.
         </p>
 
         <div className="login-btn" ref={div} />

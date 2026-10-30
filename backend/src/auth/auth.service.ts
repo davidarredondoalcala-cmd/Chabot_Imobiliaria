@@ -98,12 +98,13 @@ export class AuthService {
   }
 
   private publico(u: any) {
-    const admin = esAdmin(u.email);
+    const email = normalizar(u?.email);
+    const admin = esAdmin(email);
     return {
-      id: String(u._id || ''),
-      email: u.email,
-      nombre: u.nombre || u.email?.split('@')[0] || '',
-      foto: u.foto || '',
+      id: String(u?._id || ''),
+      email,
+      nombre: u?.nombre || email.split('@')[0] || '',
+      foto: u?.foto || '',
       admin,
       rol: admin ? 'admin' : 'usuario',
     };

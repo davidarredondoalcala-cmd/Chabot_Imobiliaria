@@ -3,13 +3,12 @@ export const GOOGLE_CLIENT_ID =
   process.env.GOOGLE_CLIENT_ID ||
   '305367642614-imcnroh46epfbp8cmr3bbhqu230aa0jf.apps.googleusercontent.com';
 
-// Lista blanca de administradores: SOLO estos correos de Google pueden entrar.
-// Editable aquí o con la variable de entorno ADMIN_EMAILS (separados por coma).
+// Lista blanca de administradores: SOLO estos 4 correos tienen privilegios de administrador.
+// Cualquier otro correo que inicie sesión con Google ingresa como usuario estándar (Modo Cliente).
 const ADMIN_POR_DEFECTO = [
   'macanabernal@gmail.com',
   'montoyaherreracarlosmario@gmail.com',
   'davidarredondoalcala@gmail.com',
-  'david.arredondo@estudiantesunibague.edu.co',
   'juan.robayo1@estudiantesunibague.edu.co',
 ];
 
@@ -28,7 +27,8 @@ export function normalizar(email: string) {
 }
 
 export function esAdmin(email: string) {
-  return ADMIN_EMAILS.includes(normalizar(email));
+  const norm = normalizar(email);
+  return ADMIN_EMAILS.some((a) => normalizar(a) === norm);
 }
 
 // Duración de la sesión (7 días)

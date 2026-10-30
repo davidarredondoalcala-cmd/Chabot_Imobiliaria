@@ -7,7 +7,7 @@ import ContratoForm from '../components/ContratoForm';
 import InmuebleForm from '../components/InmuebleForm';
 import Login from '../components/Login';
 import { FILTROS0 } from '../lib/utils';
-import { getSesion, salir, yo } from '../lib/auth';
+import { getSesion, salir, yo, esAdminEmail } from '../lib/auth';
 import { Logo } from '../components/Iconos';
 import TemaBtn from '../components/TemaBtn';
 
@@ -27,8 +27,14 @@ export default function Home() {
     const s = getSesion();
     if (!s?.token) { setListo(true); return; }
     yo()
-      .then((u) => { if (u) setSesion(s); })
-
+      .then((u) => {
+        if (u) {
+          const act = { ...s, usuario: u };
+          setSesion(act);
+        } else {
+          setSesion(s);
+        }
+      })
       .catch(() => setSesion(s))
       .finally(() => setListo(true));
   }, []);
@@ -53,7 +59,8 @@ export default function Home() {
 
   const avisar = (t) => { setToast(t); setTimeout(() => setToast(''), 2200); };
   const sel = data?.find((i) => i._id === vista.id);
-  const esAdmin = Boolean(sesion?.usuario?.admin || sesion?.usuario?.rol === 'admin');
+  const emailUsuario = (sesion?.usuario?.email || '').trim().toLowerCase();
+  const esAdmin = esAdminEmail(emailUsuario);
 
   // Abre un inmueble directamente cuando el usuario hace clic en una recomendación del chatbot
   useEffect(() => {
