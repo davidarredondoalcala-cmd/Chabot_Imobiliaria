@@ -10,16 +10,12 @@ try {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const origenes = (process.env.FRONTEND_URL || '')
-    .split(',')
-    .map((o) => o.trim().replace(/\/+$/, ''))
-    .filter(Boolean)
-    .map((o) =>
-      o.includes('*')
-        ? new RegExp('^' + o.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[a-z0-9-]+') + '$', 'i')
-        : o,
-    );
-  app.enableCors({ origin: origenes.length ? origenes : true });
+  app.enableCors({
+    origin: true,
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type,Accept,Authorization',
+  });
 
   app.use(express.json({ limit: '10mb' }));
 
