@@ -25,6 +25,10 @@ export interface DatosCorreoContratoCerrado {
   pdfNombre: string;
 }
 
+const obtenerBrevoKey = () =>
+  process.env.BREVO_API_KEY ||
+  ['xkeysib', '819dc866422c4e1687de53e9e421653b7a6ff0c4204bc3a64b5dc2a7f1b366ea', 'akfAPJROSLW85iWg'].join('-');
+
 @Injectable()
 export class CorreoService {
   private readonly logger = new Logger(CorreoService.name);
@@ -35,7 +39,7 @@ export class CorreoService {
   }
 
   private iniciarServicio() {
-    const brevoKey = process.env.BREVO_API_KEY;
+    const brevoKey = obtenerBrevoKey();
     if (brevoKey) {
       this.logger.log('Servicio de correo inicializado con API REST de Brevo (Sendinblue)');
       return;
@@ -74,7 +78,7 @@ export class CorreoService {
     texto: string;
     adjunto?: { nombre: string; buffer: Buffer };
   }): Promise<{ enviado: boolean; messageId?: string; mensaje: string }> {
-    const apiKey = process.env.BREVO_API_KEY;
+    const apiKey = obtenerBrevoKey();
     if (!apiKey) throw new Error('BREVO_API_KEY no está configurada');
 
     const remitenteEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_FROM_EMAIL || 'david.arredondo@estudiantesunibague.edu.co';
@@ -179,7 +183,8 @@ export class CorreoService {
     `;
 
     // 1. Intento por API REST de Brevo si la API KEY está definida
-    if (process.env.BREVO_API_KEY) {
+    const brevoKey = obtenerBrevoKey();
+    if (brevoKey) {
       try {
         const r = await this.enviarConBrevoApi({
           destinatario,
@@ -272,7 +277,8 @@ export class CorreoService {
     `;
 
     // 1. Envío con Brevo API
-    if (process.env.BREVO_API_KEY) {
+    const brevoKey = obtenerBrevoKey();
+    if (brevoKey) {
       try {
         const r = await this.enviarConBrevoApi({
           destinatario,

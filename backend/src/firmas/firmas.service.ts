@@ -85,7 +85,7 @@ export class FirmasService {
     }
 
     // Envío automático de correos con Brevo API a firmantes y codeudores
-    let baseUrl = frontendUrl || process.env.FRONTEND_URL || 'http://localhost:3000';
+    let baseUrl = frontendUrl || process.env.FRONTEND_URL || 'https://habitatcapitalweb.vercel.app';
     if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
     for (const f of conOrden) {
       if (f.email && typeof f.email === 'string' && f.email.includes('@')) {
@@ -155,7 +155,7 @@ export class FirmasService {
         rol: f.rol, orden: f.orden, estado: f.estado,
         nombre: f.datos?.nombre || f.nombre || '',
         imagen: f.imagen || null, // solo visible una vez firmada
-        evidencia: f.estado === 'firmada' ? {
+        evidencia: f.estado === 'firmada' && f.evidencia ? {
           metodo: f.evidencia.metodo,
           fecha: f.evidencia.fecha,
           ip: f.evidencia.ip,
