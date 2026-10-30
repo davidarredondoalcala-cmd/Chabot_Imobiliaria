@@ -36,7 +36,7 @@ export class FirmasService {
   ) {}
 
   // ===== Crear acuerdo: genera los tokens y el hash del contrato =====
-  async crearAcuerdo({ inmueble, tipo, datos, firmantes }: any) {
+  async crearAcuerdo({ inmueble, tipo, datos, firmantes, frontendUrl }: any) {
     if (!['arriendo', 'venta'].includes(tipo)) throw new ErrorFirma(400, 'Tipo de contrato inválido');
     if (!datos || typeof datos !== 'object') throw new ErrorFirma(400, 'Faltan los datos del contrato');
 
@@ -85,7 +85,8 @@ export class FirmasService {
     }
 
     // Envío automático de correos con Brevo API a firmantes y codeudores
-    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    let baseUrl = frontendUrl || process.env.FRONTEND_URL || 'http://localhost:3000';
+    if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
     for (const f of conOrden) {
       if (f.email && typeof f.email === 'string' && f.email.includes('@')) {
         this.correo.enviarEnlaceFirma({

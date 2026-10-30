@@ -25,9 +25,8 @@ const CLAUSULAS_VENTA_DEF = [
 
 export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) {
   const [modo, setModo] = useState(modo0 || 'arriendo');
-  const [links, setLinks] = useState([]);
+  const [enviados, setEnviados] = useState([]);
   const [acuerdoId, setAcuerdoId] = useState(null);
-  const [copiado, setCopiado] = useState(null);
   const [creando, setCreando] = useState(false);
   const [descargando, setDescargando] = useState(false);
 
@@ -185,23 +184,17 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
         tipo: modo,
         datos: { ...S, clausulas },
         firmantes,
+        frontendUrl: typeof window !== 'undefined' ? window.location.origin : undefined,
       });
 
       setAcuerdoId(r.id);
-      setLinks(r.links.map((l) => ({ ...l, full: `${window.location.origin}${l.url}` })));
-      avisar?.('Contrato generado y correos enviados automáticamente a las partes y codeudores.');
+      setEnviados(firmantes);
+      avisar?.('¡Contrato generado y enviado con éxito a los correos registrados!');
     } catch (err) {
       avisar?.(err.message || 'No se pudo crear el acuerdo de firma');
     } finally {
       setCreando(false);
     }
-  };
-
-  const copiar = (l) => {
-    navigator.clipboard?.writeText(l.full);
-    setCopiado(l.token);
-    setTimeout(() => setCopiado(null), 1800);
-    avisar?.('Enlace copiado al portapapeles');
   };
 
   const descargar = async () => {
@@ -375,30 +368,41 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
             </button>
           </div>
 
-          {links.length > 0 && (
-            <div className="card view noprint" style={{ marginTop: 20 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <span className="tag Arrendada"><IcoCheck /> Correos enviados automáticamente</span>
-                <b>Enlaces directos de firma</b>
+          {enviados.length > 0 && (
+            <div className="card view noprint" style={{ marginTop: 24, padding: '24px 28px', border: '1.5px solid var(--bd)', borderRadius: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                <span className="tag Arrendada" style={{ padding: '6px 12px', fontSize: '0.85rem' }}>
+                  <IcoCheck /> Contrato despachado por correo
+                </span>
+                <b style={{ fontSize: '1.05rem' }}>Enviado exitosamente a cada firmante</b>
               </div>
-              <p className="mut" style={{ margin: '0 0 12px', fontSize: '0.85rem' }}>
-                Se enviaron los enlaces a los correos de las partes y codeudores registrados. También puedes copiar los enlaces si deseas compartirlos por WhatsApp:
+              <p className="mut" style={{ margin: '0 0 16px', fontSize: '0.88rem', lineHeight: 1.5 }}>
+                El contrato en formato PDF y el enlace seguro de firma fueron enviados a través de Brevo directamente a los correos registrados en el formulario:
               </p>
-              <div className="enlaces">
-                {links.map((l, k) => (
-                  <div key={l.token} className="enlace" style={{ '--n': k }}>
-                    <div className="enlace-rol">
-                      <span className="enlace-n">{k + 1}</span>
-                      {l.rol}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {enviados.map((f, k) => (
+                  <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg)', padding: '12px 16px', borderRadius: 12, border: '1px solid var(--bd)' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontWeight: 700, fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--ac)' }}>
+                          {f.rol}:
+                        </span>
+                        <strong style={{ fontSize: '0.95rem' }}>{f.nombre || 'Sin nombre'}</strong>
+                      </div>
+                      <div className="mut" style={{ fontSize: '0.82rem', marginTop: 3, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <IcoMail /> {f.email || 'Sin correo especificado'} {f.cedula ? ` · C.C. ${f.cedula}` : ''}
+                      </div>
                     </div>
-                    {l.nombre && <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{l.nombre}</div>}
-                    {l.email && <div className="mut" style={{ fontSize: '0.78rem' }}><IcoMail /> {l.email}</div>}
-                    <div className="link">{l.full}</div>
-                    <button className={copiado === l.token ? 'g' : ''} onClick={() => copiar(l)}>
-                      {copiado === l.token ? <><IcoCheck /> ¡Copiado!</> : 'Copiar enlace'}
-                    </button>
+                    <span className="tag Arrendada" style={{ fontSize: '0.78rem' }}>
+                      <IcoCheck /> Enviado al correo
+                    </span>
                   </div>
                 ))}
+              </div>
+              <div style={{ marginTop: 20, textAlign: 'right' }}>
+                <button type="button" className="g" onClick={() => terminado?.()}>
+                  Aceptar y volver al inmueble
+                </button>
               </div>
             </div>
           )}

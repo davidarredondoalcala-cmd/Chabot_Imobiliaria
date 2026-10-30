@@ -15,8 +15,9 @@ export class FirmasController {
     if (!usuario?.admin) {
       throw new ForbiddenException('Solo los administradores pueden generar acuerdos de firma');
     }
-    const { inmueble, tipo, datos, firmantes } = body || {};
-    return this.svc.crearAcuerdo({ inmueble, tipo, datos, firmantes });
+    const { inmueble, tipo, datos, firmantes, frontendUrl } = body || {};
+    const origin = frontendUrl || req?.headers?.origin || req?.headers?.referer;
+    return this.svc.crearAcuerdo({ inmueble, tipo, datos, firmantes, frontendUrl: origin });
   }
 
   // Estado del acuerdo (panel administrativo)
