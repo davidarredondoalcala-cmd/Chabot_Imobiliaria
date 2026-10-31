@@ -12,20 +12,72 @@ export interface StructuredLLMOptions<T> {
   fallbackFactory?: () => T;
 }
 
-const LLM_PROVIDER = process.env.LLM_PROVIDER || 'openai';
-const LLM_MODEL = process.env.LLM_MODEL || 'gpt-4o-mini';
-const LLM_API_KEY = process.env.LLM_API_KEY || process.env.OPENAI_API_KEY || '';
+/**
+ * Obtiene la configuración activa del LLM a partir de variables de entorno.
+ * Soporta de manera nativa OpenAI, Google Gemini, Groq, OpenRouter o cualquier endpoint OpenAI-compatible.
+ */
+function getLLMConfig() {
+  const apiKey =
+    process.env.LLM_API_KEY ||
+    process.env.OPENAI_API_KEY ||
+    process.env.GEMINI_API_KEY ||
+    process.env.GROQ_API_KEY ||
+    '';
 
-let client: OpenAI | null = null;
-if (LLM_API_KEY && (LLM_PROVIDER === 'openai' || LLM_PROVIDER === 'openrouter') && !LLM_API_KEY.startsWith('mock')) {
-  try {
-    client = new OpenAI({
-      apiKey: LLM_API_KEY,
-      baseURL: process.env.LLM_BASE_URL || undefined,
-    });
-  } catch (e) {
-    client = null;
+  const provider =
+    process.env.LLM_PROVIDER ||
+    (process.env.GEMINI_API_KEY
+      ? 'gemini'
+      : process.env.GROQ_API_KEY
+        ? 'groq'
+        : 'openai');
+
+  let baseURL = process.env.LLM_BASE_URL;
+  let defaultModel = 'gpt-4o-mini';
+
+  if (!baseURL) {
+    if (provider === 'gemini' || process.env.GEMINI_API_KEY) {
+      baseURL = 'https://generativelanguage.googleapis.com/v1beta/openai/';
+      defaultModel = 'gemini-1.5-flash';
+    } else if (provider === 'groq' || process.env.GROQ_API_KEY) {
+      baseURL = 'https://api.groq.com/openai/v1';
+      defaultModel = 'llama-3.3-70b-versatile';
+    } else if (provider === 'openrouter') {
+      baseURL = 'https://openrouter.ai/api/v1';
+      defaultModel = 'openai/gpt-4o-mini';
+    }
   }
+
+  const model = process.env.LLM_MODEL || defaultModel;
+
+  return { apiKey, baseURL, model, provider };
+}
+
+let cachedClient: OpenAI | null = null;
+let lastApiKey = '';
+let lastBaseURL: string | undefined = undefined;
+
+function getClient(): { client: OpenAI | null; model: string } {
+  const { apiKey, baseURL, model } = getLLMConfig();
+
+  if (!apiKey || apiKey.startsWith('mock')) {
+    return { client: null, model };
+  }
+
+  if (!cachedClient || lastApiKey !== apiKey || lastBaseURL !== baseURL) {
+    try {
+      cachedClient = new OpenAI({
+        apiKey,
+        baseURL: baseURL || undefined,
+      });
+      lastApiKey = apiKey;
+      lastBaseURL = baseURL;
+    } catch {
+      cachedClient = null;
+    }
+  }
+
+  return { client: cachedClient, model };
 }
 
 /**
@@ -33,8 +85,9 @@ if (LLM_API_KEY && (LLM_PROVIDER === 'openai' || LLM_PROVIDER === 'openrouter') 
  */
 export async function generateStructuredJSON<T>(options: StructuredLLMOptions<T>): Promise<T> {
   const { messages, temperature = 0.1, fallbackFactory } = options;
+  const { client, model } = getClient();
 
-  if (LLM_PROVIDER === 'mock' || !client || !LLM_API_KEY || LLM_API_KEY.startsWith('mock')) {
+  if (!client) {
     if (fallbackFactory) {
       return fallbackFactory();
     }
@@ -43,7 +96,7 @@ export async function generateStructuredJSON<T>(options: StructuredLLMOptions<T>
 
   try {
     const response = await client.chat.completions.create({
-      model: LLM_MODEL,
+      model,
       messages: messages as any,
       temperature,
       response_format: { type: 'json_object' },
@@ -63,13 +116,15 @@ export async function generateStructuredJSON<T>(options: StructuredLLMOptions<T>
  * Capa de abstracción para generación de texto libre con el LLM.
  */
 export async function generateText(messages: LLMMessage[], temperature: number = 0.3): Promise<string> {
-  if (LLM_PROVIDER === 'mock' || !client || !LLM_API_KEY || LLM_API_KEY.startsWith('mock')) {
+  const { client, model } = getClient();
+
+  if (!client) {
     return '';
   }
 
   try {
     const response = await client.chat.completions.create({
-      model: LLM_MODEL,
+      model,
       messages: messages as any,
       temperature,
     });
