@@ -50,6 +50,7 @@ export interface ExtractedUnderstanding {
   solicita_asesor: boolean;
   tipo_no_soportado?: string | null;
   fuera_de_tema?: boolean;
+  presupuesto_invalido?: boolean;
 }
 
 export interface ConversationCriterios extends CriteriosDuros {

@@ -9,7 +9,8 @@ import {
   generateDeterministicSearchReply,
   generateDeterministicDetailReply,
   respuestaCiudadNoSoportada,
-  respuestaFueraDeTema
+  respuestaFueraDeTema,
+  respuestaPresupuestoInvalido
 } from './generator';
 import { verifyReplyIntegrity } from './verifier';
 import { buildWhatsAppLink } from './whatsapp';
@@ -142,6 +143,29 @@ export async function processUserMessage(
     understanding.intencion !== 'fuera_de_tema';
   if (esCiudadNoCubierta) {
     const reply = respuestaCiudadNoSoportada(ciudadMencionada);
+    await recordMessage(conversationId, 'user', userMessage);
+    await recordMessage(conversationId, 'assistant', reply, meta);
+    return {
+      conversationId,
+      reply,
+      properties: [],
+      needsHuman: false,
+      metadata: meta,
+    };
+  }
+
+  // Presupuesto mencionado con algo que no es una cifra válida (ej. "una mandarina como presupuesto"):
+  // pedir un presupuesto real en pesos, sin celebrar ni aceptar el dato como válido
+  const esPresupuestoInvalido =
+    understanding.presupuesto_invalido &&
+    !understanding.criterios_duros.precio_min &&
+    !understanding.criterios_duros.precio_max &&
+    !understanding.codigo_inmueble_mencionado &&
+    !understanding.solicita_asesor &&
+    understanding.intencion !== 'hablar_con_asesor' &&
+    understanding.intencion !== 'fuera_de_tema';
+  if (esPresupuestoInvalido) {
+    const reply = respuestaPresupuestoInvalido();
     await recordMessage(conversationId, 'user', userMessage);
     await recordMessage(conversationId, 'assistant', reply, meta);
     return {

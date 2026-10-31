@@ -12,7 +12,7 @@ Reglas obligatorias:
    - "detalle_inmueble": si pregunta detalles específicos (precio, área, amenidades, fotos) de un código de inmueble específico o del listado previo.
    - "hablar_con_asesor": si pide expresamente hablar con una persona/humano, asesor, negociar precio, trámites legales/notaría, agendar visita.
    - "saludo_o_otro": saludos ("hola", "buenas"), agradecimientos ("gracias"), despedidas o comentarios generales.
-   - "fuera_de_tema": preguntas claramente ajenas al negocio inmobiliario (cálculos matemáticos tipo "cuánto es 2x2", clima, noticias, chistes, recetas, deportes, historia, cultura general, consejos no inmobiliarios).
+   - "fuera_de_tema": preguntas claramente ajenas al negocio inmobiliario (cálculos matemáticos tipo "cuánto es 2x2", clima, noticias, chistes, recetas, deportes, historia, cultura general, consejos no inmobiliarios). REGLA GENERAL: si el mensaje no menciona NADA relacionado con casas, apartamentos, alquilar, arrendar, comprar, vender, inmuebles, barrios, sectores, precios de propiedades, presupuesto para vivienda o citas/acuerdos de la inmobiliaria, entonces ES "fuera_de_tema". No te dejes engañar por palabras sueltas: "tengo una mandarina como regalo" es fuera de tema, pero "tengo una mandarina como presupuesto" NO es fuera de tema (habla de presupuesto => marcamos "presupuesto_invalido").
 2. "fuera_de_tema": boolean. true si el mensaje pertenece a "fuera_de_tema".
 3. "operacion": 'venta' | 'arriendo' | null.
    - Si el usuario dice "compra", "comprar", "compro", "comprarme", "adquirir", "venta", "en venta": pon ESTRICTAMENTE 'venta', SIN IMPORTAR el monto del presupuesto (incluso si dice 10 millones o 5 millones).
@@ -28,6 +28,7 @@ Reglas obligatorias:
 5. "criterios_blandos": texto libre con descriptores subjetivos o vagos (ej. "tranquilo", "cerca de transporte", "iluminado", "familiar"). Lo vago va aquí.
 6. "codigo_inmueble_mencionado": si menciona un código como "IBG-0001" o "HC-0001", extráelo aquí.
 7. "tipo_no_soportado": si el usuario pide local, lote, oficina, bodega, finca, etc.
+8. "presupuesto_invalido": boolean. true SOLO cuando el usuario habla de un presupuesto/valor de vivienda pero con algo que NO es una cifra válida en pesos colombianos: objetos o animales como unidad ("presupuesto de una mandarina", "tengo tres delfines"), o unidades no monetarias ("presupuesto de 50 kilos", "presupuesto de dos horas"). NO lo marques si hay una cifra monetaria interpretable ("presupuesto de 2.5 millones") o si simplemente pide precio de un inmueble.
 
 Devuelve estrictamente un objeto JSON con el siguiente esquema:
 {
@@ -49,7 +50,8 @@ Devuelve estrictamente un objeto JSON con el siguiente esquema:
   "criterios_blandos": string | null,
   "codigo_inmueble_mencionado": string | null,
   "solicita_asesor": boolean,
-  "tipo_no_soportado": string | null
+  "tipo_no_soportado": string | null,
+  "presupuesto_invalido": boolean
 }
 `;
 
@@ -283,6 +285,15 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     intencion = 'fuera_de_tema';
   }
 
+  // Presupuesto mencionado pero sin cifra válida en pesos (ej. "una mandarina como presupuesto").
+  // Solo se marca si el usuario habla de presupuesto y NO se pudo parsear ningún monto real.
+  const mencionaPresupuesto = /presupuesto|cu[aá]nt[oa]\s+dinero|valor\s+m[aá]ximo|cu[aá]nt[oa]\s+quiero\s+gastar|de\s+cu[aá]nt[oa]\s+queda/i.test(lower);
+  const presupuestoInvalido =
+    mencionaPresupuesto &&
+    finalMoney.min == null &&
+    finalMoney.max == null &&
+    !codigo;
+
   // Ciudad real mencionada; el default del catálogo es Ibagué
   const ciudadDetectada = detectarCiudad(userMessage);
 
@@ -307,6 +318,7 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     solicita_asesor: solicitaAsesor,
     tipo_no_soportado,
     fuera_de_tema: esFueraDeTema,
+    presupuesto_invalido: presupuestoInvalido,
   };
 }
 
@@ -352,6 +364,15 @@ export async function understandUserMessage(
     if (llmResult.fuera_de_tema == null && heuristic.fuera_de_tema) {
       llmResult.fuera_de_tema = heuristic.fuera_de_tema;
       llmResult.intencion = 'fuera_de_tema';
+    }
+    // Presupuesto inválido: el heurístico (menciona "presupuesto" + dinero no parseable)
+    // prevalece sobre el LLM; si el LLM trajo un monto real, el heurístico no lo marca
+    if (
+      heuristic.presupuesto_invalido &&
+      !llmResult.criterios_duros.precio_min &&
+      !llmResult.criterios_duros.precio_max
+    ) {
+      llmResult.presupuesto_invalido = true;
     }
 
     return llmResult;

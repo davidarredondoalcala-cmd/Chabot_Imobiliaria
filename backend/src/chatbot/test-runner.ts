@@ -135,6 +135,22 @@ async function runTests() {
     r12.reply
   );
 
+  // Test 12b: presupuesto con unidades absurdas (sin cifra válida en pesos)
+  const r12b = await processUserMessage('test-12b', 'tengo una mandarina como presupuesto');
+  assert(
+    r12b.properties.length === 0 && r12b.reply.toLowerCase().includes('pesos'),
+    'Presupuesto "mandarina" pide presupuesto válido en pesos, sin celebrar',
+    r12b.reply
+  );
+
+  // Test 12c: monto real de presupuesto sigue el flujo normal
+  const r12c = await processUserMessage('test-12c', 'quiero arriendo con 2.5 millones');
+  assert(
+    r12c.properties.length > 0 && !r12c.reply.toLowerCase().includes('mandarina'),
+    'Presupuesto real de arriendo devuelve opciones normales',
+    `props=${r12c.properties.length} reply=${r12c.reply}`
+  );
+
   // Test 13: Barrio explícito sin stock no cae a otros barrios
   const r13 = await processUserMessage('test-13', 'busco casa en arriendo en el vergel con presupuesto de 300 mil');
   assert(

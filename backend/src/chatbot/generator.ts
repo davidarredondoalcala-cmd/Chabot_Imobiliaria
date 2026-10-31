@@ -43,6 +43,19 @@ Eso significa casas y apartamentos en **arriendo o venta** en Ibagué, precios, 
 }
 
 /**
+ * Respuesta cuando el usuario menciona un presupuesto con algo que no es una
+ * cifra válida en pesos (ej. "tengo una mandarina como presupuesto").
+ * Pide aclaración sin celebrar ni aceptar el dato como válido.
+ */
+export function respuestaPresupuestoInvalido(): string {
+  return `Esa me da curiosidad 😄, pero para poder ayudarte de verdad necesito tu presupuesto en **pesos colombianos**.
+
+Dime algo como: "**arriendo con 2.5 millones**", "**comprar con 150 millones**" o solo "**1.2 millones**".
+
+¿De cuánto estamos hablando?`;
+}
+
+/**
  * Genera una respuesta determinista anclada sin riesgo de alucinación (plantilla nativa)
  */
 export function generateDeterministicSearchReply(
