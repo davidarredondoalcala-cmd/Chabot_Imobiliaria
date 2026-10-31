@@ -79,6 +79,9 @@ export function mergeConversationCriterios(
   }
   if (criterios_duros.barrios && criterios_duros.barrios.length > 0) {
     merged.barrios = criterios_duros.barrios;
+  } else if (userMessage && /otras?\s+(?:zonas?|sectores?|barrios?)|todas?\s+las\s+(?:zonas?|opciones)|sin\s+importar\s+el\s+(?:barrio|sector)|cualquier\s+(?:zona|barrio|sector)/i.test(userMessage.toLowerCase())) {
+    // El usuario aceptó ver otras zonas: soltamos el filtro de barrio acumulado
+    merged.barrios = null;
   }
   if (criterios_duros.precio_min != null && criterios_duros.precio_min > 0) {
     merged.precio_min = criterios_duros.precio_min;

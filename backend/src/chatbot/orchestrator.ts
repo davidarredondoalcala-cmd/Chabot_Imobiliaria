@@ -7,7 +7,9 @@ import { obtenerDetalleInmueble } from './detail';
 import {
   generateGroundedSearchReply,
   generateDeterministicSearchReply,
-  generateDeterministicDetailReply
+  generateDeterministicDetailReply,
+  respuestaCiudadNoSoportada,
+  respuestaFueraDeTema
 } from './generator';
 import { verifyReplyIntegrity } from './verifier';
 import { buildWhatsAppLink } from './whatsapp';
@@ -85,6 +87,56 @@ export async function processUserMessage(
     return {
       conversationId,
       reply: greetingReply,
+      properties: [],
+      needsHuman: false,
+      metadata: meta,
+    };
+  }
+
+  // Preguntas claramente fuera del tema inmobiliario (matemáticas, clima, chistes, etc.)
+  const esFueraDeTema =
+    understanding.fuera_de_tema === true &&
+    understanding.intencion === 'fuera_de_tema' &&
+    !understanding.operacion &&
+    !understanding.criterios_duros.tipo &&
+    !understanding.criterios_duros.barrios &&
+    !understanding.criterios_duros.precio_max &&
+    !understanding.tipo_no_soportado &&
+    !understanding.codigo_inmueble_mencionado;
+  if (esFueraDeTema) {
+    const reply = respuestaFueraDeTema();
+    await recordMessage(conversationId, 'user', userMessage);
+    await recordMessage(conversationId, 'assistant', reply, meta);
+    return {
+      conversationId,
+      reply,
+      properties: [],
+      needsHuman: false,
+      metadata: meta,
+    };
+  }
+
+  // Búsqueda en una ciudad fuera de la cobertura del catálogo (solo Ibagué)
+  const ciudadMencionada = understanding.criterios_duros?.ciudad || null;
+  const hayCriteriosBusqueda =
+    understanding.operacion ||
+    understanding.criterios_duros.tipo ||
+    understanding.criterios_duros.barrios ||
+    understanding.criterios_duros.precio_max ||
+    understanding.criterios_duros.habitaciones_min;
+  const esCiudadNoCubierta =
+    ciudadMencionada &&
+    !/ibagu[ée\u00fc]/i.test(ciudadMencionada) &&
+    understanding.intencion === 'buscar' &&
+    hayCriteriosBusqueda &&
+    !understanding.codigo_inmueble_mencionado;
+  if (esCiudadNoCubierta) {
+    const reply = respuestaCiudadNoSoportada(ciudadMencionada);
+    await recordMessage(conversationId, 'user', userMessage);
+    await recordMessage(conversationId, 'assistant', reply, meta);
+    return {
+      conversationId,
+      reply,
       properties: [],
       needsHuman: false,
       metadata: meta,

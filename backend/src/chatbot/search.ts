@@ -165,19 +165,14 @@ export async function buscarInmuebles(
     };
   }
 
-  // Intento 2: Relajación de zona (mismo presupuesto, otras zonas de Ibagué)
+  // Intento 2: barrio estricto. Si el usuario nombró zonas y no hay nada, NO caemos
+  // a otros barrios: se explica y se le invita a pedir opciones de otras zonas.
   if (params.barrios && params.barrios.length > 0) {
-    const paramsSinBarrio: SearchInmueblesParams = { ...params, barrios: undefined };
-    candidates = executeFilterSearch(paramsSinBarrio, catalog);
-
-    if (candidates.length > 0) {
-      const reranked = await rerankCandidates(candidates, paramsSinBarrio);
-      return {
-        inmuebles: reranked,
-        criterio_relajado: `No encontramos inmuebles en ${params.barrios.join(', ')} para ese presupuesto, pero tenemos estas opciones disponibles en otras zonas de Ibagué:`,
-        total_candidatos: candidates.length,
-      };
-    }
+    return {
+      inmuebles: [],
+      criterio_relajado: mensajeZonaSinResultados(params, catalog),
+      total_candidatos: 0,
+    };
   }
 
   // Nada dentro del presupuesto: informar desde qué valor empiezan los registrados
@@ -198,6 +193,34 @@ export async function buscarInmuebles(
     criterio_relajado: 'No encontramos inmuebles con esos criterios exactos en nuestro catálogo actual.',
     total_candidatos: 0,
   };
+}
+
+/**
+ * Mensaje único cuando el usuario pidió barrios concretos y no hay nada que encaje:
+ * se aclara, se da el piso mínimo del catálogo si hay presupuesto y se invita a otras zonas.
+ */
+export function mensajeZonaSinResultados(
+  params: SearchInmueblesParams,
+  catalog?: Property[]
+): string {
+  const cop = (n: number) => `$${Math.round(n).toLocaleString('es-CO')} COP`;
+  const zona = params.barrios!.join(', ');
+  const sujeto = params.tipo === 'casa' ? 'casas' : params.tipo === 'apartamento' ? 'apartamentos' : 'casas y apartamentos';
+  const accion = params.operacion === 'venta' ? 'para comprar' : params.operacion === 'arriendo' ? 'en arriendo' : 'disponibles';
+
+  let mensaje = `Miré con calma nuestro catálogo y, por el momento, no tenemos ${sujeto} ${accion} en **${zona}**. 🏘️`;
+
+  const hayPresupuesto = (params.precio_max != null && params.precio_max > 0) || (params.precio_min != null && params.precio_min > 0);
+  if (hayPresupuesto) {
+    const minimo = getCatalogMinPrice(params.operacion, params.tipo, catalog);
+    if (minimo) {
+      const periodo = minimo.operacion === 'arriendo' ? ' al mes' : '';
+      mensaje += `\n\nTen en cuenta que en Ibagué los ${sujeto} ${accion} parten desde ${cop(minimo.precio)}${periodo}.`;
+    }
+  }
+
+  mensaje += `\n\n**¿Quieres que te muestre opciones en otras zonas de Ibagué?** Dime “sí, otras zonas” y con mucho gusto te las traigo.`;
+  return mensaje;
 }
 
 /**

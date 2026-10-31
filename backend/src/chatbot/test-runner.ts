@@ -95,6 +95,40 @@ async function runTests() {
     r10.whatsappUrl
   );
 
+  // Test 11: Ciudad fuera de la cobertura (solo Ibagué)
+  const r11 = await processUserMessage('test-11', 'quiero arrendar una casa en Bogotá');
+  assert(
+    r11.properties.length === 0 && r11.reply.toLowerCase().includes('ibagué'),
+    'Buscar en Bogotá responde que solo hay inmuebles en Ibagué',
+    r11.reply
+  );
+
+  // Test 12: Pregunta fuera del tema inmobiliario
+  const r12 = await processUserMessage('test-12', 'cuanto es 2x2');
+  assert(
+    r12.properties.length === 0 && r12.reply.toLowerCase().includes('inmobiliaria'),
+    'Pregunta matemática responde que solo responde temas de la inmobiliaria',
+    r12.reply
+  );
+
+  // Test 13: Barrio explícito sin stock no cae a otros barrios
+  const r13 = await processUserMessage('test-13', 'busco casa en arriendo en el vergel con presupuesto de 300 mil');
+  assert(
+    r13.properties.length === 0 &&
+      r13.reply.includes('El Vergel') &&
+      r13.reply.toLowerCase().includes('otras'),
+    'Barrio sin stock se explica sin tarjetas de otros barrios',
+    `props=${r13.properties.length} reply=${r13.reply}`
+  );
+
+  // Test 13b: aceptar otras zonas elimina el barrio acumulado y devuelve opciones
+  const r13b = await processUserMessage('test-13', 'sí, muéstrame otras zonas con presupuesto de 1.5 millones');
+  assert(
+    r13b.properties.length > 0,
+    'Al aceptar otras zonas se limpia el barrio y devuelve opciones realmente disponibles',
+    `props=${r13b.properties.length}`
+  );
+
   console.log(`\n=== Resultado de pruebas: ${passed}/${total} superadas (${Math.round((passed/total)*100)}%) ===\n`);
   if (passed !== total) {
     process.exit(1);

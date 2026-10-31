@@ -42,13 +42,14 @@ export interface CriteriosDuros {
 }
 
 export interface ExtractedUnderstanding {
-  intencion: 'buscar' | 'detalle_inmueble' | 'hablar_con_asesor' | 'saludo_o_otro';
+  intencion: 'buscar' | 'detalle_inmueble' | 'hablar_con_asesor' | 'saludo_o_otro' | 'fuera_de_tema';
   operacion?: Operacion | null;
   criterios_duros: CriteriosDuros;
   criterios_blandos?: string | null;
   codigo_inmueble_mencionado?: string | null;
   solicita_asesor: boolean;
   tipo_no_soportado?: string | null;
+  fuera_de_tema?: boolean;
 }
 
 export interface ConversationCriterios extends CriteriosDuros {

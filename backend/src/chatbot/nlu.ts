@@ -12,24 +12,27 @@ Reglas obligatorias:
    - "detalle_inmueble": si pregunta detalles específicos (precio, área, amenidades, fotos) de un código de inmueble específico o del listado previo.
    - "hablar_con_asesor": si pide expresamente hablar con una persona/humano, asesor, negociar precio, trámites legales/notaría, agendar visita.
    - "saludo_o_otro": saludos ("hola", "buenas"), agradecimientos ("gracias"), despedidas o comentarios generales.
-2. "operacion": 'venta' | 'arriendo' | null.
+   - "fuera_de_tema": preguntas claramente ajenas al negocio inmobiliario (cálculos matemáticos tipo "cuánto es 2x2", clima, noticias, chistes, recetas, deportes, historia, cultura general, consejos no inmobiliarios).
+2. "fuera_de_tema": boolean. true si el mensaje pertenece a "fuera_de_tema".
+3. "operacion": 'venta' | 'arriendo' | null.
    - Si el usuario dice "compra", "comprar", "compro", "comprarme", "adquirir", "venta", "en venta": pon ESTRICTAMENTE 'venta', SIN IMPORTAR el monto del presupuesto (incluso si dice 10 millones o 5 millones).
    - Si el usuario dice "arriendo", "arrendar", "alquiler", "alquilar", "arrendo": pon ESTRICTAMENTE 'arriendo'.
    - Si NO especifica compra ni arriendo: montos hasta 20M COP sugieren arriendo mensual; montos desde 40M COP sugieren venta.
-3. "criterios_duros":
+4. "criterios_duros":
    - tipo: 'casa' | 'apartamento' | null (IMPORTANTE: Nuestro catálogo se especializa única y exclusivamente en casas y apartamentos residenciales).
-   - ciudad: ej. 'Ibagué'
+   - ciudad: la ciudad REAL que el usuario menciona para la búsqueda, tal como la escribió con acentos correctos (ej. "Bogotá", "Medellín", "El Espinal"). Si menciona Ibagué explícitamente, usa "Ibagué". Si NINGUNA ciudad aparece en el mensaje, responde null (NUNCA asumas Ibagué aquí; ese default se decide después).
    - barrios: array con nombres de barrios mencionados (ej. ["El Vergel", "Cádiz"]) o null
    - precio_min, precio_max: en pesos colombianos (COP numérico entero)
    - habitaciones_min, banos_min, parqueaderos_min, area_min, estrato: números enteros o null
    - NUNCA inventes criterios duros que el usuario no dijo explícitamente.
-4. "criterios_blandos": texto libre con descriptores subjetivos o vagos (ej. "tranquilo", "cerca de transporte", "iluminado", "familiar"). Lo vago va aquí.
-5. "codigo_inmueble_mencionado": si menciona un código como "IBG-0001" o "HC-0001", extráelo aquí.
-6. "tipo_no_soportado": si el usuario pide local, lote, oficina, bodega, finca, etc.
+5. "criterios_blandos": texto libre con descriptores subjetivos o vagos (ej. "tranquilo", "cerca de transporte", "iluminado", "familiar"). Lo vago va aquí.
+6. "codigo_inmueble_mencionado": si menciona un código como "IBG-0001" o "HC-0001", extráelo aquí.
+7. "tipo_no_soportado": si el usuario pide local, lote, oficina, bodega, finca, etc.
 
 Devuelve estrictamente un objeto JSON con el siguiente esquema:
 {
-  "intencion": "buscar" | "detalle_inmueble" | "hablar_con_asesor" | "saludo_o_otro",
+  "intencion": "buscar" | "detalle_inmueble" | "hablar_con_asesor" | "saludo_o_otro" | "fuera_de_tema",
+  "fuera_de_tema": boolean,
   "operacion": "venta" | "arriendo" | null,
   "criterios_duros": {
     "tipo": "casa" | "apartamento" | null,
@@ -49,6 +52,73 @@ Devuelve estrictamente un objeto JSON con el siguiente esquema:
   "tipo_no_soportado": string | null
 }
 `;
+
+/**
+ * Normaliza quitando acentos y pasando a minúsculas.
+ */
+const stripAccents = (str: string) =>
+  str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+/** Escapa caracteres especiales para construir una regex literal. */
+const escaparRegex = (texto: string) => texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * Ciudades y municipios con cobertura de búsqueda (solo Ibagué por ahora).
+ * Clave: forma sin acentos con la que se detecta; valor: nombre bonito para mostrar.
+ */
+const CIUDADES_CONOCIDAS: Record<string, string> = {
+  'bogota': 'Bogotá', 'medellin': 'Medellín', 'cali': 'Cali', 'barranquilla': 'Barranquilla',
+  'cartagena': 'Cartagena', 'bucaramanga': 'Bucaramanga', 'pereira': 'Pereira',
+  'manizales': 'Manizales', 'armenia': 'Armenia', 'neiva': 'Neiva', 'villavicencio': 'Villavicencio',
+  'popayan': 'Popayán', 'pasto': 'Pasto', 'santa marta': 'Santa Marta', 'cucuta': 'Cúcuta',
+  'tunja': 'Tunja', 'sincelejo': 'Sincelejo', 'florencia': 'Florencia', 'monteria': 'Montería',
+  'palmira': 'Palmira', 'duitama': 'Duitama', 'sogamoso': 'Sogamoso', 'yopal': 'Yopal',
+  'valledupar': 'Valledupar', 'riohacha': 'Riohacha', 'cartago': 'Cartago',
+  'espinal': 'El Espinal', 'el espinal': 'El Espinal', 'melgar': 'Melgar', 'girardot': 'Girardot',
+  'honda': 'Honda', 'chaparral': 'Chaparral', 'libano': 'Líbano', 'el libano': 'Líbano',
+  'mariquita': 'Mariquita', 'fresno': 'Fresno', 'prado': 'Prado', 'ortega': 'Ortega',
+  'rovira': 'Rovira', 'saldaña': 'Saldaña', 'saldana': 'Saldaña', 'coello': 'Coello',
+  'carmen de apicala': 'Carmen de Apicalá', 'ibague': 'Ibagué', 'ibagüe': 'Ibagué',
+};
+
+/**
+ * Detecta la ciudad REAL citada en el mensaje (patrón típico: "en <ciudad>", "de <ciudad>").
+ */
+export function detectarCiudad(userMessage: string): string | null {
+  const clean = stripAccents(userMessage);
+  const ordenadas = [...Object.keys(CIUDADES_CONOCIDAS)].sort((a, b) => b.length - a.length);
+  for (const ciudadKey of ordenadas) {
+    const regex = new RegExp(
+      `\\b(?:en|de|por|hacia)\\s+(?:el\\s+|la\\s+|ciudad\\s+de\\s+|municipio\\s+de\\s+)?${escaparRegex(ciudadKey).replace(/\s+/g, '\\s+')}\\b`,
+      'i'
+    );
+    if (regex.test(clean)) return CIUDADES_CONOCIDAS[ciudadKey];
+  }
+  return null;
+}
+
+/**
+ * Detecta preguntas claramente ajenas al negocio inmobiliario (matemáticas, clima,
+ * noticias, chistes, etc.). Solo se aplica cuando NO hay señales inmobiliarias.
+ */
+const PATRONES_FUERA_DE_TEMA = [
+  /\bcu[aá]nto(?:\s+es|\s+son)?\s*[\d(]\s*\d*\s*[x×+\-*/^=]/,
+  /\b\d+\s*[x×]\s*\d+\b/,
+  /\b\d+\s*[\-*/^]\s*\d+\b/,
+  /\bra[íi]z\s+cuadrada/,
+  /\bclima\b|\bpron[óo]stico del tiempo\b|\bva a llover\b/,
+  /\bnoticias?\b|\bnoticiero\b|\bperi[óo]dico\b/,
+  /\bchistes?\b|\bm[eé]jame una risa\b/,
+  /\brecetas?\b|\breceta de\b/,
+  /\bf[úu]tbol\b|\bshakira\b|\bmessi\b|\bkarol g\b/,
+  /\btr[aá]duceme\b|\btrad[uú]ceme\b|\btraduce esto\b/,
+  /\bhablame de filosofía\b|\bhablame de historia\b|\bhablame de biología\b/,
+];
+
+function detectarFueraDeTema(userMessage: string): boolean {
+  const texto = userMessage.toLowerCase();
+  return PATRONES_FUERA_DE_TEMA.some((patron) => patron.test(texto));
+}
 
 /**
  * Extractor heurístico / regex para modo offline, testing y fallback determinista
@@ -123,9 +193,6 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     'Valparaíso', 'La Floresta', 'Santa Bárbara', 'Ibagué 2000'
   ];
 
-  const stripAccents = (str: string) =>
-    str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-
   const detectedBarrios: string[] = [];
   const cleanUserMessage = stripAccents(userMessage);
 
@@ -197,12 +264,26 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     intencion = 'buscar';
   }
 
+  // Fuera de tema: solo si no hay señales inmobiliarias en el mensaje
+  const hayContextoInmobiliario = Boolean(
+    codigo || tipo || tipo_no_soportado || operacion || solicitaAsesor ||
+    detectedBarrios.length > 0 || finalMoney.min != null || finalMoney.max != null ||
+    /inmobiliari|casas?|apartamento|arriendo|arrendo|venta|alquil|inmueble|barrio|propiedad|habitacion|presupuesto/i.test(lower)
+  );
+  const esFueraDeTema = !hayContextoInmobiliario && detectarFueraDeTema(userMessage);
+  if (esFueraDeTema) {
+    intencion = 'fuera_de_tema';
+  }
+
+  // Ciudad real mencionada; el default del catálogo es Ibagué
+  const ciudadDetectada = detectarCiudad(userMessage);
+
   return {
     intencion,
     operacion,
     criterios_duros: {
       tipo,
-      ciudad: 'Ibagué',
+      ciudad: ciudadDetectada || 'Ibagué',
       barrios: detectedBarrios.length > 0 ? detectedBarrios : null,
       precio_min: finalMoney.min || null,
       precio_max: finalMoney.max || null,
@@ -217,6 +298,7 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     codigo_inmueble_mencionado: codigo,
     solicita_asesor: solicitaAsesor,
     tipo_no_soportado,
+    fuera_de_tema: esFueraDeTema,
   };
 }
 
@@ -247,6 +329,15 @@ export async function understandUserMessage(
     }
     if (!llmResult.criterios_duros.precio_min && moneyParsed.min) {
       llmResult.criterios_duros.precio_min = moneyParsed.min;
+    }
+
+    // Fallbacks deterministas: si el LLM no trajo ciudad o fuera_de_tema, usamos el heurístico
+    if (!llmResult.criterios_duros.ciudad && heuristic.criterios_duros.ciudad) {
+      llmResult.criterios_duros.ciudad = heuristic.criterios_duros.ciudad;
+    }
+    if (llmResult.fuera_de_tema == null && heuristic.fuera_de_tema) {
+      llmResult.fuera_de_tema = heuristic.fuera_de_tema;
+      llmResult.intencion = 'fuera_de_tema';
     }
 
     return llmResult;

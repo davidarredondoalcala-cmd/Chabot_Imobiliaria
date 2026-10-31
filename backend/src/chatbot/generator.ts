@@ -18,6 +18,31 @@ SOLO debes recomendar inmuebles que estén explícitamente en el catálogo.
 NUNCA inventes códigos de inmuebles ni precios.`;
 
 /**
+ * Respuesta cuando el usuario busca en una ciudad que no es Ibagué.
+ * Natural, cálida y clara: la cobertura única es Ibagué y se invita a explorar el catálogo.
+ */
+export function respuestaCiudadNoSoportada(ciudad: string): string {
+  const ciudadBonita = (ciudad || '').trim() || 'otra ciudad';
+  return `¡Claro que te entiendo! Lo que pasa es que, por ahora, nuestro catálogo vive 100% en **Ibagué** (Tolima), así que todavía no tenemos casas ni apartamentos disponibles en ${ciudadBonita}. 🏡
+
+Si te animas a quedarte por acá, te cuento que tenemos buenos sectores: **El Vergel**, **La Pola**, **Piedra Pintada**, **Calambeo** y **Cádiz**, tanto en arriendo como para comprar.
+
+¿Quieres que te muestre lo que tenemos disponible en Ibagué?`;
+}
+
+/**
+ * Respuesta para preguntas ajenas al negocio inmobiliario
+ * (matemáticas, clima, noticias, chistes, cultura general, etc.).
+ */
+export function respuestaFueraDeTema(): string {
+  return `¡Ja! Me encanta la buena charla, pero mi especialidad es muy puntual: solo me encargo de temas de la **inmobiliaria** por acá. 🏡
+
+Eso significa casas y apartamentos en **arriendo o venta** en Ibagué, precios, barrios, cómos y coordinar visitas.
+
+¿Te ayudo con algo de eso? Por ejemplo, dime en qué barrio te interesa y en qué presupuesto, y con gusto te muestro opciones.`;
+}
+
+/**
  * Genera una respuesta determinista anclada sin riesgo de alucinación (plantilla nativa)
  */
 export function generateDeterministicSearchReply(
