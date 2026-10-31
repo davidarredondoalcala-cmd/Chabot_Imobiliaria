@@ -41,7 +41,7 @@ function getLLMConfig() {
       defaultModel = 'gemini-1.5-flash';
     } else if (provider === 'groq' || process.env.GROQ_API_KEY) {
       baseURL = 'https://api.groq.com/openai/v1';
-      defaultModel = 'llama-3.3-70b-versatile';
+      defaultModel = 'openai/gpt-oss-120b';
     } else if (provider === 'openrouter') {
       baseURL = 'https://openrouter.ai/api/v1';
       defaultModel = 'openai/gpt-4o-mini';
