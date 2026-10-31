@@ -34,6 +34,8 @@ export interface CriteriosDuros {
   precio_min?: number | null;
   precio_max?: number | null;
   habitaciones_min?: number | null;
+  habitaciones_max?: number | null;
+  banos_max?: number | null;
   banos_min?: number | null;
   parqueaderos_min?: number | null;
   area_min?: number | null;
@@ -58,12 +60,17 @@ export interface ConversationCriterios extends CriteriosDuros {
   criterios_blandos?: string | null;
   turnos_aclaracion?: number;
   turnos_presupuesto?: number;
+  acepta_otras_zonas?: boolean;
+  presupuesto_insuficiente_anterior?: boolean;
+  explorando_sin_presupuesto?: boolean;
 }
 
 export interface ConversationState {
   conversation_id: string;
   criterios: ConversationCriterios;
   ultimo_listado_ids: string[];
+  ultimo_reply?: string;
+  ultimo_mensaje_usuario?: string;
   updated_at: Date;
 }
 

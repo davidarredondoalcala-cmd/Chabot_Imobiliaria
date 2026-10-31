@@ -49,8 +49,14 @@ export function executeFilterSearch(
   if (criterios.habitaciones_min != null && criterios.habitaciones_min > 0) {
     list = list.filter(p => p.habitaciones >= criterios.habitaciones_min!);
   }
+  if (criterios.habitaciones_max != null && criterios.habitaciones_max > 0) {
+    list = list.filter(p => p.habitaciones <= criterios.habitaciones_max!);
+  }
   if (criterios.banos_min != null && criterios.banos_min > 0) {
     list = list.filter(p => p.banos >= criterios.banos_min!);
+  }
+  if (criterios.banos_max != null && criterios.banos_max > 0) {
+    list = list.filter(p => p.banos <= criterios.banos_max!);
   }
   if (criterios.parqueaderos_min != null && criterios.parqueaderos_min > 0) {
     list = list.filter(p => p.parqueaderos >= criterios.parqueaderos_min!);
@@ -173,15 +179,36 @@ export async function buscarInmuebles(
     };
   }
 
-  // Nada dentro del presupuesto: informar desde qué valor empiezan los registrados
+  // Nada dentro del presupuesto: informar desde qué valor empiezan los registrados SOLO si el presupuesto está por debajo del mínimo
   const hayPresupuesto = (params.precio_max != null && params.precio_max > 0) || (params.precio_min != null && params.precio_min > 0);
   if (hayPresupuesto) {
     const minimo = getCatalogMinPrice(params.operacion, params.tipo, catalog);
-    if (minimo) {
+    if (minimo && params.precio_max != null && params.precio_max < minimo.precio) {
       return {
         inmuebles: [],
         criterio_relajado: buildBelowBudgetMessage(params, minimo),
         total_candidatos: 0,
+      };
+    }
+  }
+
+  // Si no hay resultados por habitaciones u otros filtros duros, intentar relajar habitaciones
+  if (params.habitaciones_min != null || params.habitaciones_max != null) {
+    const sinHabitaciones = executeFilterSearch({
+      ...params,
+      habitaciones_min: null,
+      habitaciones_max: null,
+    }, catalog);
+
+    if (sinHabitaciones.length > 0) {
+      const reranked = await rerankCandidates(sinHabitaciones, params);
+      const habDesc = params.habitaciones_max != null
+        ? `con hasta ${params.habitaciones_max} habitaciones`
+        : `con ${params.habitaciones_min} habitaciones`;
+      return {
+        inmuebles: reranked,
+        criterio_relajado: `No encontré inmuebles exactos ${habDesc}, pero te comparto estas excelentes opciones disponibles en el catálogo:`,
+        total_candidatos: sinHabitaciones.length,
       };
     }
   }

@@ -23,7 +23,9 @@ Reglas obligatorias:
    - ciudad: la ciudad REAL que el usuario menciona para la búsqueda, tal como la escribió con acentos correctos (ej. "Bogotá", "Medellín", "El Espinal"). Si menciona Ibagué explícitamente, usa "Ibagué". Si NINGUNA ciudad aparece en el mensaje, responde null (NUNCA asumas Ibagué aquí; ese default se decide después).
    - barrios: array con nombres de barrios mencionados (ej. ["El Vergel", "Cádiz"]) o null
    - precio_min, precio_max: en pesos colombianos (COP numérico entero)
-   - habitaciones_min, banos_min, parqueaderos_min, area_min, estrato: números enteros o null
+   - habitaciones_min,
+      habitaciones_max,
+      banos_max, banos_min, parqueaderos_min, area_min, estrato: números enteros o null
    - NUNCA inventes criterios duros que el usuario no dijo explícitamente.
 5. "criterios_blandos": texto libre con descriptores subjetivos o vagos (ej. "tranquilo", "cerca de transporte", "iluminado", "familiar"). Lo vago va aquí.
 6. "codigo_inmueble_mencionado": si menciona un código como "IBG-0001" o "HC-0001", extráelo aquí.
@@ -42,6 +44,7 @@ Devuelve estrictamente un objeto JSON con el siguiente esquema:
     "precio_min": number | null,
     "precio_max": number | null,
     "habitaciones_min": number | null,
+    "habitaciones_max": number | null,
     "banos_min": number | null,
     "parqueaderos_min": number | null,
     "area_min": number | null,
@@ -194,7 +197,7 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     intencion = 'hablar_con_asesor';
   } else if (codigo || (/qu[eé] precio tiene|cu[aá]nto vale|d[oó]nde queda|qu[eé] amenidades|m[aá]s informaci[oó]n de (?:la|el)/i.test(lower) && !/busco|quiero/i.test(lower))) {
     intencion = 'detalle_inmueble';
-  } else if (/busco|arrendar|arriendo|alquilar|comprar|venta|casa|apartamento|apto|local|lote|oficina|inmueble|habitacion|barrio|presupuesto|mill[oó]n|millones|palos?|\bmil\b|\b\d+k\b/i.test(lower) || money.max != null || money.min != null) {
+  } else if (/busco|arrendar|arriendo|alquilar|comprar|venta|casa|apartamento|apto|local|lote|oficina|inmueble|habitacion|barrio|presupuesto|mill[oó]n|millones|palos?|\bmil\b|\b\d+k\b|mu[eé]strame|ver\b|opciones\b|ens[eé][nñ]ame|otras?\s+zonas?/i.test(lower) || money.max != null || money.min != null) {
     intencion = 'buscar';
   } else if (/hola|buenos d[ií]as|buenas tardes|buenas noches|quiubo|buenas|c[oó]mo est[aá]s|que tal|reiniciar|inicio/i.test(lower)) {
     intencion = 'saludo_o_otro';
@@ -275,16 +278,37 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
 
   // Habitaciones
   let habitaciones_min: number | null = null;
-  const habMatch = lower.match(/(\d+)\s*(?:habitaci(?:on|ones|ón)|alcobas?|piezas?|cuartos?)/i);
-  if (habMatch) {
-    habitaciones_min = parseInt(habMatch[1], 10);
+  let habitaciones_max: number | null = null;
+
+  const habMaxMatch = lower.match(/(?:m[aá]ximo|hasta|a\s+lo\s+sumo)\s*(\d+)\s*(?:habitaci(?:on|ones|ón)|alcobas?|piezas?|cuartos?)|(\d+)\s*(?:habitaci(?:on|ones|ón)|alcobas?|piezas?|cuartos?)\s*(?:m[aá]ximo|como\s+m[aá]ximo|o\s+menos)/i);
+  const habMinMatch = lower.match(/(?:m[ií]nimo|al\s+menos|desde)\s*(\d+)\s*(?:habitaci(?:on|ones|ón)|alcobas?|piezas?|cuartos?)|(\d+)\s*(?:habitaci(?:on|ones|ón)|alcobas?|piezas?|cuartos?)\s*(?:m[ií]nimo|o\s+m[aá]s)/i);
+  const habRangeMatch = lower.match(/entre\s*(\d+)\s*(?:y|a)\s*(\d+)\s*(?:habitaci(?:on|ones|ón)|alcobas?|piezas?|cuartos?)/i);
+  const habSimpleMatch = lower.match(/(\d+)\s*(?:habitaci(?:on|ones|ón)|alcobas?|piezas?|cuartos?)/i);
+
+  if (habRangeMatch) {
+    habitaciones_min = parseInt(habRangeMatch[1], 10);
+    habitaciones_max = parseInt(habRangeMatch[2], 10);
+  } else if (habMaxMatch) {
+    habitaciones_max = parseInt(habMaxMatch[1] || habMaxMatch[2], 10);
+  } else if (habMinMatch) {
+    habitaciones_min = parseInt(habMinMatch[1] || habMinMatch[2], 10);
+  } else if (habSimpleMatch) {
+    habitaciones_min = parseInt(habSimpleMatch[1], 10);
   }
 
   // Baños
   let banos_min: number | null = null;
-  const banosMatch = lower.match(/(\d+)\s*(?:ba[ñn]os?)/i);
-  if (banosMatch) {
-    banos_min = parseInt(banosMatch[1], 10);
+  let banos_max: number | null = null;
+  const banosMaxMatch = lower.match(/(?:m[aá]ximo|hasta)\s*(\d+)\s*(?:ba[ñn]os?)|(\d+)\s*(?:ba[ñn]os?)\s*(?:m[aá]ximo|o\s+menos)/i);
+  const banosMinMatch = lower.match(/(?:m[ií]nimo|al\s+menos|desde)\s*(\d+)\s*(?:ba[ñn]os?)|(\d+)\s*(?:ba[ñn]os?)\s*(?:m[ií]nimo|o\s+m[aá]s)/i);
+  const banosSimpleMatch = lower.match(/(\d+)\s*(?:ba[ñn]os?)/i);
+
+  if (banosMaxMatch) {
+    banos_max = parseInt(banosMaxMatch[1] || banosMaxMatch[2], 10);
+  } else if (banosMinMatch) {
+    banos_min = parseInt(banosMinMatch[1] || banosMinMatch[2], 10);
+  } else if (banosSimpleMatch) {
+    banos_min = parseInt(banosSimpleMatch[1], 10);
   }
 
   // Estrato

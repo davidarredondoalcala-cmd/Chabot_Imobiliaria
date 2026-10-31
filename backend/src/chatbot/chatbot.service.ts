@@ -43,7 +43,7 @@ export class ChatbotService {
     });
   }
 
-  async processMessage(conversationId: string, message: string): Promise<ChatResponse> {
+  async processMessage(conversationId: string, message: string, history?: Array<{ role: string; content: string }>): Promise<ChatResponse> {
     let mongoProperties: Property[] = [];
     try {
       if (this.inmueblesService) {
@@ -54,7 +54,7 @@ export class ChatbotService {
       mongoProperties = [];
     }
 
-    return await processUserMessage(conversationId, message, mongoProperties);
+    return await processUserMessage(conversationId, message, mongoProperties, history);
   }
 
   async getMessages(conversationId: string) {

@@ -22,11 +22,23 @@ export function evaluateClarificationPolicy(criterios: ConversationCriterios): C
     ? ` en ${criterios.barrios.join(', ')}`
     : '';
 
-  // Compra: preguntar SIEMPRE el presupuesto antes de dar opciones (la zona no lo reemplaza)
+  // Si el usuario aceptó ver otras zonas o todas las opciones de la ciudad, NO solicitar aclaración de barrio
+  if (criterios.acepta_otras_zonas) {
+    return { needsClarification: false };
+  }
+
+  // Si el usuario ya fue informado de que su presupuesto era insuficiente y ahora está explorando opciones ("muéstrame...", habitaciones, etc.),
+  // no bloquearlo con otra aclaración de presupuesto: permitirle ver el catálogo disponible
+  if (criterios.presupuesto_insuficiente_anterior || criterios.explorando_sin_presupuesto) {
+    return { needsClarification: false };
+  }
+
+  // Compra: preguntar el presupuesto antes de dar opciones si no se ha preguntado
   if (
     criterios.operacion === 'venta' &&
     !hasPresupuesto &&
     !criterios.orden_precio &&
+    !criterios.acepta_otras_zonas &&
     (criterios.turnos_presupuesto || 0) < MAX_PREGUNTAS_PRESUPUESTO_VENTA
   ) {
     const que = criterios.tipo === 'casa' ? 'la casa' : criterios.tipo === 'apartamento' ? 'el apartamento' : 'la casa o el apartamento';

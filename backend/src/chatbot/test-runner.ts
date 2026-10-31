@@ -230,6 +230,74 @@ async function runTests() {
     `props=${r17.properties.map(p => p.codigo).join(', ')}`
   );
 
+  // Test 18: Corrección del bug de repetición con habitaciones (Screenshot 1 del usuario)
+  // Turno 1: Presupuesto insuficiente de compra
+  const r18a = await processUserMessage('test-18-repetition', 'compra de apartamento con presupuesto de 50 millones');
+  assert(
+    r18a.properties.length === 0 && r18a.reply.includes('210.000.000'),
+    'Turno 1: Presupuesto 50M de compra explica piso mínimo',
+    r18a.reply
+  );
+  // Turno 2: Usuario pide "Muéstrame algunos apartamentos con 4 habitaciones maximo"
+  // Jarvis NO debe repetir el mensaje de 50M de presupuesto y debe mostrar apartamentos con <= 4 habitaciones
+  const r18b = await processUserMessage('test-18-repetition', 'Muéstrame algunos apartamentos con 4 habitaciones maximo');
+  assert(
+    r18b.properties.length > 0 &&
+      r18b.properties.every(p => p.habitaciones <= 4) &&
+      !r18b.reply.includes('Con tu presupuesto no tenemos opciones disponibles en este momento'),
+    'Turno 2: "Muéstrame apartamentos con 4 habitaciones maximo" muestra inmuebles y NO repite el error de presupuesto',
+    `props=${r18b.properties.length} reply=${r18b.reply.slice(0, 80)}`
+  );
+
+  // Test 19: Corrección del bug de bucle en "Sí, otras zonas" (Screenshot 2 del usuario)
+  // Turno 1: Buscar casa en arriendo en El Vergel (no hay stock)
+  const r19a = await processUserMessage('test-19-otras-zonas', 'busco casa en arriendo en la macarena');
+  assert(
+    r19a.properties.length === 0 && r19a.reply.includes('otras zonas'),
+    'Turno 1: Sin stock en La Macarena invita a ver otras zonas',
+    r19a.reply
+  );
+  // Turno 2: Usuario responde "Sí, otras zonas"
+  // Jarvis NO debe volver a preguntar por barrio o presupuesto; debe mostrar directamente casas en arriendo en Ibagué
+  const r19b = await processUserMessage('test-19-otras-zonas', 'Sí, otras zonas');
+  assert(
+    r19b.properties.length > 0 &&
+      r19b.properties.every(p => p.tipo === 'casa' && p.operacion === 'arriendo') &&
+      !r19b.reply.toLowerCase().includes('algún barrio de ibagué de tu preferencia'),
+    'Turno 2: "Sí, otras zonas" entrega casas en arriendo directamente sin pedir barrio en bucle',
+    `props=${r19b.properties.length} reply=${r19b.reply.slice(0, 80)}`
+  );
+
+  // Test 20: Cambio de modalidad (venta a arriendo) resetea presupuesto incompatible
+  const r20a = await processUserMessage('test-20-modalidad', 'quiero comprar una casa con 350 millones');
+  assert(r20a.properties.length > 0, 'Turno 1: Compra con 350M encuentra casas');
+  const r20b = await processUserMessage('test-20-modalidad', 'ahora prefiero ver casas en arriendo con 1.5 millones');
+  assert(
+    r20b.properties.length > 0 &&
+      r20b.properties.every(p => p.operacion === 'arriendo') &&
+      r20b.properties.some(p => p.precio < 10000000),
+    'Turno 2: Cambio a arriendo limpia presupuesto de compra de 350M y entrega arriendos normales',
+    `props=${r20b.properties.length}`
+  );
+
+  // Test 21: Preservación de contexto restaurado desde historial cliente
+  const historyClient = [
+    { role: 'user', content: 'hola, estoy interesado en comprar un apartamento' },
+    { role: 'assistant', content: '¡Con gusto! ¿Tienes algún barrio en mente o presupuesto?' }
+  ];
+  const r21 = await processUserMessage(
+    'test-21-restored',
+    'en Piedra Pintada con 300 millones',
+    undefined,
+    historyClient
+  );
+  assert(
+    r21.properties.length > 0 &&
+      r21.properties.every(p => p.operacion === 'venta' && p.tipo === 'apartamento'),
+    'Historial restaurado del cliente preserva tipo (apartamento) y operación (compra)',
+    `props=${r21.properties.length}`
+  );
+
   console.log(`\n=== Resultado de pruebas: ${passed}/${total} superadas (${Math.round((passed/total)*100)}%) ===\n`);
   if (passed !== total) {
     process.exit(1);

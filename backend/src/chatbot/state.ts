@@ -50,25 +50,30 @@ export function mergeConversationCriterios(
   userMessage?: string
 ): ConversationCriterios {
   const merged: ConversationCriterios = { ...current };
+  const lower = (userMessage || '').toLowerCase();
 
-  // Operación:
+  // 1. Detección de reseteo explícito o flexibilización de presupuesto
+  const pideResetPresupuesto = /\b(sin\s+presupuesto|cualquier\s+(?:precio|presupuesto|valor)|sin\s+l[ií]mite|no\s+importa\s+el\s+(?:precio|presupuesto|valor)|presupuesto\s+libre|libre\s+de\s+presupuesto)\b/i.test(lower);
+  if (pideResetPresupuesto) {
+    merged.precio_max = null;
+    merged.precio_min = null;
+    merged.presupuesto_insuficiente_anterior = false;
+  }
+
+  // 2. Operación (arriendo / venta):
   if (extracted.operacion) {
-    if (current.operacion && current.operacion !== extracted.operacion && userMessage) {
-      const lower = userMessage.toLowerCase();
-      const hasExplicitArriendo = /\b(arriendos?|arrendar|alquiler(?:es)?|alquilar|arrendo)\b/i.test(lower);
-      const hasExplicitVenta = /\b(comprar?|compras?|compro|comprarme|adquirir|ventas?|vender)\b/i.test(lower);
-
-      if (extracted.operacion === 'arriendo' && hasExplicitArriendo) {
-        merged.operacion = 'arriendo';
-      } else if (extracted.operacion === 'venta' && hasExplicitVenta) {
-        merged.operacion = 'venta';
-      }
+    if (current.operacion && current.operacion !== extracted.operacion) {
+      // Cambio explícito de operación: el presupuesto de compra no aplica a arriendo ni viceversa
+      merged.operacion = extracted.operacion;
+      merged.precio_min = null;
+      merged.precio_max = null;
+      merged.presupuesto_insuficiente_anterior = false;
     } else {
       merged.operacion = extracted.operacion;
     }
   }
 
-  // Criterios duros
+  // 3. Criterios duros
   const { criterios_duros } = extracted;
 
   if (criterios_duros.tipo) {
@@ -77,24 +82,65 @@ export function mergeConversationCriterios(
   if (criterios_duros.ciudad) {
     merged.ciudad = criterios_duros.ciudad;
   }
+
+  // Zonas / Barrios / Aceptación de otras zonas:
+  const aceptaOtrasZonas = /otras?\s+(?:zonas?|sectores?|barrios?)|todas?\s+las\s+(?:zonas?|opciones)|sin\s+importar\s+el\s+(?:barrio|sector)|cualquier\s+(?:zona|barrio|sector)|toda\s+la\s+ciudad|en\s+ibagu[eé]/i.test(lower);
+
   if (criterios_duros.barrios && criterios_duros.barrios.length > 0) {
     merged.barrios = criterios_duros.barrios;
-  } else if (userMessage && /otras?\s+(?:zonas?|sectores?|barrios?)|todas?\s+las\s+(?:zonas?|opciones)|sin\s+importar\s+el\s+(?:barrio|sector)|cualquier\s+(?:zona|barrio|sector)/i.test(userMessage.toLowerCase())) {
-    // El usuario aceptó ver otras zonas: soltamos el filtro de barrio acumulado
+    merged.acepta_otras_zonas = false;
+  } else if (aceptaOtrasZonas) {
+    // El usuario aceptó o pidió ver otras zonas / toda la ciudad
     merged.barrios = null;
+    merged.acepta_otras_zonas = true;
   }
+
+  // Presupuesto nuevo en este mensaje:
   if (criterios_duros.precio_min != null && criterios_duros.precio_min > 0) {
     merged.precio_min = criterios_duros.precio_min;
+    merged.presupuesto_insuficiente_anterior = false;
   }
   if (criterios_duros.precio_max != null && criterios_duros.precio_max > 0) {
     merged.precio_max = criterios_duros.precio_max;
+    merged.presupuesto_insuficiente_anterior = false;
   }
-  if (criterios_duros.habitaciones_min != null && criterios_duros.habitaciones_min > 0) {
+
+  // Si el presupuesto anterior fue insuficiente (por debajo del mínimo) y el usuario
+  // ahora pide ver inmuebles o cambia criterios (como habitaciones, tipo, etc.) SIN mencionar un presupuesto nuevo:
+  // soltamos el presupuesto imposible para que no quede atascado en bucle.
+  const cambioCriteriosSinPresupuesto =
+    (criterios_duros.habitaciones_min != null ||
+     criterios_duros.habitaciones_max != null ||
+     criterios_duros.tipo != null ||
+     criterios_duros.barrios != null ||
+     aceptaOtrasZonas ||
+     /\b(?:mu[eé]strame|ver|qu[eé]\s+(?:tienes|hay|opciones)|algun(?:os?|as?)|opciones|ens[eé][nñ]ame)\b/i.test(lower)) &&
+    criterios_duros.precio_max == null &&
+    criterios_duros.precio_min == null;
+
+  if (current.presupuesto_insuficiente_anterior && cambioCriteriosSinPresupuesto) {
+    merged.precio_max = null;
+    merged.precio_min = null;
+    merged.presupuesto_insuficiente_anterior = true;
+    merged.explorando_sin_presupuesto = true;
+  }
+
+  // Habitaciones:
+  if (criterios_duros.habitaciones_min !== undefined) {
     merged.habitaciones_min = criterios_duros.habitaciones_min;
   }
-  if (criterios_duros.banos_min != null && criterios_duros.banos_min > 0) {
+  if (criterios_duros.habitaciones_max !== undefined) {
+    merged.habitaciones_max = criterios_duros.habitaciones_max;
+  }
+
+  // Baños:
+  if (criterios_duros.banos_min !== undefined) {
     merged.banos_min = criterios_duros.banos_min;
   }
+  if (criterios_duros.banos_max !== undefined) {
+    merged.banos_max = criterios_duros.banos_max;
+  }
+
   if (criterios_duros.parqueaderos_min != null && criterios_duros.parqueaderos_min > 0) {
     merged.parqueaderos_min = criterios_duros.parqueaderos_min;
   }

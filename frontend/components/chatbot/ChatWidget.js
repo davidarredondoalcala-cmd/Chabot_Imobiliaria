@@ -212,12 +212,18 @@ export default function ChatWidget() {
     setIsLoading(true);
 
     try {
+      const historyPayload = messages
+        .filter((m) => !m.isResumePrompt && m.id !== 'welcome')
+        .slice(-6)
+        .map((m) => ({ role: m.role, content: m.content }));
+
       const res = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           conversationId: targetConvId,
           message: text,
+          history: historyPayload,
         }),
       });
 

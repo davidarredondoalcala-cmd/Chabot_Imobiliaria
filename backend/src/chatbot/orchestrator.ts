@@ -1,6 +1,6 @@
 import { Property, ChatResponse } from './types';
-import { getConversationState, saveConversationState, mergeConversationCriterios, recordMessage } from './state';
-import { understandUserMessage, tieneContextoInmobiliario } from './nlu';
+import { getConversationState, saveConversationState, mergeConversationCriterios, recordMessage, getConversationMessages } from './state';
+import { understandUserMessage, tieneContextoInmobiliario, extractHeuristicUnderstanding } from './nlu';
 import { evaluateClarificationPolicy } from './clarification';
 import { buscarInmuebles } from './search';
 import { obtenerDetalleInmueble } from './detail';
@@ -18,17 +18,43 @@ import { buildWhatsAppLink } from './whatsapp';
 export async function processUserMessage(
   conversationId: string,
   userMessage: string,
-  extraProperties?: Property[]
+  extraProperties?: Property[],
+  historyInput?: Array<{ role: string; content: string }>
 ): Promise<ChatResponse> {
   const meta: Record<string, any> = {
     received_at: new Date().toISOString(),
   };
 
-  // 1. Obtener estado previo
+  // 1. Obtener estado previo y mensajes previos
   const state = await getConversationState(conversationId);
+  let priorMessages = await getConversationMessages(conversationId);
 
-  // 2. Comprensión (NLU estructurada)
-  const understanding = await understandUserMessage(userMessage);
+  // Si se provee historial desde el cliente y la memoria estaba vacía, sincronizar
+  if (priorMessages.length === 0 && historyInput && historyInput.length > 0) {
+    for (const h of historyInput) {
+      await recordMessage(conversationId, h.role as 'user' | 'assistant', h.content);
+    }
+    priorMessages = await getConversationMessages(conversationId);
+  }
+
+  // Construir contexto de diálogo para el NLU
+  const recentHistory = priorMessages.slice(-6);
+  const historyContext = recentHistory
+    .map(m => `${m.role === 'user' ? 'Usuario' : 'Jarvis'}: ${m.content}`)
+    .join('\n');
+
+  // Si el estado no tenía operación ni tipo, intentar reconstruir desde el historial
+  if (!state.criterios.operacion || !state.criterios.tipo) {
+    for (const msg of recentHistory) {
+      const u = extractHeuristicUnderstanding(msg.content);
+      if (!state.criterios.operacion && u.operacion) state.criterios.operacion = u.operacion;
+      if (!state.criterios.tipo && u.criterios_duros.tipo) state.criterios.tipo = u.criterios_duros.tipo;
+      if (!state.criterios.barrios && u.criterios_duros.barrios) state.criterios.barrios = u.criterios_duros.barrios;
+    }
+  }
+
+  // 2. Comprensión (NLU estructurada con historial)
+  const understanding = await understandUserMessage(userMessage, historyContext);
   meta.understanding = understanding;
 
   // Agradecimiento o cortesía
@@ -370,6 +396,39 @@ export async function processUserMessage(
       })
     : undefined;
 
+  // Seguimiento de estado de presupuesto
+  if (propertiesToReturn.length === 0 && searchResult.criterio_relajado && searchResult.criterio_relajado.includes('Con tu presupuesto no tenemos opciones')) {
+    state.criterios.presupuesto_insuficiente_anterior = true;
+  } else if (propertiesToReturn.length > 0) {
+    state.criterios.presupuesto_insuficiente_anterior = false;
+  }
+
+  // Prevención de repetición de respuestas idénticas
+  const previousAssistantMsg = priorMessages
+    .filter(m => m.role === 'assistant')
+    .slice(-1)[0]?.content?.trim();
+
+  if (propertiesToReturn.length === 0 && previousAssistantMsg && rawReply.trim() === previousAssistantMsg) {
+    if (rawReply.includes('Con tu presupuesto no tenemos opciones')) {
+      rawReply = `Como te mencionaba, en nuestro catálogo actual los inmuebles con esas características parten de ese rango. Si deseas, podemos mirar en la modalidad de ${state.criterios.operacion === 'venta' ? 'arriendo' : 'venta'} o ajustar las habitaciones para mostrarte alternativas disponibles. ¿Qué prefieres?`;
+    } else {
+      rawReply = `Con gusto puedo orientarte con otras opciones en Ibagué. Cuéntame si deseas cambiar de barrio, número de habitaciones o modalidad (arriendo o venta).`;
+    }
+  }
+
+  state.ultimo_reply = rawReply;
+  state.ultimo_mensaje_usuario = userMessage;
+  await saveConversationState(state);
+
+  // Chips dinámicos según el contexto de búsqueda
+  const dynamicChips = propertiesToReturn.length > 0
+    ? (state.criterios.operacion === 'venta'
+        ? ['Ver más en venta', 'Casas en El Vergel', 'Hablar con un asesor']
+        : ['Ver más en arriendo', 'Apartamentos en La Pola', 'Hablar con un asesor'])
+    : (searchResult.criterio_relajado && searchResult.criterio_relajado.includes('otras zonas')
+        ? ['Sí, otras zonas', 'Ver toda la ciudad', 'Hablar con un asesor']
+        : ['Apartamentos en arriendo', 'Casas en venta en Ibagué', 'Hablar con un asesor']);
+
   await recordMessage(conversationId, 'user', userMessage);
   await recordMessage(conversationId, 'assistant', rawReply, meta);
 
@@ -379,6 +438,7 @@ export async function processUserMessage(
     properties: propertiesToReturn,
     needsHuman: false,
     whatsappUrl: waLink,
+    suggestionChips: dynamicChips,
     metadata: meta,
   };
 }

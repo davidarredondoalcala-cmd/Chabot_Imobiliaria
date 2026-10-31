@@ -8,14 +8,14 @@ export class ChatbotController {
 
   @Public()
   @Post(['api/chat', 'chatbot/chat'])
-  async chat(@Body() body: { conversationId?: string; message?: string }) {
+  async chat(@Body() body: { conversationId?: string; message?: string; history?: Array<{ role: string; content: string }> }) {
     const message = body?.message?.trim();
     if (!message) {
       throw new BadRequestException('El mensaje no puede estar vacío');
     }
     const conversationId = body?.conversationId || `conv-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
-    return await this.chatbotService.processMessage(conversationId, message);
+    return await this.chatbotService.processMessage(conversationId, message, body?.history);
   }
 
   @Public()

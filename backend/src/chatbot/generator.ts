@@ -89,7 +89,11 @@ export function generateDeterministicSearchReply(
     : criterios?.tipo === 'apartamento'
       ? 'apartamentos'
       : 'propiedades';
-  lines.push(`Encontré estas excelentes opciones de ${tipoInm} disponibles${sector}:`);
+  const accion = (criterios as any)?.operacion === 'venta' ? 'en venta' : (criterios as any)?.operacion === 'arriendo' ? 'en arriendo' : '';
+  const headerText = (criterios as any)?.acepta_otras_zonas
+    ? `¡Con mucho gusto! Encontré estas excelentes opciones de ${tipoInm} ${accion} disponibles en otras zonas de Ibagué:`
+    : `Encontré estas excelentes opciones de ${tipoInm} ${accion} disponibles${sector}:`;
+  lines.push(headerText);
 
   items.slice(0, 3).forEach((item, idx) => {
     const p = item.inmueble;
