@@ -10,7 +10,7 @@ import { setFotoInmueble } from '../lib/api';
 import { INMOBILIARIA_INFO } from '../lib/firmaInmobiliaria';
 import { descargarPdfBorrador, descargarPdfFinal, obtenerAcuerdo, obtenerAcuerdoPorInmueble, actualizarClausulas } from '../lib/apiFirmas';
 import { IcoOjo, IcoDescargar, IcoImprimir, IcoCerrar, IcoDocumento, IcoSparkle, IcoWhatsApp, IcoCamara, IcoCheck, IcoEditar } from './Iconos';
-import { waUrl } from '../lib/contacto';
+import { waUrl, abrirWhatsApp } from '../lib/contacto';
 import EditorClausulas from './EditorClausulas';
 
 // Tarjeta del contrato con acciones de ver, descargar y renovar (exclusivo para administradores)
@@ -386,6 +386,7 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
                   href={waUrl(`Hola Habitat Capital, me interesa el inmueble "${i.nombre}" (${i.tipo} en ${i.barrio || 'Ibagué'}). ¿Está disponible para visita?`)}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={abrirWhatsApp}
                   className="g btn-cliente-wa"
                 >
                   <IcoWhatsApp /> Contactar por WhatsApp

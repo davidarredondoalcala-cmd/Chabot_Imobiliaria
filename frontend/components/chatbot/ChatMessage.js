@@ -2,6 +2,7 @@
 import React from 'react';
 import PropertyCard from './PropertyCard';
 import { IcoChatBot, IcoChatUser, IcoChatWhatsApp } from './IconosChat';
+import { abrirWhatsApp } from '../../lib/contacto';
 
 /**
  * Parsea el texto del mensaje para renderizar en negrita (**texto**) sin mostrar asteriscos,
@@ -90,6 +91,7 @@ export default function ChatMessage({ message, onRetomar, onNueva }) {
             href={message.whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={abrirWhatsApp}
             className="hc-direct-wa-btn"
           >
             <IcoChatWhatsApp size={16} />

@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { IcoChatPin, IcoChatBed, IcoChatBath, IcoChatArea, IcoChatWhatsApp, IcoChatExternal } from './IconosChat';
-import { waUrl } from '../../lib/contacto';
+import { waUrl, abrirWhatsApp } from '../../lib/contacto';
 
 export default function PropertyCard({ property, whatsappUrl }) {
   if (!property) return null;
@@ -101,6 +101,7 @@ export default function PropertyCard({ property, whatsappUrl }) {
             href={waTarget}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={abrirWhatsApp}
             className="hc-prop-btn-wa"
           >
             <IcoChatWhatsApp size={15} />

@@ -17,7 +17,6 @@ import {
 } from './Iconos';
 import {
   MAX_CLAUSULAS,
-  MAX_PRE,
   normalizarClausulas,
   normalizarHtmlInline,
   htmlDeTexto,
@@ -49,6 +48,7 @@ export default function EditorClausulas({
   const [error, setError] = useState('');
   const [montado, setMontado] = useState(false);
   const editores = useRef(new Map());
+  const titulos = useRef(new Map());
   const idRef = useRef(0);
 
   const crearItem = (c) => ({
@@ -69,6 +69,7 @@ export default function EditorClausulas({
       : [{ pre: 'PRIMERA – Objeto.', resto: '' }];
     const iniciales = base.slice(0, MAX_CLAUSULAS).map(crearItem);
     editores.current.clear();
+    titulos.current.clear();
     setItems(iniciales);
     setActivo(iniciales[0]?.id || null);
     setDirty(false);
@@ -103,8 +104,12 @@ export default function EditorClausulas({
 
   const capturar = () =>
     items.map((it) => {
-      const el = editores.current.get(it.id);
-      return { ...it, html: el ? el.innerHTML : it.html };
+      const cuerpo = editores.current.get(it.id);
+      const titulo = titulos.current.get(it.id);
+      const pre = titulo
+        ? (titulo.innerText || titulo.textContent || '').replace(/\s+/g, ' ').trim()
+        : it.pre;
+      return { ...it, pre, html: cuerpo ? cuerpo.innerHTML : it.html };
     });
 
   const agregar = () => {
@@ -148,11 +153,6 @@ export default function EditorClausulas({
     setError('');
   };
 
-  const cambiarPre = (id, valor) => {
-    setItems((prev) => prev.map((it) => (it.id === id ? { ...it, pre: valor.slice(0, MAX_PRE) } : it)));
-    setDirty(true);
-  };
-
   const aplicarFormato = (cmd) => {
     const el = editores.current.get(activo) || editores.current.values().next().value;
     if (!el) return;
@@ -187,7 +187,7 @@ export default function EditorClausulas({
             <span className="editor-clausulas-ico"><IcoEditar /></span>
             <div className="editor-clausulas-title-txt">
               <strong>{titulo}</strong>
-              <span>{soloLectura ? 'Solo lectura' : `${items.length} cláusula${items.length === 1 ? '' : 's'} · los cambios se aplican al guardar`}</span>
+              <span>{soloLectura ? 'Solo lectura' : `Documento completo · ${items.length} cláusula${items.length === 1 ? '' : 's'} · los cambios se aplican al guardar`}</span>
             </div>
           </div>
           <div className="editor-clausulas-header-btns">
@@ -239,9 +239,12 @@ export default function EditorClausulas({
         <div className="editor-clausulas-scroll">
           <div className="editor-clausulas-paper">
             {items.map((it, idx) => (
-              <div className="editor-clausula" key={it.id}>
+              <section
+                className={`editor-clausula${activo === it.id ? ' activa' : ''}`}
+                key={it.id}
+              >
                 <div className="editor-clausula-barra">
-                  <span className="editor-clausula-num">{idx + 1}</span>
+                  <span className="editor-clausula-num">{String(idx + 1).padStart(2, '0')}</span>
                   {!soloLectura && (
                     <div className="editor-clausula-barra-btns">
                       <button
@@ -275,48 +278,72 @@ export default function EditorClausulas({
                   )}
                 </div>
 
-                {soloLectura ? (
-                  <>
-                    {it.pre && <div className="editor-clausula-pre-texto">{it.pre}</div>}
-                    <div
-                      className="editor-clausula-cuerpo"
-                      dangerouslySetInnerHTML={{ __html: sanitizarHtml(it.html) }}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <input
-                      id={`cl-pre-${it.id}`}
-                      className="editor-clausula-pre"
-                      value={it.pre}
-                      maxLength={MAX_PRE}
-                      placeholder="Título de la cláusula (ej: PRIMERA – Objeto.)"
-                      onChange={(e) => cambiarPre(it.id, e.target.value)}
-                      onFocus={() => setActivo(it.id)}
-                    />
-                    <div
-                      ref={(el) => {
-                        if (!el) {
-                          editores.current.delete(it.id);
-                          return;
-                        }
-                        editores.current.set(it.id, el);
-                        if (el.dataset.clInicializada !== it.id) {
-                          el.innerHTML = it.html;
-                          el.dataset.clInicializada = it.id;
-                        }
-                      }}
-                      className="editor-clausula-cuerpo"
-                      contentEditable
-                      suppressContentEditableWarning
-                      spellCheck
-                      data-placeholder="Escribe aquí el contenido de la cláusula…"
-                      onFocus={() => setActivo(it.id)}
-                      onInput={() => setDirty(true)}
-                    />
-                  </>
-                )}
-              </div>
+                <div className="editor-clausula-contenido">
+                  {soloLectura ? (
+                    <>
+                      {it.pre && <div className="editor-clausula-pre-texto">{it.pre}</div>}
+                      <div
+                        className="editor-clausula-cuerpo"
+                        dangerouslySetInnerHTML={{ __html: sanitizarHtml(it.html) }}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <div
+                        id={`cl-pre-${it.id}`}
+                        ref={(el) => {
+                          if (!el) {
+                            titulos.current.delete(it.id);
+                            return;
+                          }
+                          titulos.current.set(it.id, el);
+                          if (el.dataset.clTituloInicializado !== it.id) {
+                            el.textContent = it.pre;
+                            el.dataset.clTituloInicializado = it.id;
+                          }
+                        }}
+                        className="editor-clausula-pre"
+                        contentEditable
+                        suppressContentEditableWarning
+                        spellCheck
+                        role="textbox"
+                        aria-label={`Título de la cláusula ${idx + 1}`}
+                        data-placeholder="Título de la cláusula (ej: PRIMERA – Objeto.)"
+                        onFocus={() => setActivo(it.id)}
+                        onInput={() => {
+                          setActivo(it.id);
+                          setDirty(true);
+                        }}
+                      />
+                      <div
+                        ref={(el) => {
+                          if (!el) {
+                            editores.current.delete(it.id);
+                            return;
+                          }
+                          editores.current.set(it.id, el);
+                          if (el.dataset.clInicializada !== it.id) {
+                            el.innerHTML = it.html;
+                            el.dataset.clInicializada = it.id;
+                          }
+                        }}
+                        className="editor-clausula-cuerpo"
+                        contentEditable
+                        suppressContentEditableWarning
+                        spellCheck
+                        role="textbox"
+                        aria-label={`Contenido de la cláusula ${idx + 1}`}
+                        data-placeholder="Escribe aquí el contenido de la cláusula…"
+                        onFocus={() => setActivo(it.id)}
+                        onInput={() => {
+                          setActivo(it.id);
+                          setDirty(true);
+                        }}
+                      />
+                    </>
+                  )}
+                </div>
+              </section>
             ))}
 
             {!soloLectura && (
