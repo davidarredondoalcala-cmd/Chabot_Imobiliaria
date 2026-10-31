@@ -1712,6 +1712,15 @@ label { transition: color .5s }
     object-fit: contain;
 }
 
+/* Visor de foto de solo lectura para el cliente: más grande que la previsualización de subida */
+.modal-ver-foto {
+    max-width: 820px;
+}
+
+.modal-ver-foto .previa-foto-wrap {
+    height: min(66vh, 640px);
+}
+
 /* Badge de Rol de Usuario y Toggle de Simulación */
 .tag-rol {
     display: inline-flex;

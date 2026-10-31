@@ -56,6 +56,7 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
   const [guardandoClausulas, setGuardandoClausulas] = useState(false);
   const [descargandoId, setDescargandoId] = useState(null);
   const [fotoPrevia, setFotoPrevia] = useState(null); // { file, previewUrl }
+  const [verFoto, setVerFoto] = useState(false); // Visor de solo lectura para clientes
   const [montado, setMontado] = useState(false);
 
   useEffect(() => {
@@ -73,6 +74,18 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
       document.body.style.overflow = '';
     };
   }, [contratoVer]);
+
+  // Visor de foto del cliente: cierra con Escape y bloquea el scroll de fondo
+  useEffect(() => {
+    if (!verFoto) return;
+    const onTecla = (e) => { if (e.key === 'Escape') setVerFoto(false); };
+    window.addEventListener('keydown', onTecla);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onTecla);
+      document.body.style.overflow = '';
+    };
+  }, [verFoto]);
 
   const prepararContratoS = (c) => {
     const modo = (c.tipo || '').toLowerCase().includes('compra') || (c.tipo || '').toLowerCase().includes('venta')
@@ -291,17 +304,22 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
   const abrirSelector = () => { if (esAdmin && !subiendo) fileRef.current?.click(); };
   const alTeclado = (e) => { if (esAdmin && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); abrirSelector(); } };
 
+  // Para clientes con foto cargada: pulsar la vista solo amplía la imagen (sin edición).
+  const tieneFotoCliente = !esAdmin && i.foto && !imgErr;
+  const abrirVisorFoto = () => { setVerFoto(true); };
+  const tecladoVisorFoto = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirVisorFoto(); } };
+
   return (
     <div className="view">
       <button className="l" onClick={volver}>← Volver a {i.tipo === 'Casa' ? 'casas' : 'apartamentos'}</button>
       <div className="card ficha">
         <div
-          className={`thumb grande ${i.tipo} ${esAdmin ? 'editable' : ''}`}
-          role={esAdmin ? 'button' : undefined}
-          tabIndex={esAdmin ? 0 : undefined}
-          aria-label={esAdmin ? (i.foto ? 'Cambiar foto del inmueble' : 'Agregar foto al inmueble') : undefined}
-          onClick={esAdmin ? abrirSelector : undefined}
-          onKeyDown={esAdmin ? alTeclado : undefined}
+          className={`thumb grande ${i.tipo} ${esAdmin ? 'editable' : ''} ${tieneFotoCliente ? 'clicable' : ''}`}
+          role={esAdmin ? 'button' : (tieneFotoCliente ? 'button' : undefined)}
+          tabIndex={esAdmin ? 0 : (tieneFotoCliente ? 0 : undefined)}
+          aria-label={esAdmin ? (i.foto ? 'Cambiar foto del inmueble' : 'Agregar foto al inmueble') : (tieneFotoCliente ? 'Ver foto del inmueble en grande' : undefined)}
+          onClick={esAdmin ? abrirSelector : (tieneFotoCliente ? abrirVisorFoto : undefined)}
+          onKeyDown={esAdmin ? alTeclado : (tieneFotoCliente ? tecladoVisorFoto : undefined)}
         >
           {i.foto && !imgErr ? <img className="foto-thumb" src={urlImagen(i.foto)} alt={i.nombre} onError={() => setImgErr(true)} /> : <Ilustra tipo={i.tipo} />}
           {esAdmin && !i.foto && <span className="foto-mas" aria-hidden="true">{subiendo ? '…' : '+'}</span>}
@@ -334,10 +352,9 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
             {esAdmin && i.venc && <div className="dato"><span>Vencimiento del contrato</span><b>{fd(i.venc)}</b></div>}
             {esAdmin && i.venc && <div className="dato"><span>Día de pago</span><b>El {i.diaPago} de cada mes</b></div>}
           </div>
-          {esAdmin && i.estado !== 'Arrendada' && (
+          {esAdmin && (i.estado === 'Disponible' || i.estado === 'Para la venta') && (
             <div className="row">
               <button className="g" onClick={() => crear(i.estado === 'Para la venta' ? 'venta' : 'arriendo')}>Crear contrato</button>
-              <button onClick={() => crear('venta')}>Descargar formato de compraventa</button>
             </div>
           )}
           {esAdmin ? (
@@ -429,6 +446,26 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
         document.body
       )}
 
+      {/* Visor de foto para clientes: solo lectura, sin opciones de edición */}
+      {!esAdmin && verFoto && i.foto && !imgErr && montado && typeof document !== 'undefined' && createPortal(
+        <div className="modal-contrato-backdrop" onClick={() => setVerFoto(false)}>
+          <div className="card modal-previa-foto modal-ver-foto" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-contrato-header">
+              <h3><IcoCamara /> Foto del inmueble</h3>
+              <button type="button" className="l" onClick={() => setVerFoto(false)} title="Cerrar visor">
+                <IcoCerrar />
+              </button>
+            </div>
+            <div style={{ padding: '20px 24px' }}>
+              <div className="previa-foto-wrap">
+                <img src={urlImagen(i.foto)} alt={i.nombre} className="previa-foto-img" />
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
       {/* Visor de Contrato: perspectiva natural tipo documento en escritorio, se sale al hacer clic en cualquier lugar fuera del papel */}
       {esAdmin && contratoVer && montado && typeof document !== 'undefined' && createPortal(
         <div
@@ -447,19 +484,16 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
               </span>
             </div>
             <div className="modal-contrato-toolbar-btns">
-              <button
-                type="button"
-                className="s"
-                onClick={() => setEditorContrato(true)}
-                disabled={!contratoEditable}
-                title={
-                  contratoEditable
-                    ? 'Editar las cláusulas del contrato'
-                    : 'Solo se puede editar mientras el contrato está en firma y sin firmas externas registradas'
-                }
-              >
-                <IcoEditar /> Editar contrato
-              </button>
+              {contratoEditable && (
+                <button
+                  type="button"
+                  className="s"
+                  onClick={() => setEditorContrato(true)}
+                  title="Editar las cláusulas del contrato"
+                >
+                  <IcoEditar /> Editar contrato
+                </button>
+              )}
               <button
                 type="button"
                 className="s"
