@@ -124,12 +124,22 @@ export async function processUserMessage(
     understanding.criterios_duros.barrios ||
     understanding.criterios_duros.precio_max ||
     understanding.criterios_duros.habitaciones_min;
+  // Ampliamos el gatillo: cualquier señal de intención inmobiliaria en el mensaje
+  // (no solo la intención exacta "buscar") + no es asesoría ni detalle de un código
+  const hayIntencionInmobiliaria =
+    hayCriteriosBusqueda ||
+    understanding.intencion === 'buscar' ||
+    /arriendo|arrendar|alquil|comprar?|vender|ventas?|casas?|apartamento|apto|inmueble|busco|buscando|disponible|ofertas?\b/i.test(
+      userMessage
+    );
   const esCiudadNoCubierta =
     ciudadMencionada &&
     !/ibagu[ée\u00fc]/i.test(ciudadMencionada) &&
-    understanding.intencion === 'buscar' &&
-    hayCriteriosBusqueda &&
-    !understanding.codigo_inmueble_mencionado;
+    hayIntencionInmobiliaria &&
+    !understanding.codigo_inmueble_mencionado &&
+    !understanding.solicita_asesor &&
+    understanding.intencion !== 'hablar_con_asesor' &&
+    understanding.intencion !== 'fuera_de_tema';
   if (esCiudadNoCubierta) {
     const reply = respuestaCiudadNoSoportada(ciudadMencionada);
     await recordMessage(conversationId, 'user', userMessage);

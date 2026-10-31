@@ -83,18 +83,26 @@ const CIUDADES_CONOCIDAS: Record<string, string> = {
 
 /**
  * Detecta la ciudad REAL citada en el mensaje (patrón típico: "en <ciudad>", "de <ciudad>").
+ * Si el mensaje menciona varias ciudades y una de ellas es Ibagué, prevalece Ibagué
+ * (ej. "soy de Bogotá, busco casa en Ibagué" => no se debe rechazar la búsqueda).
  */
 export function detectarCiudad(userMessage: string): string | null {
   const clean = stripAccents(userMessage);
   const ordenadas = [...Object.keys(CIUDADES_CONOCIDAS)].sort((a, b) => b.length - a.length);
+  const encontradas: string[] = [];
   for (const ciudadKey of ordenadas) {
     const regex = new RegExp(
       `\\b(?:en|de|por|hacia)\\s+(?:el\\s+|la\\s+|ciudad\\s+de\\s+|municipio\\s+de\\s+)?${escaparRegex(ciudadKey).replace(/\s+/g, '\\s+')}\\b`,
       'i'
     );
-    if (regex.test(clean)) return CIUDADES_CONOCIDAS[ciudadKey];
+    if (regex.test(clean)) {
+      const nombre = CIUDADES_CONOCIDAS[ciudadKey];
+      if (!encontradas.includes(nombre)) encontradas.push(nombre);
+    }
   }
-  return null;
+  if (encontradas.length === 0) return null;
+  if (encontradas.includes('Ibagué')) return 'Ibagué';
+  return encontradas[0];
 }
 
 /**
@@ -334,6 +342,12 @@ export async function understandUserMessage(
     // Fallbacks deterministas: si el LLM no trajo ciudad o fuera_de_tema, usamos el heurístico
     if (!llmResult.criterios_duros.ciudad && heuristic.criterios_duros.ciudad) {
       llmResult.criterios_duros.ciudad = heuristic.criterios_duros.ciudad;
+    }
+    // Si el heurístico detecta una ciudad real distinta de Ibagué, prevalece sobre el LLM
+    // (evita que el LLM asuma "Ibagué" por defecto cuando el usuario cita otra ciudad)
+    const ciudadHeuristica = heuristic.criterios_duros.ciudad;
+    if (ciudadHeuristica && !/ibagu[ée\u00fc]/i.test(ciudadHeuristica)) {
+      llmResult.criterios_duros.ciudad = ciudadHeuristica;
     }
     if (llmResult.fuera_de_tema == null && heuristic.fuera_de_tema) {
       llmResult.fuera_de_tema = heuristic.fuera_de_tema;

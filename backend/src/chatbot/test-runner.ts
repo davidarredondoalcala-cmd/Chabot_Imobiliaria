@@ -103,6 +103,30 @@ async function runTests() {
     r11.reply
   );
 
+  // Test 11b: variante corta con otra ciudad
+  const r11b = await processUserMessage('test-11b', 'arriendo en medellin');
+  assert(
+    r11b.properties.length === 0 && r11b.reply.toLowerCase().includes('ibagué'),
+    'Arriendo en Medellín responde que solo hay inmuebles en Ibagué',
+    r11b.reply
+  );
+
+  // Test 11c: variante sin palabra "busco/arriendo" explícita
+  const r11c = await processUserMessage('test-11c', 'casa en medellin');
+  assert(
+    r11c.properties.length === 0 && r11c.reply.toLowerCase().includes('ibagué'),
+    'Casa en Medellín responde que solo hay inmuebles en Ibagué',
+    r11c.reply
+  );
+
+  // Test 11d: mencionar otra ciudad NO bloquea si el usuario busca en Ibagué
+  const r11d = await processUserMessage('test-11d', 'soy de Medellín pero busco casa en Ibagué');
+  assert(
+    !r11d.reply.includes('nuestro catálogo vive 100%'),
+    'Soy de Medellín pero busco en Ibagué NO genera rechazo por ciudad',
+    `props=${r11d.properties.length} reply=${r11d.reply}`
+  );
+
   // Test 12: Pregunta fuera del tema inmobiliario
   const r12 = await processUserMessage('test-12', 'cuanto es 2x2');
   assert(
