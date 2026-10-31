@@ -73,6 +73,7 @@ export interface ChatResponse {
   properties: Property[];
   needsHuman: boolean;
   whatsappUrl?: string;
+  suggestionChips?: string[];
   metadata?: Record<string, any>;
 }
 

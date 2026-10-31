@@ -1,6 +1,6 @@
 import { Property, ChatResponse } from './types';
 import { getConversationState, saveConversationState, mergeConversationCriterios, recordMessage } from './state';
-import { understandUserMessage } from './nlu';
+import { understandUserMessage, tieneContextoInmobiliario } from './nlu';
 import { evaluateClarificationPolicy } from './clarification';
 import { buscarInmuebles } from './search';
 import { obtenerDetalleInmueble } from './detail';
@@ -94,18 +94,47 @@ export async function processUserMessage(
     };
   }
 
-  // Preguntas claramente fuera del tema inmobiliario (matemáticas, clima, chistes, etc.)
+  // Ayuda y capacidades de Habitat Capital
+  const isHelpOrCapabilities = /^\s*(ayuda|qu[eé] puedes hacer|qu[eé] haces|c[oó]mo funciona|servicios|qu[eé] me recomiendas)[\s\.,!¡?¿]*$/i.test(userMessage.trim());
+  if (isHelpOrCapabilities) {
+    const helpReply = 'Con muchísimo gusto. Como asistente virtual de **Habitat Capital** en Ibagué, puedo orientarte en:\n\n• **Búsqueda en catálogo:** Encontrar casas y apartamentos disponibles en arriendo o para comprar en Ibagué.\n• **Filtros por zona:** Opciones en sectores como El Vergel, Piedra Pintada, La Pola, Calambeo, Cádiz o Centro.\n• **Presupuesto y características:** Filtrar por precio mensual, valor de compra, habitaciones o baños.\n• **Atención personalizada:** Brindarte fichas de inmuebles o comunicarte con un asesor comercial por WhatsApp.\n\n¿Qué tipo de inmueble te gustaría consultar hoy?';
+    await recordMessage(conversationId, 'user', userMessage);
+    await recordMessage(conversationId, 'assistant', helpReply, meta);
+    return {
+      conversationId,
+      reply: helpReply,
+      properties: [],
+      needsHuman: false,
+      suggestionChips: [
+        'Apartamentos en arriendo',
+        'Casas en venta en Ibagué',
+        'Propiedades en El Vergel',
+        'Hablar con un asesor'
+      ],
+      metadata: meta,
+    };
+  }
+
+  // Preguntas fuera del tema inmobiliario (matemáticas, clima, recetas, deportes, noticias, cultura, etc.)
   const esFueraDeTema =
-    understanding.fuera_de_tema === true &&
-    understanding.intencion === 'fuera_de_tema' &&
+    (understanding.fuera_de_tema === true ||
+      understanding.intencion === 'fuera_de_tema' ||
+      (!tieneContextoInmobiliario(userMessage, understanding) && !isPureGreetingOrReset && !isSmallTalk && !isThankYou && !isHelpOrCapabilities)) &&
     !understanding.operacion &&
     !understanding.criterios_duros.tipo &&
     !understanding.criterios_duros.barrios &&
     !understanding.criterios_duros.precio_max &&
     !understanding.tipo_no_soportado &&
     !understanding.codigo_inmueble_mencionado;
+
   if (esFueraDeTema) {
     const reply = respuestaFueraDeTema();
+    const suggestionChips = [
+      'Apartamentos en arriendo',
+      'Casas en venta en Ibagué',
+      'Propiedades en El Vergel',
+      'Hablar con un asesor'
+    ];
     await recordMessage(conversationId, 'user', userMessage);
     await recordMessage(conversationId, 'assistant', reply, meta);
     return {
@@ -113,6 +142,7 @@ export async function processUserMessage(
       reply,
       properties: [],
       needsHuman: false,
+      suggestionChips,
       metadata: meta,
     };
   }

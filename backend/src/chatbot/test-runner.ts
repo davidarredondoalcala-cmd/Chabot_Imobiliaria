@@ -169,6 +169,67 @@ async function runTests() {
     `props=${r13b.properties.length}`
   );
 
+  // Test 14: Pregunta sobre deportes o personajes ajenos a la inmobiliaria
+  const r14 = await processUserMessage('test-14', 'quién es Messi');
+  assert(
+    r14.properties.length === 0 &&
+      r14.reply.includes('No puedo responder a ese tipo de peticiones') &&
+      Boolean(r14.suggestionChips && r14.suggestionChips.length > 0),
+    'Pregunta sobre Messi responde que no puede responder a esa petición y ofrece recomendaciones',
+    r14.reply
+  );
+
+  // Test 15: Pregunta sobre recetas o cocina ajena
+  const r15 = await processUserMessage('test-15', 'cómo preparar una pizza');
+  assert(
+    r15.properties.length === 0 &&
+      r15.reply.includes('No puedo responder a ese tipo de peticiones') &&
+      Boolean(r15.suggestionChips && r15.suggestionChips.length > 0),
+    'Pregunta de recetas responde que no puede responder y ofrece sugerencias inmobiliarias',
+    r15.reply
+  );
+
+  // Test 16: Pregunta de programación o código
+  const r16 = await processUserMessage('test-16', 'escribe un script en python');
+  assert(
+    r16.properties.length === 0 &&
+      r16.reply.includes('No puedo responder a ese tipo de peticiones'),
+    'Pregunta de programación responde que no puede responder a peticiones ajenas',
+    r16.reply
+  );
+
+  // Test 17: Búsqueda restringida EXCLUSIVAMENTE a la base de datos (MongoDB)
+  const mockDbProperty = {
+    id: 'mongo-custom-99',
+    codigo: 'HC-9999',
+    operacion: 'arriendo' as const,
+    tipo: 'apartamento' as const,
+    titulo: 'Apartamento Exclusivo BD Real Habitat',
+    descripcion: 'Apartamento únicamente existente en la base de datos real de Habitat Capital.',
+    ciudad: 'Ibagué',
+    barrio: 'El Vergel',
+    precio: 1800000,
+    area_m2: 85,
+    habitaciones: 3,
+    banos: 2,
+    parqueaderos: 1,
+    estrato: 5,
+    amenidades: ['ascensor', 'piscina'],
+    disponible: true,
+  };
+  const r17 = await processUserMessage(
+    'test-17',
+    'apartamento en arriendo en el vergel por 1.8 millones',
+    [mockDbProperty]
+  );
+  assert(
+    r17.properties.length === 1 &&
+      r17.properties[0].codigo === 'HC-9999' &&
+      !r17.properties.some(p => p.id.startsWith('seed-')),
+    'El chat responde SOLO con lo registrado en la base de datos (sin incluir semillas)',
+    `props=${r17.properties.map(p => p.codigo).join(', ')}`
+  );
+
   console.log(`\n=== Resultado de pruebas: ${passed}/${total} superadas (${Math.round((passed/total)*100)}%) ===\n`);
   if (passed !== total) {
     process.exit(1);

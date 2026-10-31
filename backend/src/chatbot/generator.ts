@@ -35,11 +35,15 @@ Si te animas a quedarte por acá, te cuento que tenemos buenos sectores: **El Ve
  * (matemáticas, clima, noticias, chistes, cultura general, etc.).
  */
 export function respuestaFueraDeTema(): string {
-  return `¡Ja! Me encanta la buena charla, pero mi especialidad es muy puntual: solo me encargo de temas de la **inmobiliaria** por acá. 🏡
+  return `No puedo responder a ese tipo de peticiones. Como asistente virtual de **Habitat Capital**, mi labor se enfoca exclusivamente en la asesoría inmobiliaria y en los inmuebles de nuestro catálogo en Ibagué.
 
-Eso significa casas y apartamentos en **arriendo o venta** en Ibagué, precios, barrios, cómos y coordinar visitas.
+Para colaborarte de la mejor manera, te recomiendo realizar consultas sobre:
+• **Inmuebles en catálogo:** Casas o apartamentos disponibles para arriendo o venta en Ibagué.
+• **Zonas y sectores:** Opciones en barrios como El Vergel, Piedra Pintada, La Pola, Calambeo, Cádiz o Centro.
+• **Precios y características:** Consulta por número de habitaciones, baños, áreas o rangos de presupuesto.
+• **Trámites y visitas:** Coordinación de visitas presenciales o contacto directo con un asesor comercial.
 
-¿Te ayudo con algo de eso? Por ejemplo, dime en qué barrio te interesa y en qué presupuesto, y con gusto te muestro opciones.`;
+¿Te gustaría que busquemos una casa o un apartamento en arriendo o venta?`;
 }
 
 /**

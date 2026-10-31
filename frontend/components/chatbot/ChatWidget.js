@@ -232,6 +232,7 @@ export default function ChatWidget() {
         content: data.reply || 'No obtuve respuesta en este momento.',
         properties: data.properties || [],
         whatsappUrl: data.whatsappUrl,
+        suggestionChips: data.suggestionChips,
       };
 
       setMessages((prev) => [...prev, botMsg]);
@@ -250,9 +251,10 @@ export default function ChatWidget() {
     }
   };
 
+  const lastBotMsg = messages.length > 0 ? [...messages].reverse().find(m => m.role === 'assistant') : null;
   const currentChips = showResumePrompt
     ? ['💬 Retomar conversación', '✨ Empezar una nueva']
-    : undefined;
+    : (lastBotMsg?.suggestionChips || undefined);
 
   return (
     <div className="hc-chat-widget">

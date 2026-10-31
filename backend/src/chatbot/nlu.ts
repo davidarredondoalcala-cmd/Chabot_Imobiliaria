@@ -111,23 +111,66 @@ export function detectarCiudad(userMessage: string): string | null {
  * Detecta preguntas claramente ajenas al negocio inmobiliario (matemáticas, clima,
  * noticias, chistes, etc.). Solo se aplica cuando NO hay señales inmobiliarias.
  */
-const PATRONES_FUERA_DE_TEMA = [
+export const PATRONES_FUERA_DE_TEMA = [
   /\bcu[aá]nto(?:\s+es|\s+son)?\s*[\d(]\s*\d*\s*[x×+\-*/^=]/,
   /\b\d+\s*[x×]\s*\d+\b/,
   /\b\d+\s*[\-*/^]\s*\d+\b/,
   /\bra[íi]z\s+cuadrada/,
-  /\bclima\b|\bpron[óo]stico del tiempo\b|\bva a llover\b/,
+  /\bclima\b|\bpron[óo]stico del tiempo\b|\bva a llover\b|\blluvia\b|\btemperatura\b/,
   /\bnoticias?\b|\bnoticiero\b|\bperi[óo]dico\b/,
-  /\bchistes?\b|\bm[eé]jame una risa\b/,
-  /\brecetas?\b|\breceta de\b/,
-  /\bf[úu]tbol\b|\bshakira\b|\bmessi\b|\bkarol g\b/,
-  /\btr[aá]duceme\b|\btrad[uú]ceme\b|\btraduce esto\b/,
-  /\bhablame de filosofía\b|\bhablame de historia\b|\bhablame de biología\b/,
+  /\bchistes?\b|\bm[eé]jame una risa\b|\bcu[eé]ntame un chiste\b|\badivinanza\b|\bpoema\b|\bpoes[ií]a\b/,
+  /\brecetas?\b|\breceta de\b|\bc[oó]mo (?:se hace|hacer|preparar|cocinar)\b|\bingredientes\b|\bpizza\b|\bhamburguesa\b|\bpostre\b/,
+  /\bf[úu]tbol\b|\bsoccer\b|\bshakira\b|\bmessi\b|\bronaldo\b|\bcristiano\b|\bkarol g\b|\bbaloncesto\b|\btenis\b|\bmundial\b|\bchampions\b/,
+  /\btr[aá]duceme\b|\btrad[uú]ceme\b|\btraduce esto\b|\btranslate\b/,
+  /\bhablame de\b|\bqui[eé]n es\s+(?!jarvis\b)|\bqui[eé]n fue\b|\bcu[aá]l es la capital\b/,
+  /\bfilosof[ií]a\b|\bhistoria\b|\bbiolog[ií]a\b|\bqu[ií]mica\b|\bf[ií]sica\b|\bmatem[aá]ticas?\b/,
+  /\bpython\b|\bjavascript\b|\btypescript\b|\bc[oó]digo\b|\bprogramar\b|\bprogramaci[oó]n\b|\balgoritmo\b/,
+  /\bhazme una tarea\b|\bescribe un ensayo\b|\bresumen de\b/,
+  /\bpol[ií]tica\b|\belecciones\b|\bpresidente\b|\balcalde\b/,
+  /\bhor[oó]scopo\b|\bsigno zodiacal\b|\bastrolog[ií]a\b/,
+  /\bmedicina\b|\bs[ií]ntomas?\b|\benfermedad\b|\bpastilla\b|\bremedio\b/,
 ];
 
-function detectarFueraDeTema(userMessage: string): boolean {
+export function detectarFueraDeTema(userMessage: string): boolean {
   const texto = userMessage.toLowerCase();
   return PATRONES_FUERA_DE_TEMA.some((patron) => patron.test(texto));
+}
+
+export function tieneContextoInmobiliario(
+  userMessage: string,
+  signals?: {
+    codigo?: string | null;
+    tipo?: TipoInmueble | null;
+    tipo_no_soportado?: string | null;
+    operacion?: Operacion | null;
+    solicitaAsesor?: boolean;
+    barrios?: string[] | null;
+    moneyMin?: number | null;
+    moneyMax?: number | null;
+    presupuestoInvalido?: boolean;
+  }
+): boolean {
+  if (signals) {
+    if (signals.codigo) return true;
+    if (signals.tipo) return true;
+    if (signals.tipo_no_soportado) return true;
+    if (signals.operacion) return true;
+    if (signals.solicitaAsesor) return true;
+    if (signals.barrios && signals.barrios.length > 0) return true;
+    if (signals.moneyMin != null || signals.moneyMax != null) return true;
+    if (signals.presupuestoInvalido) return true;
+  }
+
+  const clean = stripAccents(userMessage);
+
+  const patronInmobiliario = /\b(casas?|apartamentos?|aptos?|apartaestudios?|inmuebles?|propiedad(?:es)?|viviendas?|habitaci(?:on|ones)|alcobas?|cuartos?|piezas?|ba[nñ]os?|estrato|garajes?|parqueaderos?|balcon(?:es)?|terrazas?|patios?|piscinas?|m2|metros?|arriendos?|arrendar|arrendo|alquiler(?:es)?|alquilar|comprar?|compras?|compro|comprarme|ventas?|vender|vendo|adquirir|adquisici(?:on|ones)|canon|inmobiliaria|inmobiliario|habitat\s+capital|catalogo|disponibles?|ofertas?|presupuesto|mill(?:on|ones)|palos?|asesor(?:a)?|asesor[ií]a|agente|visitas?|agendar|citas?|negociar|descuento|escrituras?|notar[ií]a|contratos?|lotes?|terrenos?|locales?|oficinas?|bodegas?|fincas?|consultorios?|ibague|tolima|el vergel|cadiz|la pola|calambeo|piedra pintada|jordan|belen|interlaken|picale[nñ]a|la macarena|santa helena|el salado|prados del norte|arkacentro|mirolindo|varsovia|campestre|valparaiso|otras?\s+zonas?|otras?\s+opciones?)\b/i;
+
+  return patronInmobiliario.test(clean);
+}
+
+export function esSaludoOCortesia(userMessage: string): boolean {
+  const clean = stripAccents(userMessage.trim());
+  return /^\s*(hola|buen[oa]s?|buenos dias|buenas tardes|buenas noches|quiubo|qu[eé] tal|c[oó]mo estas|c[oó]mo te va|c[oó]mo andas|qui[eé]n eres|gracias|muchas gracias|mil gracias|ok|vale|perfecto|listo|reiniciar|inicio|empezar|comenzar|ayuda|qu[eé] puedes hacer)[\s\.,!¡?¿]*$/i.test(clean);
 }
 
 /**
@@ -274,17 +317,6 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     intencion = 'buscar';
   }
 
-  // Fuera de tema: solo si no hay señales inmobiliarias en el mensaje
-  const hayContextoInmobiliario = Boolean(
-    codigo || tipo || tipo_no_soportado || operacion || solicitaAsesor ||
-    detectedBarrios.length > 0 || finalMoney.min != null || finalMoney.max != null ||
-    /inmobiliari|casas?|apartamento|arriendo|arrendo|venta|alquil|inmueble|barrio|propiedad|habitacion|presupuesto/i.test(lower)
-  );
-  const esFueraDeTema = !hayContextoInmobiliario && detectarFueraDeTema(userMessage);
-  if (esFueraDeTema) {
-    intencion = 'fuera_de_tema';
-  }
-
   // Presupuesto mencionado pero sin cifra válida en pesos (ej. "una mandarina como presupuesto").
   // Solo se marca si el usuario habla de presupuesto y NO se pudo parsear ningún monto real.
   const mencionaPresupuesto = /presupuesto|cu[aá]nt[oa]\s+dinero|valor\s+m[aá]ximo|cu[aá]nt[oa]\s+quiero\s+gastar|de\s+cu[aá]nt[oa]\s+queda/i.test(lower);
@@ -293,6 +325,26 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     finalMoney.min == null &&
     finalMoney.max == null &&
     !codigo;
+
+  // Fuera de tema: se detecta por patrones explícitos o por falta total de contexto inmobiliario
+  // siempre que no sea un saludo, cortesía, agradecimiento o reinicio.
+  const hayContextoInmobiliario = tieneContextoInmobiliario(userMessage, {
+    codigo,
+    tipo,
+    tipo_no_soportado,
+    operacion,
+    solicitaAsesor,
+    barrios: detectedBarrios,
+    moneyMin: finalMoney.min,
+    moneyMax: finalMoney.max,
+    presupuestoInvalido,
+  });
+
+  const saludoOCortesia = esSaludoOCortesia(userMessage);
+  const esFueraDeTema = detectarFueraDeTema(userMessage) || (!hayContextoInmobiliario && !saludoOCortesia);
+  if (esFueraDeTema) {
+    intencion = 'fuera_de_tema';
+  }
 
   // Ciudad real mencionada; el default del catálogo es Ibagué
   const ciudadDetectada = detectarCiudad(userMessage);
@@ -361,8 +413,8 @@ export async function understandUserMessage(
     if (ciudadHeuristica && !/ibagu[ée\u00fc]/i.test(ciudadHeuristica)) {
       llmResult.criterios_duros.ciudad = ciudadHeuristica;
     }
-    if (llmResult.fuera_de_tema == null && heuristic.fuera_de_tema) {
-      llmResult.fuera_de_tema = heuristic.fuera_de_tema;
+    if (heuristic.fuera_de_tema || llmResult.fuera_de_tema) {
+      llmResult.fuera_de_tema = true;
       llmResult.intencion = 'fuera_de_tema';
     }
     // Presupuesto inválido: el heurístico (menciona "presupuesto" + dinero no parseable)
