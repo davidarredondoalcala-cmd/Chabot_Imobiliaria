@@ -44,9 +44,10 @@ export async function processUserMessage(
     .map(m => `${m.role === 'user' ? 'Usuario' : 'Jarvis'}: ${m.content}`)
     .join('\n');
 
-  // Si el estado no tenía operación ni tipo, intentar reconstruir desde el historial
+  // Si el estado no tenía operación ni tipo, intentar reconstruir desde el historial previo del USUARIO
   if (!state.criterios.operacion || !state.criterios.tipo) {
     for (const msg of recentHistory) {
+      if (msg.role !== 'user') continue;
       const u = extractHeuristicUnderstanding(msg.content);
       if (!state.criterios.operacion && u.operacion) state.criterios.operacion = u.operacion;
       if (!state.criterios.tipo && u.criterios_duros.tipo) state.criterios.tipo = u.criterios_duros.tipo;

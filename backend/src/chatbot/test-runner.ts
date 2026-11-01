@@ -363,6 +363,19 @@ async function runTests() {
     `props=${r28.properties.map(p => p.codigo).join(', ')} reply=${r28.reply.slice(0, 100)}`
   );
 
+  // Test 29: El saludo de Jarvis nunca debe inyectar sus barrios de ejemplo al usuario (Screenshot del usuario)
+  const conv29 = 'test-29-saludo-barrios-' + Date.now();
+  await processUserMessage(conv29, 'hola');
+  const r29 = await processUserMessage(conv29, 'dime que apto coste como maximo 900k en arriendo');
+  assert(
+    r29.properties.length > 0 &&
+      r29.properties.every(p => p.tipo === 'apartamento' && p.operacion === 'arriendo' && p.precio <= 900000) &&
+      !r29.reply.includes('no tenemos apartamentos en arriendo en El Vergel, Cádiz') &&
+      !r29.reply.includes('Favorito'),
+    'Tras el saludo, búsqueda "apto como maximo 900k en arriendo" entrega apartamentos sin inventar filtros de barrios',
+    `props=${r29.properties.map(p => `${p.codigo}:$${p.precio}`).join(', ')} reply=${r29.reply.slice(0, 100)}`
+  );
+
   console.log(`\n=== Resultado de pruebas: ${passed}/${total} superadas (${Math.round((passed/total)*100)}%) ===\n`);
   if (passed !== total) {
     process.exit(1);
