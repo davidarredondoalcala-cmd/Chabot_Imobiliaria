@@ -376,6 +376,51 @@ async function runTests() {
     `props=${r29.properties.map(p => `${p.codigo}:$${p.precio}`).join(', ')} reply=${r29.reply.slice(0, 100)}`
   );
 
+  // Test 30: Reconocimiento de '900k' y variantes con 'k' como miles
+  const r30 = await processUserMessage('test-30-k', 'Busco apartamento en arriendo que cueste como maximo 900k en ibague');
+  assert(
+    r30.properties.length > 0 &&
+      r30.properties.every(p => p.tipo === 'apartamento' && p.operacion === 'arriendo' && p.precio <= 900000),
+    'Notación 900k se interpreta correctamente como $900.000 COP y filtra inmuebles <= 900k',
+    `props=${r30.properties.map(p => `${p.codigo}:$${p.precio}`).join(', ')}`
+  );
+
+  // Test 31: Modismos colombianos de miles ('lucas' y 'barras')
+  const r31 = await processUserMessage('test-31-lucas', 'arriendo de apartamento hasta 900 lucas');
+  assert(
+    r31.properties.length > 0 &&
+      r31.properties.every(p => p.tipo === 'apartamento' && p.operacion === 'arriendo' && p.precio <= 900000),
+    'Modismo "900 lucas" se interpreta correctamente como $900.000 COP',
+    `props=${r31.properties.map(p => `${p.codigo}:$${p.precio}`).join(', ')}`
+  );
+
+  // Test 32: Notación 'M' para millones (ej. 350M en venta)
+  const r32 = await processUserMessage('test-32-m', 'busco casa en venta de hasta 350M');
+  assert(
+    r32.properties.length > 0 &&
+      r32.properties.every(p => p.tipo === 'casa' && p.operacion === 'venta' && p.precio <= 350000000),
+    'Notación "350M" se interpreta correctamente como $350.000.000 COP',
+    `props=${r32.properties.map(p => `${p.codigo}:$${p.precio}`).join(', ')}`
+  );
+
+  // Test 33: Cifras escritas en palabras ("novecientos mil")
+  const r33 = await processUserMessage('test-33-words', 'arriendo de apartamento con presupuesto de novecientos mil');
+  assert(
+    r33.properties.length > 0 &&
+      r33.properties.every(p => p.tipo === 'apartamento' && p.operacion === 'arriendo' && p.precio <= 900000),
+    'Palabras "novecientos mil" se interpreta correctamente como $900.000 COP',
+    `props=${r33.properties.map(p => `${p.codigo}:$${p.precio}`).join(', ')}`
+  );
+
+  // Test 34: Modismo colombiano de millones ("palos")
+  const r34 = await processUserMessage('test-34-palos', 'arriendo de casa hasta un palo');
+  assert(
+    r34.properties.length > 0 &&
+      r34.properties.every(p => p.tipo === 'casa' && p.operacion === 'arriendo' && p.precio <= 1000000),
+    'Modismo "un palo" se interpreta correctamente como $1.000.000 COP',
+    `props=${r34.properties.map(p => `${p.codigo}:$${p.precio}`).join(', ')}`
+  );
+
   console.log(`\n=== Resultado de pruebas: ${passed}/${total} superadas (${Math.round((passed/total)*100)}%) ===\n`);
   if (passed !== total) {
     process.exit(1);
