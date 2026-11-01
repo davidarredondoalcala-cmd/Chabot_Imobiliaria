@@ -40,6 +40,7 @@ export interface CriteriosDuros {
   parqueaderos_min?: number | null;
   area_min?: number | null;
   estrato?: number | null;
+  amenidades?: string[] | null;
   orden_precio?: 'asc' | 'desc' | null;
 }
 

@@ -76,8 +76,14 @@ export function mergeConversationCriterios(
   // 3. Criterios duros
   const { criterios_duros } = extracted;
 
-  if (criterios_duros.tipo) {
+  const ambosTipos = /\b(ambos|ambas|cualquiera|casa\s+o\s+apartamento|apartamento\s+o\s+casa|casas\s+o\s+apartamentos|no\s+importa\s+el\s+tipo)\b/i.test(lower);
+  if (ambosTipos) {
+    merged.tipo = null;
+  } else if (criterios_duros.tipo) {
     merged.tipo = criterios_duros.tipo;
+  }
+  if (criterios_duros.amenidades && criterios_duros.amenidades.length > 0) {
+    merged.amenidades = criterios_duros.amenidades;
   }
   if (criterios_duros.ciudad) {
     merged.ciudad = criterios_duros.ciudad;

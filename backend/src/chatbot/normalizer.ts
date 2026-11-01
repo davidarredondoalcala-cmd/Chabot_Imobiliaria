@@ -116,8 +116,8 @@ export function normalizeColombianMoney(
     }
   }
 
-  // Caso límite superior: "hasta X", "máximo X", "menos de X", "que no pase de X", "presupuesto de X"
-  const maxMatch = lower.match(/(?:hasta|maximo|máximo|menos\s+de|presupuesto\s+(?:de\s+)?|no\s+pase\s+de|tope\s+(?:de\s+)?)\s*([^,\.;\n]+)/i);
+  // Caso límite superior: "hasta X", "máximo X", "menos de X", "que no pase de X", "presupuesto de X", "con X"
+  const maxMatch = lower.match(/(?:hasta|maximo|máximo|menos\s+de|presupuesto\s+(?:de\s+)?|no\s+pase\s+de|tope\s+(?:de\s+)?|con\s+)\s*([^,\.;\n]+)/i);
   if (maxMatch) {
     const val = parseSingleAmount(maxMatch[1], context);
     if (val) {
@@ -148,13 +148,9 @@ export function normalizeColombianMoney(
     if (matches.length > 0) {
       const parsed = parseSingleAmount(matches[0][0], context);
       if (parsed) {
-        if (parsed <= 20_000_000) {
-          result.max = Math.round(parsed * 1.35);
-          result.min = Math.max(0, Math.round(parsed * 0.6));
-        } else {
-          result.max = Math.round(parsed * 1.25);
-          result.min = Math.max(0, Math.round(parsed * 0.7));
-        }
+        // El monto mencionado por el cliente establece el techo máximo estricto para no exceder su presupuesto
+        result.max = parsed;
+        result.min = Math.max(0, Math.round(parsed * 0.4));
         return result;
       }
     }

@@ -298,6 +298,71 @@ async function runTests() {
     `props=${r21.properties.length}`
   );
 
+  // Test 22: Filtro estricto de casas (nunca devuelve apartamentos)
+  const r22 = await processUserMessage('test-22-casa', 'busco casas en arriendo con 1.5 millones');
+  assert(
+    r22.properties.length > 0 &&
+      r22.properties.every(p => p.tipo === 'casa' && p.operacion === 'arriendo' && p.precio <= 1500000),
+    'Filtro de casas devuelve estrictamente casas dentro del presupuesto (<= 1.5M)',
+    `props=${r22.properties.map(p => `${p.codigo}:${p.tipo}:${p.precio}`).join(', ')}`
+  );
+
+  // Test 23: Filtro estricto de apartamentos (nunca devuelve casas)
+  const r23 = await processUserMessage('test-23-apto', 'busco apartamentos en arriendo con 1.5 millones');
+  assert(
+    r23.properties.length > 0 &&
+      r23.properties.every(p => p.tipo === 'apartamento' && p.operacion === 'arriendo' && p.precio <= 1500000),
+    'Filtro de apartamentos devuelve estrictamente apartamentos dentro del presupuesto (<= 1.5M)',
+    `props=${r23.properties.map(p => `${p.codigo}:${p.tipo}:${p.precio}`).join(', ')}`
+  );
+
+  // Test 24: Respeto estricto del presupuesto del cliente (<= 1 millón)
+  const r24 = await processUserMessage('test-24-budget', 'arriendo de casa con 1 millon');
+  assert(
+    r24.properties.length > 0 &&
+      r24.properties.every(p => p.precio <= 1000000 && p.tipo === 'casa'),
+    'Presupuesto de 1M para casas devuelve solo opciones con precio <= 1.000.000 COP',
+    `props=${r24.properties.map(p => `${p.codigo}:$${p.precio}`).join(', ')}`
+  );
+
+  // Test 25: Pregunta informativa sobre requisitos de arriendo
+  const r25 = await processUserMessage('test-25-req', '¿Cuáles son los requisitos para arrendar?');
+  assert(
+    r25.reply.toLowerCase().includes('requisitos') &&
+      (r25.reply.toLowerCase().includes('codeudor') || r25.reply.toLowerCase().includes('ingresos') || r25.reply.toLowerCase().includes('cédula')) &&
+      r25.properties.length === 0,
+    'Pregunta de requisitos de arriendo responde oportunamente con los requisitos sin desviar la conversación',
+    r25.reply.slice(0, 100)
+  );
+
+  // Test 26: Pregunta informativa sobre mascotas
+  const r26 = await processUserMessage('test-26-pets', '¿Aceptan mascotas en los apartamentos?');
+  assert(
+    r26.reply.toLowerCase().includes('mascotas') &&
+      r26.reply.toLowerCase().includes('propiedad horizontal'),
+    'Pregunta de mascotas responde oportunamente sobre las políticas de mascotas',
+    r26.reply.slice(0, 100)
+  );
+
+  // Test 27: Pregunta sobre ubicación de oficina de la inmobiliaria
+  const r27 = await processUserMessage('test-27-location', '¿Dónde queda su oficina?');
+  assert(
+    r27.reply.toLowerCase().includes('ibagué') &&
+      r27.reply.toLowerCase().includes('horario'),
+    'Pregunta de ubicación responde oportunamente con la sede y horarios en Ibagué',
+    r27.reply.slice(0, 100)
+  );
+
+  // Test 28: Consulta del inmueble más barato en catálogo
+  const r28 = await processUserMessage('test-28-cheapest', '¿Cuál es el apartamento más barato en arriendo?');
+  assert(
+    r28.properties.length === 1 &&
+      r28.properties[0].codigo === 'IBG-0018' &&
+      r28.reply.includes('IBG-0018'),
+    'Consulta del más barato devuelve exactamente el apartamento de menor valor en el catálogo (IBG-0018)',
+    `props=${r28.properties.map(p => p.codigo).join(', ')} reply=${r28.reply.slice(0, 100)}`
+  );
+
   console.log(`\n=== Resultado de pruebas: ${passed}/${total} superadas (${Math.round((passed/total)*100)}%) ===\n`);
   if (passed !== total) {
     process.exit(1);

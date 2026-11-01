@@ -67,6 +67,20 @@ export function executeFilterSearch(
   if (criterios.area_min != null && criterios.area_min > 0) {
     list = list.filter(p => p.area_m2 >= criterios.area_min!);
   }
+  if (criterios.amenidades && criterios.amenidades.length > 0) {
+    list = list.filter(p => {
+      const pAmens = (p.amenidades || []).map(a => a.toLowerCase()).join(' ');
+      const pDesc = (p.descripcion || '').toLowerCase();
+      const combined = `${pAmens} ${pDesc}`;
+      return criterios.amenidades!.every(am => {
+        const amLower = am.toLowerCase();
+        if (amLower === 'parqueadero' || amLower === 'garaje') {
+          return (p.parqueaderos != null && p.parqueaderos > 0) || combined.includes('parqueadero') || combined.includes('garaje');
+        }
+        return combined.includes(amLower);
+      });
+    });
+  }
   if (criterios.excluir_codigos && criterios.excluir_codigos.length > 0) {
     const set = new Set(criterios.excluir_codigos.map(c => c.toUpperCase()));
     list = list.filter(p => !set.has(p.codigo.toUpperCase()));
@@ -209,6 +223,25 @@ export async function buscarInmuebles(
         inmuebles: reranked,
         criterio_relajado: `No encontré inmuebles exactos ${habDesc}, pero te comparto estas excelentes opciones disponibles en el catálogo:`,
         total_candidatos: sinHabitaciones.length,
+      };
+    }
+  }
+
+  // Si no hay resultados con las amenidades solicitadas (ej. piscina, garaje)
+  if (params.amenidades && params.amenidades.length > 0) {
+    const amDesc = params.amenidades.join(', ');
+    const sinAmenidades = executeFilterSearch({
+      ...params,
+      amenidades: null,
+    }, catalog);
+
+    if (sinAmenidades.length > 0) {
+      const reranked = await rerankCandidates(sinAmenidades, params);
+      const sujeto = params.tipo === 'casa' ? 'casas' : params.tipo === 'apartamento' ? 'apartamentos' : 'inmuebles';
+      return {
+        inmuebles: reranked,
+        criterio_relajado: `No encontré ${sujeto} disponibles con **${amDesc}** en este momento, pero te comparto estas excelentes opciones que encajan con tu búsqueda:`,
+        total_candidatos: sinAmenidades.length,
       };
     }
   }

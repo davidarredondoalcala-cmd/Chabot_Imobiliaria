@@ -90,9 +90,12 @@ export function generateDeterministicSearchReply(
       ? 'apartamentos'
       : 'propiedades';
   const accion = (criterios as any)?.operacion === 'venta' ? 'en venta' : (criterios as any)?.operacion === 'arriendo' ? 'en arriendo' : '';
+  const amensText = (criterios as any)?.amenidades && (criterios as any).amenidades.length > 0
+    ? ` con ${(criterios as any).amenidades.join(', ')}`
+    : '';
   const headerText = (criterios as any)?.acepta_otras_zonas
-    ? `¡Con mucho gusto! Encontré estas excelentes opciones de ${tipoInm} ${accion} disponibles en otras zonas de Ibagué:`
-    : `Encontré estas excelentes opciones de ${tipoInm} ${accion} disponibles${sector}:`;
+    ? `¡Con mucho gusto! Encontré estas excelentes opciones de ${tipoInm} ${accion}${amensText} disponibles en otras zonas de Ibagué:`
+    : `Encontré estas excelentes opciones de ${tipoInm} ${accion}${amensText} disponibles${sector}:`;
   lines.push(headerText);
 
   items.slice(0, 3).forEach((item, idx) => {

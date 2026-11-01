@@ -2,8 +2,9 @@ import { Property, ChatResponse } from './types';
 import { getConversationState, saveConversationState, mergeConversationCriterios, recordMessage, getConversationMessages } from './state';
 import { understandUserMessage, tieneContextoInmobiliario, extractHeuristicUnderstanding } from './nlu';
 import { evaluateClarificationPolicy } from './clarification';
-import { buscarInmuebles } from './search';
+import { buscarInmuebles, getAllCatalogProperties } from './search';
 import { obtenerDetalleInmueble } from './detail';
+import { detectarPreguntaInformativa, responderPreguntaInformativa } from './faq';
 import {
   generateGroundedSearchReply,
   generateDeterministicSearchReply,
@@ -233,6 +234,36 @@ export async function processUserMessage(
     };
   }
 
+  // Consultas informativas frecuentes (requisitos, consignación, mascotas, ubicación, extremos de precios, visitas)
+  const tipoFaq = detectarPreguntaInformativa(userMessage);
+  if (tipoFaq) {
+    const catalogProps = getAllCatalogProperties(extraProperties);
+    const faqResult = responderPreguntaInformativa(tipoFaq, userMessage, catalogProps, state.criterios);
+
+    if (faqResult) {
+      if (faqResult.properties.length > 0) {
+        state.ultimo_listado_ids = [
+          ...state.ultimo_listado_ids,
+          ...faqResult.properties.map(p => p.codigo)
+        ];
+      }
+      await saveConversationState(state);
+
+      await recordMessage(conversationId, 'user', userMessage);
+      await recordMessage(conversationId, 'assistant', faqResult.reply, meta);
+
+      return {
+        conversationId,
+        reply: faqResult.reply,
+        properties: faqResult.properties,
+        needsHuman: faqResult.needsHuman || false,
+        whatsappUrl: faqResult.whatsappUrl,
+        suggestionChips: faqResult.suggestionChips,
+        metadata: meta,
+      };
+    }
+  }
+
   // Solicitud no residencial
   if (understanding.tipo_no_soportado && !understanding.criterios_duros.tipo) {
     const waLink = buildWhatsAppLink({
@@ -334,7 +365,15 @@ export async function processUserMessage(
     excluir_codigos: state.criterios.orden_precio ? undefined : state.ultimo_listado_ids,
   }, extraProperties);
 
-  const propertiesToReturn = searchResult.inmuebles.map(i => i.inmueble);
+  let propertiesToReturn = searchResult.inmuebles.map(i => i.inmueble);
+
+  // Filtro estricto final para garantizar que NUNCA se devuelva nada fuera del presupuesto o del tipo pedido
+  if (state.criterios.precio_max != null && state.criterios.precio_max > 0) {
+    propertiesToReturn = propertiesToReturn.filter(p => p.precio <= state.criterios.precio_max!);
+  }
+  if (state.criterios.tipo) {
+    propertiesToReturn = propertiesToReturn.filter(p => p.tipo.toLowerCase() === state.criterios.tipo!.toLowerCase());
+  }
 
   // Generación anclada
   let rawReply = await generateGroundedSearchReply(
@@ -344,13 +383,13 @@ export async function processUserMessage(
     state.criterios
   );
 
-  // Verificación determinista
-  let verification = await verifyReplyIntegrity(rawReply, extraProperties);
+  // Verificación determinista (código, precio real, tipo de inmueble y límite de presupuesto)
+  let verification = await verifyReplyIntegrity(rawReply, extraProperties, state.criterios);
   meta.verification_attempt_1 = verification;
 
   if (!verification.isValid) {
     rawReply = generateDeterministicSearchReply(searchResult.inmuebles, searchResult.criterio_relajado, state.criterios);
-    verification = await verifyReplyIntegrity(rawReply, extraProperties);
+    verification = await verifyReplyIntegrity(rawReply, extraProperties, state.criterios);
     meta.verification_attempt_2 = verification;
 
     if (!verification.isValid) {

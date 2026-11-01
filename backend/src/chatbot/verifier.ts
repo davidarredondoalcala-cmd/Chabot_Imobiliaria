@@ -1,13 +1,15 @@
-import { Property, VerificationResult } from './types';
+import { Property, VerificationResult, CriteriosDuros } from './types';
 import { obtenerDetalleInmueble } from './detail';
 
 /**
  * Módulo determinista de verificación obligatoria antes de enviar al usuario.
  * Extrae de la respuesta los códigos de inmuebles citados y los compara contra el catálogo.
+ * Valida fidelidad de datos, apego al tipo solicitado y límite presupuestal del cliente.
  */
 export async function verifyReplyIntegrity(
   replyText: string,
-  extraProperties?: Property[]
+  extraProperties?: Property[],
+  criterios?: CriteriosDuros
 ): Promise<VerificationResult> {
   const discrepancies: string[] = [];
   const verifiedProperties: Property[] = [];
@@ -20,6 +22,20 @@ export async function verifyReplyIntegrity(
     if (!realProp) {
       discrepancies.push(`ALUCINACIÓN: El inmueble con código "${code}" no existe en el catálogo.`);
       continue;
+    }
+
+    // Verificación estricta de Tipo de Inmueble
+    if (criterios?.tipo && realProp.tipo.toLowerCase() !== criterios.tipo.toLowerCase()) {
+      discrepancies.push(
+        `TIPO INCORRECTO en ${code}: es ${realProp.tipo} pero el cliente solicitó estrictamente ${criterios.tipo}.`
+      );
+    }
+
+    // Verificación estricta de Presupuesto Máximo
+    if (criterios?.precio_max != null && criterios.precio_max > 0 && realProp.precio > criterios.precio_max) {
+      discrepancies.push(
+        `PRESUPUESTO EXCEDIDO en ${code}: registra COP $${realProp.precio.toLocaleString('es-CO')} superando el presupuesto máximo del cliente de COP $${criterios.precio_max.toLocaleString('es-CO')}.`
+      );
     }
 
     verifiedProperties.push(realProp);

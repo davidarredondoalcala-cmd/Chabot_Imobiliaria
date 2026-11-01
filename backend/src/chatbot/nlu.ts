@@ -232,7 +232,7 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     tipo_no_soportado = 'local comercial';
   } else if (/\blote(?:s)?\b|\bterreno(?:s)?\b/i.test(lower)) {
     tipo_no_soportado = 'lote o terreno';
-  } else if (/\boficina(?:s)?\b|\bconsultorio(?:s)?\b/i.test(lower)) {
+  } else if (/\boficina(?:s)?\b|\bconsultorio(?:s)?\b/i.test(lower) && !/(?:su|la)\s+oficina|d[oó]nde\s+(?:queda|est[aá]).*oficina|oficina\s+de\s+(?:la\s+inmobiliaria|habitat)/i.test(lower)) {
     tipo_no_soportado = 'oficina';
   } else if (/\bbodega(?:s)?\b/i.test(lower)) {
     tipo_no_soportado = 'bodega';
@@ -318,7 +318,7 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     estrato = parseInt(estratoMatch[1], 10);
   }
 
-  // Criterios blandos
+  // Criterios blandos y amenidades específicas
   const softKeywords = [
     'cómodo', 'comodo', 'tranquilo', 'seguro', 'fresco', 'amplio',
     'iluminado', 'cerca del centro', 'cerca a la 5ta', 'familiar',
@@ -328,6 +328,25 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
   for (const kw of softKeywords) {
     if (lower.includes(kw)) {
       foundSoft.push(kw);
+    }
+  }
+
+  // Detección de amenidades buscadas
+  const knownAmenities = [
+    { key: 'piscina', regex: /\b(piscina|alberca)\b/i },
+    { key: 'balcón', regex: /\b(balc[oó]n)\b/i },
+    { key: 'terraza', regex: /\b(terraza)\b/i },
+    { key: 'patio', regex: /\b(patio)\b/i },
+    { key: 'parqueadero', regex: /\b(parqueadero|garaje|cochera)\b/i },
+    { key: 'gimnasio', regex: /\b(gimnasio|gym)\b/i },
+    { key: 'jacuzzi', regex: /\b(jacuzzi)\b/i },
+    { key: 'zona bbq', regex: /\b(bbq|zona\s+bbq|asador)\b/i },
+    { key: 'ascensor', regex: /\b(ascensor|elevador)\b/i },
+  ];
+  const detectedAmenities: string[] = [];
+  for (const am of knownAmenities) {
+    if (am.regex.test(lower)) {
+      detectedAmenities.push(am.key);
     }
   }
 
@@ -383,11 +402,14 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
       precio_min: finalMoney.min || null,
       precio_max: finalMoney.max || null,
       habitaciones_min,
+      habitaciones_max,
       banos_min,
+      banos_max,
       parqueaderos_min: null,
       area_min: null,
       estrato,
       orden_precio,
+      amenidades: detectedAmenities.length > 0 ? detectedAmenities : null,
     },
     criterios_blandos: foundSoft.length > 0 ? foundSoft.join(', ') : null,
     codigo_inmueble_mencionado: codigo,
@@ -427,9 +449,21 @@ export async function understandUserMessage(
       llmResult.criterios_duros.precio_min = moneyParsed.min;
     }
 
-    // Fallbacks deterministas: si el LLM no trajo ciudad o fuera_de_tema, usamos el heurístico
+    // Fallbacks deterministas: si el LLM no trajo ciudad, tipo, o fuera_de_tema, usamos el heurístico
     if (!llmResult.criterios_duros.ciudad && heuristic.criterios_duros.ciudad) {
       llmResult.criterios_duros.ciudad = heuristic.criterios_duros.ciudad;
+    }
+    if (!llmResult.criterios_duros.tipo && heuristic.criterios_duros.tipo) {
+      llmResult.criterios_duros.tipo = heuristic.criterios_duros.tipo;
+    }
+    if (llmResult.criterios_duros.habitaciones_max == null && heuristic.criterios_duros.habitaciones_max != null) {
+      llmResult.criterios_duros.habitaciones_max = heuristic.criterios_duros.habitaciones_max;
+    }
+    if (llmResult.criterios_duros.banos_max == null && heuristic.criterios_duros.banos_max != null) {
+      llmResult.criterios_duros.banos_max = heuristic.criterios_duros.banos_max;
+    }
+    if (!llmResult.criterios_duros.amenidades && heuristic.criterios_duros.amenidades) {
+      llmResult.criterios_duros.amenidades = heuristic.criterios_duros.amenidades;
     }
     // Si el heurístico detecta una ciudad real distinta de Ibagué, prevalece sobre el LLM
     // (evita que el LLM asuma "Ibagué" por defecto cuando el usuario cita otra ciudad)
