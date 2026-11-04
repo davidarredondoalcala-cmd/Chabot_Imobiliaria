@@ -119,65 +119,23 @@ const SEMILLA = [
 export class InmueblesService implements OnModuleInit {
   constructor(@InjectModel(Inmueble.name) private model: Model<InmuebleDoc>) {}
 
-  // Si la colección está vacía, carga datos de ejemplo y sincroniza las propiedades del chatbot
+  // Carga la base de datos limpia de propiedades (Casas y Apartamentos)
   async onModuleInit() {
-    if ((await this.model.estimatedDocumentCount()) === 0) await this.model.insertMany(SEMILLA);
-    // Bases ya creadas: completa habitaciones, baños, área, descripción y foto en los inmuebles de ejemplo
-    for (const s of SEMILLA) {
-      await this.model.updateOne(
-        { nombre: s.nombre },
-        {
-          $set: {
-            habitaciones: s.habitaciones,
-            banos: s.banos,
-            area: s.area,
-            ...(s.descripcion ? { descripcion: s.descripcion } : {}),
-            ...(s.foto ? { foto: s.foto } : {}),
-          },
-        },
-      );
+    let cleanDataset: any[] = [];
+    try {
+      cleanDataset = require('./co_inmuebles_clean.json');
+    } catch {
+      cleanDataset = [];
     }
 
-    // Sincroniza todas las propiedades del chatbot para que existan en la base de datos
-    for (const sp of SEED_PROPERTIES) {
-      const existe = await this.model.findOne({
-        $or: [
-          { nombre: sp.titulo },
-          { dir: sp.direccion_aproximada },
-        ],
-      });
-      if (!existe) {
-        await this.model.create({
-          tipo: (sp.tipo || 'casa').toLowerCase() === 'apartamento' ? 'Apartamento' : 'Casa',
-          nombre: sp.titulo,
-          descripcion: sp.descripcion || '',
-          estado: sp.operacion === 'venta' ? 'Para la venta' : (sp.disponible ? 'Sin arrendar' : 'Arrendada'),
-          valor: sp.precio,
-          dir: sp.direccion_aproximada || `Sector ${sp.barrio}`,
-          barrio: sp.barrio,
-          lind: 'Al norte con predio vecino, al sur con vía pública, al oriente y occidente con propiedad privada.',
-          habitaciones: sp.habitaciones || 2,
-          banos: sp.banos || 2,
-          area: sp.area_m2 || 75,
-          contratos: [],
-          foto: sp.foto || '',
-        });
-      } else {
-        // Actualiza el nombre sencillo, la descripción y la foto real
-        const update: any = {};
-        if (sp.titulo && existe.nombre !== sp.titulo && (existe.dir === sp.direccion_aproximada || sp.titulo.includes(existe.barrio || ''))) {
-          update.nombre = sp.titulo;
-        }
-        if (sp.descripcion && (!existe.descripcion || existe.descripcion.trim() === '')) {
-          update.descripcion = sp.descripcion;
-        }
-        if (sp.foto && (!existe.foto || existe.foto.trim() === '' || existe.foto.startsWith('http'))) {
-          update.foto = sp.foto;
-        }
-        if (Object.keys(update).length > 0) {
-          await this.model.updateOne({ _id: existe._id }, { $set: update });
-        }
-      }
+    const currentCount = await this.model.countDocuments();
+    // Si la base de datos está vacía o tiene los datos de prueba anteriores, reemplaza con la base limpia
+    if (cleanDataset.length > 0 && currentCount < 100) {
+      await this.model.deleteMany({});
+      await this.model.insertMany(cleanDataset);
+    } else if (cleanDataset.length > 0) {
+      // Asegura que todos los documentos tengan el campo ciudad
+      await this.model.updateMany({ ciudad: { $exists: false } }, { $set: { ciudad: 'Ibagué' } });
     }
   }
 
@@ -207,7 +165,9 @@ export class InmueblesService implements OnModuleInit {
     const estado = ['Arrendada', 'Sin arrendar', 'Para la venta'].includes(b.estado) ? b.estado : 'Sin arrendar';
     const doc: any = {
       tipo: b.tipo, nombre: b.nombre.trim(), estado, valor,
-      dir: b.dir.trim(), barrio: b.barrio?.trim() || '', lind: b.lind?.trim() || '',
+      dir: b.dir.trim(), barrio: b.barrio?.trim() || '',
+      ciudad: b.ciudad?.trim() || 'Ibagué',
+      lind: b.lind?.trim() || '',
       descripcion: b.descripcion?.trim() || '',
       habitaciones: num(b.habitaciones), banos: num(b.banos), area: num(b.area),
       foto: b.foto?.trim() || undefined,

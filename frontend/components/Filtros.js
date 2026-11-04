@@ -76,7 +76,7 @@ function Desplegable({ valor, opciones, onChange, etiqueta, otro = false, abiert
   );
 }
 
-export default function Filtros({ f, setF, total, mostrados }) {
+export default function Filtros({ f, setF, total, mostrados, ciudades = [] }) {
   const [abiertoKey, setAbiertoKey] = useState(null);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const rango = (a, b, u) => (
@@ -85,6 +85,29 @@ export default function Filtros({ f, setF, total, mostrados }) {
       <input type="number" min="0" placeholder="Máx." value={f[b]} onChange={set(b)} aria-label={`${u} máximo`} />
     </div>
   );
+
+  const opcionesCiudades = [
+    ['', 'Todas las ciudades'],
+    ...(ciudades && ciudades.length > 0
+      ? ciudades.map((c) => [c, c])
+      : [
+          ['Bogotá', 'Bogotá'],
+          ['Medellín', 'Medellín'],
+          ['Cali', 'Cali'],
+          ['Barranquilla', 'Barranquilla'],
+          ['Bucaramanga', 'Bucaramanga'],
+          ['Manizales', 'Manizales'],
+          ['Pereira', 'Pereira'],
+          ['Ibagué', 'Ibagué'],
+          ['Cartagena', 'Cartagena'],
+          ['Santa Marta', 'Santa Marta'],
+          ['Cúcuta', 'Cúcuta'],
+          ['Envigado', 'Envigado'],
+          ['Popayán', 'Popayán'],
+          ['Armenia', 'Armenia'],
+          ['Chía', 'Chía'],
+        ]),
+  ];
 
   // Desplegables: al hacer clic se abren las opciones como píldoras.
   const lista = (k, opciones, etiqueta, otro = false) => (
@@ -102,11 +125,12 @@ export default function Filtros({ f, setF, total, mostrados }) {
     <div className={`card filtros noprint ${abiertoKey ? 'dd-activo' : ''}`}>
       <div className="filtros-top"><b className="ft"><IcoBuscar /> Filtrar inmuebles</b><span className="mut">Mostrando {mostrados} de {total}</span></div>
       <div className="filtros-grid">
+        <div><label className="filtro-lbl">Ciudad</label>{lista('ciudad', opcionesCiudades, 'Ciudad')}</div>
+        <div><label className="filtro-lbl">Estado</label>{lista('estado', ESTADOS, 'Estado')}</div>
         <div><label className="filtro-lbl">Habitaciones<span className="chips-hint"> (o más)</span></label>{lista('hab', MIN, 'Habitaciones', true)}</div>
         <div><label className="filtro-lbl">Baños<span className="chips-hint"> (o más)</span></label>{lista('ban', MIN, 'Baños', true)}</div>
         <div><label className="filtro-lbl">Tamaño (m²)</label>{rango('areaMin', 'areaMax', 'Área')}</div>
         <div><label className="filtro-lbl">Rango de precio ($)</label>{rango('pMin', 'pMax', 'Precio')}</div>
-        <div><label className="filtro-lbl">Estado</label>{lista('estado', ESTADOS, 'Estado')}</div>
         <div><label className="filtro-lbl">Tiempo arrendada</label>{lista('tiempoArriendo', TIEMPOS_ARRIENDO, 'Tiempo arrendada')}</div>
       </div>
       {hayFiltros(f) && <div className="row"><button className="l" onClick={() => setF(FILTROS0)}>Limpiar filtros</button></div>}

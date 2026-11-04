@@ -13,7 +13,7 @@ import {
 } from '../lib/validadores';
 
 export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
-  const [S, setS] = useState({ tipo: tipo0 || 'Casa', nombre: '', descripcion: '', estado: 'Sin arrendar', dir: '', barrio: '', lind: '', habitaciones: '', banos: '', area: '', valor: '', venc: '', dia: 5, foto: '' });
+  const [S, setS] = useState({ tipo: tipo0 || 'Casa', nombre: '', descripcion: '', estado: 'Sin arrendar', dir: '', barrio: '', ciudad: 'Ibagué', lind: '', habitaciones: '', banos: '', area: '', valor: '', venc: '', dia: 5, foto: '' });
   const [fotoArchivo, setFotoArchivo] = useState(null);
   const [fotoPreviewLocal, setFotoPreviewLocal] = useState('');
   const [env, setEnv] = useState(false);
@@ -25,6 +25,7 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
     if (k === 'nombre') valor = limpiarTexto(valorRaw, 60);
     else if (k === 'dir') valor = limpiarDireccion(valorRaw, 80);
     else if (k === 'barrio') valor = limpiarTexto(valorRaw, 50);
+    else if (k === 'ciudad') valor = limpiarTexto(valorRaw, 50);
     else if (k === 'descripcion') valor = limpiarTexto(valorRaw, 300);
     else if (k === 'lind') valor = limpiarTexto(valorRaw, 500);
     else if (k === 'habitaciones' || k === 'banos') valor = soloNumeros(valorRaw, 2);
@@ -175,6 +176,7 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
           </select>
           {campo('dir', 'Dirección *', 'text', 'Ej: Cll 10 # 5 - 20', 80)}
           {campo('barrio', 'Barrio', 'text', 'Ej: Piedra Pintada', 50)}
+          {campo('ciudad', 'Ciudad', 'text', 'Ej: Ibagué, Bogotá, Medellín', 50)}
           <label>Linderos</label>
           <textarea
             rows="3"

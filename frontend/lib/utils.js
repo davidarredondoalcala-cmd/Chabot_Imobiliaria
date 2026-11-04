@@ -38,14 +38,15 @@ export function tiempoArrendadaTexto(i) {
 }
 
 // ===== Filtros de búsqueda =====
-export const FILTROS0 = { hab: '', ban: '', areaMin: '', areaMax: '', pMin: '', pMax: '', estado: '', tiempoArriendo: '' };
+export const FILTROS0 = { hab: '', ban: '', areaMin: '', areaMax: '', pMin: '', pMax: '', estado: '', tiempoArriendo: '', ciudad: '' };
 export const hayFiltros = (f) => Object.values(f).some((v) => v !== '');
 const num = (v) => (v === '' || v == null ? null : Number(v));
 
-// Habitaciones y baños: "mínimo" (3 = 3 o más). Área y precio: rango mín-máx.
+// Habitaciones y baños: "mínimo" (3 = 3 o más). Área y precio: rango mín-máx. Ciudad: coincidencia exacta.
 export function filtrar(lista, f) {
   const aMin = num(f.areaMin), aMax = num(f.areaMax), pMin = num(f.pMin), pMax = num(f.pMax);
   return lista.filter((i) => {
+    if (f.ciudad && (i.ciudad || '').trim().toLowerCase() !== f.ciudad.trim().toLowerCase()) return false;
     if (f.hab && !(i.habitaciones >= Number(f.hab))) return false;
     if (f.ban && !(i.banos >= Number(f.ban))) return false;
     if (aMin != null && !(i.area >= aMin)) return false;

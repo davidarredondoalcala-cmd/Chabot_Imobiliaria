@@ -1,3 +1,5 @@
+'use client';
+import { useState, useEffect, useMemo } from 'react';
 import { filtrar, porVencer } from '../lib/utils';
 import Filtros from './Filtros';
 import Tarjeta from './Tarjeta';
@@ -14,11 +16,67 @@ const Skyline = () => (
 
 
 export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, nuevo, esAdmin }) {
+  const POR_PAGINA = 50;
+  const [pagina, setPagina] = useState(1);
+
   const base = filtrar(data, filtros);
   const n = (t) => base.filter((i) => i.tipo === t).length;
   const items = tab === 'Todos' ? base : base.filter((i) => i.tipo === tab);
   const idx = tab === 'Todos' ? 0 : tab === 'Casa' ? 1 : 2;
   const total = data.length;
+
+  // Extrae lista única de ciudades presentes en el catálogo
+  const ciudades = useMemo(() => {
+    const set = new Set();
+    data.forEach((i) => {
+      if (i.ciudad && i.ciudad.trim()) set.add(i.ciudad.trim());
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'es'));
+  }, [data]);
+
+  // Al cambiar pestaña de tipo o cualquier filtro, reiniciar a la página 1
+  useEffect(() => {
+    setPagina(1);
+  }, [tab, filtros]);
+
+  const totalPaginas = Math.max(1, Math.ceil(items.length / POR_PAGINA));
+  const paginaActual = Math.min(pagina, totalPaginas);
+  const inicio = (paginaActual - 1) * POR_PAGINA;
+  const itemsPaginados = items.slice(inicio, inicio + POR_PAGINA);
+
+  const irAPagina = (p) => {
+    if (p < 1 || p > totalPaginas || p === paginaActual) return;
+    setPagina(p);
+    const elem = document.getElementById('catalogo-inmuebles');
+    if (elem) {
+      elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const generarPestanas = () => {
+    if (totalPaginas <= 7) {
+      return Array.from({ length: totalPaginas }, (_, i) => i + 1);
+    }
+    const paginas = [];
+    if (paginaActual <= 4) {
+      for (let i = 1; i <= 5; i++) paginas.push(i);
+      paginas.push('...');
+      paginas.push(totalPaginas);
+    } else if (paginaActual >= totalPaginas - 3) {
+      paginas.push(1);
+      paginas.push('...');
+      for (let i = totalPaginas - 4; i <= totalPaginas; i++) paginas.push(i);
+    } else {
+      paginas.push(1);
+      paginas.push('...');
+      paginas.push(paginaActual - 1);
+      paginas.push(paginaActual);
+      paginas.push(paginaActual + 1);
+      paginas.push('...');
+      paginas.push(totalPaginas);
+    }
+    return paginas;
+  };
 
   const handleKpiClick = (s) => {
     if (!s.esFiltro) {
@@ -259,7 +317,7 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
         </button>
       </div>
 
-      <Filtros f={filtros} setF={setFiltros} total={data.length} mostrados={base.length} />
+      <Filtros f={filtros} setF={setFiltros} total={data.length} mostrados={base.length} ciudades={ciudades} />
 
       <div className="toolbar">
         <div className="toolbar-apartado">
@@ -280,7 +338,7 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
       {items.length === 0 && <div className="card vacio">Ningún inmueble coincide con los filtros. Amplía los rangos o cambia de pestaña.</div>}
 
       <div className="lista">
-        {items.map((i) => <Tarjeta key={i._id} i={i} esAdmin={esAdmin} abrir={() => abrir(i._id)} />)}
+        {itemsPaginados.map((i) => <Tarjeta key={i._id} i={i} esAdmin={esAdmin} abrir={() => abrir(i._id)} />)}
         {esAdmin && (
           <article
             className="card item nuevo-item"
@@ -296,6 +354,60 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
           </article>
         )}
       </div>
+
+      {/* Pestañas de paginación (Límite: 50 inmuebles por pestaña) */}
+      {totalPaginas > 1 && (
+        <div className="paginacion-pestanas-wrap" role="navigation" aria-label="Navegación de pestañas de inmuebles">
+          <div className="paginacion-info">
+            <span>
+              Mostrando <b>{inicio + 1}</b> - <b>{Math.min(inicio + POR_PAGINA, items.length)}</b> de <b>{items.length}</b> inmuebles · Pestaña <b>{paginaActual}</b> de <b>{totalPaginas}</b>
+            </span>
+          </div>
+
+          <div className="paginacion-pestanas">
+            <button
+              type="button"
+              className="pag-btn pag-prev"
+              disabled={paginaActual === 1}
+              onClick={() => irAPagina(paginaActual - 1)}
+              aria-label="Pestaña anterior"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              <span>Anterior</span>
+            </button>
+
+            <div className="pag-numeros">
+              {generarPestanas().map((p, idx) =>
+                p === '...' ? (
+                  <span key={`p-dots-${idx}`} className="pag-ellipsis">…</span>
+                ) : (
+                  <button
+                    key={`p-${p}`}
+                    type="button"
+                    className={`pag-num ${p === paginaActual ? 'on' : ''}`}
+                    onClick={() => irAPagina(p)}
+                    aria-current={p === paginaActual ? 'page' : undefined}
+                    aria-label={`Ir a pestaña ${p}`}
+                  >
+                    Pestaña {p}
+                  </button>
+                )
+              )}
+            </div>
+
+            <button
+              type="button"
+              className="pag-btn pag-next"
+              disabled={paginaActual === totalPaginas}
+              onClick={() => irAPagina(paginaActual + 1)}
+              aria-label="Siguiente pestaña"
+            >
+              <span>Siguiente</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

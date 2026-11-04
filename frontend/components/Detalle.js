@@ -330,7 +330,7 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
         )}
         <div className="ficha-body">
           <h2 className="titulo">{i.nombre}</h2>
-          <p className="dir">{i.dir} · {i.barrio}</p>
+          <p className="dir">{[i.dir, i.barrio, i.ciudad].filter(Boolean).join(' · ')}</p>
           <Caract i={i} />
           {(() => {
             const desc = (i.descripcion && i.descripcion.trim()) ||

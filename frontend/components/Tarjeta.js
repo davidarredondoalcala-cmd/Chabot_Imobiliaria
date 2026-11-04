@@ -28,7 +28,7 @@ export default function Tarjeta({ i, abrir, esAdmin }) {
       </div>
       <div className="info">
         <h3 className="nom">{i.nombre}</h3>
-        {(i.dir || i.barrio) && <p className="dir">{[i.dir, i.barrio].filter(Boolean).join(' · ')}</p>}
+        {(i.dir || i.barrio || i.ciudad) && <p className="dir">{[i.dir, i.barrio, i.ciudad].filter(Boolean).join(' · ')}</p>}
         <Caract i={i} />
         {esAdmin && i.estado === 'Arrendada' && (
           <p className="meta">

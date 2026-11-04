@@ -2033,6 +2033,136 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* =====================================================================
+   PESTAÑAS DE PAGINACIÓN (LÍMITE 50 POR PESTAÑA)
+   ===================================================================== */
+
+.paginacion-pestanas-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin: 32px 0 20px;
+    padding: 20px 24px;
+    border-radius: 20px;
+    background: var(--card);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--bd);
+    box-shadow: var(--sh);
+}
+
+.paginacion-info {
+    font-size: 0.92rem;
+    color: var(--mut);
+    text-align: center;
+}
+
+.paginacion-info b {
+    color: var(--tx);
+    font-weight: 700;
+}
+
+.paginacion-pestanas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.pag-numeros {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.pag-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: 9999px;
+    border: 1.5px solid var(--bd);
+    background: var(--card);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    color: var(--tx);
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pag-btn:hover:not(:disabled) {
+    border-color: var(--ac2);
+    color: var(--ac);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+
+.pag-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    border-color: var(--bd);
+    color: var(--mut);
+}
+
+.pag-num {
+    padding: 8px 14px;
+    border-radius: 9999px;
+    border: 1.5px solid var(--bd);
+    background: var(--card);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    color: var(--mut);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+.pag-num:hover:not(.on) {
+    border-color: var(--ac2);
+    color: var(--tx);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+}
+
+.pag-num.on {
+    background: var(--gold-grad) !important;
+    border-color: transparent !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+    transform: scale(1.04);
+}
+
+.pag-ellipsis {
+    padding: 0 6px;
+    color: var(--mut);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+@media (max-width: 640px) {
+    .paginacion-pestanas-wrap {
+        padding: 16px 12px;
+    }
+    .pag-btn {
+        padding: 7px 12px;
+        font-size: 0.85rem;
+    }
+    .pag-num {
+        padding: 7px 10px;
+        font-size: 0.82rem;
+    }
+}
+
+/* =====================================================================
    IMPRESIÓN (PDF)
    ===================================================================== */
 

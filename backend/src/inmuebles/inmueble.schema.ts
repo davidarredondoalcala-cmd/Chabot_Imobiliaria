@@ -23,6 +23,7 @@ export class Inmueble {
   @Prop() valor: number;
   @Prop() dir: string;
   @Prop() barrio: string;
+  @Prop({ default: 'Ibagué' }) ciudad: string;
   @Prop() lind: string;
   @Prop() habitaciones: number;
   @Prop() banos: number;
