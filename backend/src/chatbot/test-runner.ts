@@ -18,40 +18,40 @@ async function runTests() {
   // Test 1: Compra de casa con 10 millones
   const r1 = await processUserMessage('test-1', 'compra de casa con un presupuesto de 10 millones');
   assert(
-    r1.properties.length === 0 && r1.reply.includes('300.000.000') && r1.reply.includes('casas en venta') && r1.reply.includes('empiezan desde'),
-    'Compra casa con 10M indica que empiezan desde $300.000.000 COP',
+    r1.properties.length === 0 && r1.reply.includes('45.000.000') && r1.reply.includes('casas en venta') && r1.reply.includes('empiezan desde'),
+    'Compra casa con 10M indica que empiezan desde $45.000.000 COP',
     r1.reply
   );
 
   // Test 2: Compra de apartamento con 50 millones
   const r2 = await processUserMessage('test-2', 'compra de apartamento con presupuesto de 50 millones');
   assert(
-    r2.properties.length === 0 && r2.reply.includes('210.000.000') && r2.reply.includes('apartamentos en venta'),
-    'Compra apartamento con 50M indica que empiezan desde $210.000.000 COP',
+    r2.properties.length === 0 && r2.reply.includes('68.000.000') && r2.reply.includes('apartamentos en venta'),
+    'Compra apartamento con 50M indica que empiezan desde $68.000.000 COP',
     r2.reply
   );
 
   // Test 3: Compra general con 10 millones
   const r3 = await processUserMessage('test-3', 'compra con presupuesto de 10 millones');
   assert(
-    r3.properties.length === 0 && r3.reply.includes('210.000.000') && r3.reply.includes('en venta'),
-    'Compra general con 10M indica que empiezan desde $210.000.000 COP',
+    r3.properties.length === 0 && r3.reply.includes('45.000.000') && r3.reply.includes('en venta'),
+    'Compra general con 10M indica que empiezan desde $45.000.000 COP',
     r3.reply
   );
 
-  // Test 4: Arriendo casa con 500 mil
-  const r4 = await processUserMessage('test-4', 'arriendo de casa con presupuesto de 500 mil');
+  // Test 4: Arriendo casa con 200 mil
+  const r4 = await processUserMessage('test-4', 'arriendo de casa con presupuesto de 200 mil');
   assert(
-    r4.properties.length === 0 && r4.reply.includes('900.000') && r4.reply.includes('casas en arriendo'),
-    'Arriendo casa con 500k indica que empiezan desde $900.000 COP al mes',
+    r4.properties.length === 0 && r4.reply.includes('300.000') && r4.reply.includes('casas en arriendo'),
+    'Arriendo casa con 200k indica que empiezan desde $300.000 COP al mes',
     r4.reply
   );
 
-  // Test 5: Arriendo apartamento con 500 mil
-  const r5 = await processUserMessage('test-5', 'arriendo de apartamento con presupuesto de 500 mil');
+  // Test 5: Arriendo apartamento con 200 mil
+  const r5 = await processUserMessage('test-5', 'arriendo de apartamento con presupuesto de 200 mil');
   assert(
-    r5.properties.length === 0 && r5.reply.includes('850.000') && r5.reply.includes('apartamentos en arriendo'),
-    'Arriendo apartamento con 500k indica que empiezan desde $850.000 COP al mes',
+    r5.properties.length === 0 && r5.reply.includes('350.000') && r5.reply.includes('apartamentos en arriendo'),
+    'Arriendo apartamento con 200k indica que empiezan desde $350.000 COP al mes',
     r5.reply
   );
 
@@ -64,10 +64,10 @@ async function runTests() {
   );
 
   // Test 7: Sector específico sin operación
-  const r7 = await processUserMessage('test-7', 'Un apartamento en el vergel');
+  const r7 = await processUserMessage('test-7', 'Un apartamento en Ciudad Jardín');
   assert(
-    r7.reply.includes('El Vergel') && r7.reply.includes('apartamento') && r7.reply.includes('arriendo o para comprar'),
-    'Preguntar por El Vergel sin operación nombra el sector y pregunta arriendo o comprar',
+    r7.reply.includes('Ciudad Jardín') && r7.reply.includes('apartamento') && r7.reply.includes('arriendo o para comprar'),
+    'Preguntar por Ciudad Jardín sin operación nombra el sector y pregunta arriendo o comprar',
     r7.reply
   );
 
@@ -79,10 +79,10 @@ async function runTests() {
     r8.reply
   );
 
-  // Test 9: Búsqueda con resultado (arriendo en El Vergel con 2.5 millones)
-  const r9 = await processUserMessage('test-9', 'busco apartamento en arriendo en el vergel por 2.5 millones');
+  // Test 9: Búsqueda con resultado (arriendo en Cali con 2.5 millones)
+  const r9 = await processUserMessage('test-9', 'busco apartamento en arriendo en cali por 2.5 millones');
   assert(
-    r9.properties.length > 0 && r9.properties.some(p => p.barrio.toLowerCase().includes('vergel')),
+    r9.properties.length > 0 && r9.properties.some(p => p.ciudad.toLowerCase().includes('cali')),
     'Búsqueda exitosa devuelve propiedades y cards',
     `Found ${r9.properties.length} props`
   );
@@ -95,35 +95,35 @@ async function runTests() {
     r10.whatsappUrl
   );
 
-  // Test 11: Ciudad fuera de la cobertura (solo Ibagué)
-  const r11 = await processUserMessage('test-11', 'quiero arrendar una casa en Bogotá');
+  // Test 11: Ciudad fuera de la cobertura del catálogo
+  const r11 = await processUserMessage('test-11', 'quiero arrendar una casa en Pasto');
   assert(
-    r11.properties.length === 0 && r11.reply.toLowerCase().includes('ibagué'),
-    'Buscar en Bogotá responde que solo hay inmuebles en Ibagué',
+    r11.properties.length === 0 && r11.reply.includes('Pasto') && r11.reply.includes('no tenemos'),
+    'Buscar en Pasto responde oportunamente que aún no hay inmuebles en esa ciudad y ofrece catálogo disponible',
     r11.reply
   );
 
-  // Test 11b: variante corta con otra ciudad
+  // Test 11b: Búsqueda en Medellín devuelve resultados
   const r11b = await processUserMessage('test-11b', 'arriendo en medellin');
   assert(
-    r11b.properties.length === 0 && r11b.reply.toLowerCase().includes('ibagué'),
-    'Arriendo en Medellín responde que solo hay inmuebles en Ibagué',
-    r11b.reply
+    r11b.properties.length > 0 && r11b.properties.every(p => p.ciudad.toLowerCase().includes('medell')),
+    'Arriendo en Medellín devuelve inmuebles reales de Medellín',
+    `props=${r11b.properties.length}`
   );
 
-  // Test 11c: variante sin palabra "busco/arriendo" explícita
+  // Test 11c: Búsqueda de casa en Medellín devuelve casas de Medellín
   const r11c = await processUserMessage('test-11c', 'casa en medellin');
   assert(
-    r11c.properties.length === 0 && r11c.reply.toLowerCase().includes('ibagué'),
-    'Casa en Medellín responde que solo hay inmuebles en Ibagué',
-    r11c.reply
+    r11c.properties.length > 0 && r11c.properties.every(p => p.ciudad.toLowerCase().includes('medell') && p.tipo === 'casa'),
+    'Casa en Medellín devuelve casas de Medellín',
+    `props=${r11c.properties.length}`
   );
 
-  // Test 11d: mencionar otra ciudad NO bloquea si el usuario busca en Ibagué
-  const r11d = await processUserMessage('test-11d', 'soy de Medellín pero busco casa en Ibagué');
+  // Test 11d: mencionar otra ciudad de origen NO bloquea si el usuario busca en ciudad con catálogo
+  const r11d = await processUserMessage('test-11d', 'soy de Pasto pero busco casa en Cali');
   assert(
-    !r11d.reply.includes('nuestro catálogo vive 100%'),
-    'Soy de Medellín pero busco en Ibagué NO genera rechazo por ciudad',
+    r11d.properties.length > 0 && r11d.properties.every(p => p.ciudad.toLowerCase().includes('cali')),
+    'Soy de Pasto pero busco en Cali entrega inmuebles de Cali sin rechazo',
     `props=${r11d.properties.length} reply=${r11d.reply}`
   );
 
@@ -234,7 +234,7 @@ async function runTests() {
   // Turno 1: Presupuesto insuficiente de compra
   const r18a = await processUserMessage('test-18-repetition', 'compra de apartamento con presupuesto de 50 millones');
   assert(
-    r18a.properties.length === 0 && r18a.reply.includes('210.000.000'),
+    r18a.properties.length === 0 && r18a.reply.includes('68.000.000'),
     'Turno 1: Presupuesto 50M de compra explica piso mínimo',
     r18a.reply
   );
@@ -287,7 +287,7 @@ async function runTests() {
   ];
   const r21 = await processUserMessage(
     'test-21-restored',
-    'en Piedra Pintada con 300 millones',
+    'en Medellín con 300 millones',
     undefined,
     historyClient
   );
@@ -357,9 +357,9 @@ async function runTests() {
   const r28 = await processUserMessage('test-28-cheapest', '¿Cuál es el apartamento más barato en arriendo?');
   assert(
     r28.properties.length === 1 &&
-      r28.properties[0].codigo === 'IBG-0018' &&
-      r28.reply.includes('IBG-0018'),
-    'Consulta del más barato devuelve exactamente el apartamento de menor valor en el catálogo (IBG-0018)',
+      r28.properties[0].codigo === 'HC-0777' &&
+      r28.reply.includes('HC-0777'),
+    'Consulta del más barato devuelve exactamente el apartamento de menor valor en el catálogo (HC-0777)',
     `props=${r28.properties.map(p => p.codigo).join(', ')} reply=${r28.reply.slice(0, 100)}`
   );
 

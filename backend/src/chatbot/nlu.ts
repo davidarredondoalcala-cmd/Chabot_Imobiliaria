@@ -3,12 +3,13 @@ import { generateStructuredJSON } from './llm';
 import { normalizeColombianMoney } from './normalizer';
 
 const SYSTEM_NLU_PROMPT = `
-Eres un módulo de NLU especializado en el mercado inmobiliario colombiano (específicamente Ibagué, Tolima).
+Eres un módulo de NLU especializado en el mercado inmobiliario colombiano para Habitat Capital.
+Nuestra plataforma cuenta con cobertura en múltiples ciudades de Colombia (Cali, Medellín, Bogotá, Barranquilla, Bucaramanga, Manizales, Pereira, Ibagué, etc.).
 Tu tarea es analizar el mensaje del usuario y el historial reciente para extraer datos estructurados con precisión quirúrgica.
 
 Reglas obligatorias:
 1. "intencion":
-   - "buscar": si busca propiedades, pide opciones, pregunta qué hay disponible, o da criterios de búsqueda.
+   - "buscar": si busca propiedades, pide opciones, pregunta qué hay disponible, o da criterios de búsqueda (sector, barrio, ciudad, tipo de inmueble, presupuesto).
    - "detalle_inmueble": si pregunta detalles específicos (precio, área, amenidades, fotos) de un código de inmueble específico o del listado previo.
    - "hablar_con_asesor": si pide expresamente hablar con una persona/humano, asesor, negociar precio, trámites legales/notaría, agendar visita.
    - "saludo_o_otro": saludos ("hola", "buenas"), agradecimientos ("gracias"), despedidas o comentarios generales.
@@ -20,8 +21,8 @@ Reglas obligatorias:
    - Si NO especifica compra ni arriendo: montos hasta 20M COP sugieren arriendo mensual; montos desde 40M COP sugieren venta.
 4. "criterios_duros":
    - tipo: 'casa' | 'apartamento' | null (IMPORTANTE: Nuestro catálogo se especializa única y exclusivamente en casas y apartamentos residenciales).
-   - ciudad: la ciudad REAL que el usuario menciona para la búsqueda, tal como la escribió con acentos correctos (ej. "Bogotá", "Medellín", "El Espinal"). Si menciona Ibagué explícitamente, usa "Ibagué". Si NINGUNA ciudad aparece en el mensaje, responde null (NUNCA asumas Ibagué aquí; ese default se decide después).
-   - barrios: array con nombres de barrios mencionados (ej. ["El Vergel", "Cádiz"]) o null
+   - ciudad: la ciudad REAL que el usuario menciona para la búsqueda, tal como la escribió con acentos correctos (ej. "Bogotá", "Medellín", "Cali", "Barranquilla"). Si NINGUNA ciudad aparece en el mensaje, responde null (NUNCA asumas una ciudad aquí; ese default se decide después).
+   - barrios: array con nombres de barrios o sectores mencionados (ej. ["Ciudad Jardín"], ["El Vergel"], ["El Poblado"]) o null
    - precio_min, precio_max: en pesos colombianos (COP numérico entero)
    - habitaciones_min,
       habitaciones_max,
@@ -61,18 +62,19 @@ Devuelve estrictamente un objeto JSON con el siguiente esquema:
 /**
  * Normaliza quitando acentos y pasando a minúsculas.
  */
-const stripAccents = (str: string) =>
-  str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+export const stripAccents = (str: string) =>
+  (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
 /** Escapa caracteres especiales para construir una regex literal. */
-const escaparRegex = (texto: string) => texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+export const escaparRegex = (texto: string) => texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /**
- * Ciudades y municipios con cobertura de búsqueda (solo Ibagué por ahora).
+ * Ciudades y municipios de Colombia con cobertura en el catálogo.
  * Clave: forma sin acentos con la que se detecta; valor: nombre bonito para mostrar.
  */
-const CIUDADES_CONOCIDAS: Record<string, string> = {
-  'bogota': 'Bogotá', 'medellin': 'Medellín', 'cali': 'Cali', 'barranquilla': 'Barranquilla',
+export const CIUDADES_CONOCIDAS: Record<string, string> = {
+  'bogota': 'Bogotá', 'bogota d.c.': 'Bogotá', 'bogota dc': 'Bogotá',
+  'medellin': 'Medellín', 'cali': 'Cali', 'barranquilla': 'Barranquilla',
   'cartagena': 'Cartagena', 'bucaramanga': 'Bucaramanga', 'pereira': 'Pereira',
   'manizales': 'Manizales', 'armenia': 'Armenia', 'neiva': 'Neiva', 'villavicencio': 'Villavicencio',
   'popayan': 'Popayán', 'pasto': 'Pasto', 'santa marta': 'Santa Marta', 'cucuta': 'Cúcuta',
@@ -84,30 +86,51 @@ const CIUDADES_CONOCIDAS: Record<string, string> = {
   'mariquita': 'Mariquita', 'fresno': 'Fresno', 'prado': 'Prado', 'ortega': 'Ortega',
   'rovira': 'Rovira', 'saldaña': 'Saldaña', 'saldana': 'Saldaña', 'coello': 'Coello',
   'carmen de apicala': 'Carmen de Apicalá', 'ibague': 'Ibagué', 'ibagüe': 'Ibagué',
+  'chia': 'Chía', 'jamundi': 'Jamundí', 'envigado': 'Envigado', 'bello': 'Bello',
+  'itagui': 'Itagui', 'floridablanca': 'Floridablanca', 'sabaneta': 'Sabaneta',
+  'giron': 'Girón', 'piedecuesta': 'Piedecuesta', 'rionegro': 'Rionegro',
+  'soacha': 'Soacha', 'fusagasuga': 'Fusagasugá', 'cajica': 'Cajicá', 'zipaquira': 'Zipaquirá',
+  'dagua': 'Dagua', 'restrepo': 'Restrepo', 'sopo': 'Sopó', 'tulua': 'Tuluá',
+  'zarzal': 'Zarzal', 'copacabana': 'Copacabana', 'la estrella': 'La Estrella',
+  'rivera': 'Rivera', 'barbosa': 'Barbosa', 'la ceja': 'La Ceja', 'socorro': 'Socorro',
+  'riofrio': 'Riofrío', 'palestina': 'Palestina', 'villamaria': 'Villamaría',
+  'el peñon': 'El Peñón', 'puerto colombia': 'Puerto Colombia', 'yotoco': 'Yotoco',
+  'yumbo': 'Yumbo', 'mosquera': 'Mosquera', 'funza': 'Funza', 'albania': 'Albania',
+  'guasca': 'Guasca', 'granada': 'Granada'
 };
 
 /**
- * Detecta la ciudad REAL citada en el mensaje (patrón típico: "en <ciudad>", "de <ciudad>").
- * Si el mensaje menciona varias ciudades y una de ellas es Ibagué, prevalece Ibagué
- * (ej. "soy de Bogotá, busco casa en Ibagué" => no se debe rechazar la búsqueda).
+ * Detecta la ciudad objetivo citada en el mensaje.
+ * Prioriza primero las preposiciones directas de búsqueda ("en Cali", "hacia Bogotá", "para Medellín").
+ * Luego reconoce la presencia directa de la ciudad.
  */
 export function detectarCiudad(userMessage: string): string | null {
   const clean = stripAccents(userMessage);
   const ordenadas = [...Object.keys(CIUDADES_CONOCIDAS)].sort((a, b) => b.length - a.length);
-  const encontradas: string[] = [];
+
+  // 1. Prioridad: preposición de búsqueda objetivo ("en Cali", "para Medellín", "hacia Bogotá")
   for (const ciudadKey of ordenadas) {
-    const regex = new RegExp(
-      `\\b(?:en|de|por|hacia)\\s+(?:el\\s+|la\\s+|ciudad\\s+de\\s+|municipio\\s+de\\s+)?${escaparRegex(ciudadKey).replace(/\s+/g, '\\s+')}\\b`,
+    const regexTarget = new RegExp(
+      `\\b(?:en|para|hacia)\\s+(?:el\\s+|la\\s+|ciudad\\s+de\\s+|municipio\\s+de\\s+)?${escaparRegex(ciudadKey).replace(/\\s+/g, '\\s+')}\\b`,
       'i'
     );
-    if (regex.test(clean)) {
-      const nombre = CIUDADES_CONOCIDAS[ciudadKey];
-      if (!encontradas.includes(nombre)) encontradas.push(nombre);
+    if (regexTarget.test(clean)) {
+      return CIUDADES_CONOCIDAS[ciudadKey];
     }
   }
-  if (encontradas.length === 0) return null;
-  if (encontradas.includes('Ibagué')) return 'Ibagué';
-  return encontradas[0];
+
+  // 2. Segunda prioridad: mención general con "de", "por" o directa
+  for (const ciudadKey of ordenadas) {
+    const regexAny = new RegExp(
+      `\\b(?:de\\s+|por\\s+)?(?:el\\s+|la\\s+|ciudad\\s+de\\s+|municipio\\s+de\\s+)?${escaparRegex(ciudadKey).replace(/\\s+/g, '\\s+')}\\b`,
+      'i'
+    );
+    if (regexAny.test(clean)) {
+      return CIUDADES_CONOCIDAS[ciudadKey];
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -148,6 +171,7 @@ export function tieneContextoInmobiliario(
     operacion?: Operacion | null;
     solicitaAsesor?: boolean;
     barrios?: string[] | null;
+    ciudad?: string | null;
     moneyMin?: number | null;
     moneyMax?: number | null;
     presupuestoInvalido?: boolean;
@@ -160,13 +184,14 @@ export function tieneContextoInmobiliario(
     if (signals.operacion) return true;
     if (signals.solicitaAsesor) return true;
     if (signals.barrios && signals.barrios.length > 0) return true;
+    if (signals.ciudad) return true;
     if (signals.moneyMin != null || signals.moneyMax != null) return true;
     if (signals.presupuestoInvalido) return true;
   }
 
   const clean = stripAccents(userMessage);
 
-  const patronInmobiliario = /\b(casas?|apartamentos?|aptos?|apartaestudios?|inmuebles?|propiedad(?:es)?|viviendas?|habitaci(?:on|ones)|alcobas?|cuartos?|piezas?|ba[nñ]os?|estrato|garajes?|parqueaderos?|balcon(?:es)?|terrazas?|patios?|piscinas?|m2|metros?|arriendos?|arrendar|arrendo|alquiler(?:es)?|alquilar|comprar?|compras?|compro|comprarme|ventas?|vender|vendo|adquirir|adquisici(?:on|ones)|canon|inmobiliaria|inmobiliario|habitat\s+capital|catalogo|disponibles?|ofertas?|presupuesto|mill(?:on|ones)|palos?|asesor(?:a)?|asesor[ií]a|agente|visitas?|agendar|citas?|negociar|descuento|escrituras?|notar[ií]a|contratos?|lotes?|terrenos?|locales?|oficinas?|bodegas?|fincas?|consultorios?|ibague|tolima|el vergel|cadiz|la pola|calambeo|piedra pintada|jordan|belen|interlaken|picale[nñ]a|la macarena|santa helena|el salado|prados del norte|arkacentro|mirolindo|varsovia|campestre|valparaiso|otras?\s+zonas?|otras?\s+opciones?)\b/i;
+  const patronInmobiliario = /\b(casas?|apartamentos?|aptos?|apartaestudios?|inmuebles?|propiedad(?:es)?|viviendas?|habitaci(?:on|ones)|alcobas?|cuartos?|piezas?|ba[nñ]os?|estrato|garajes?|parqueaderos?|balcon(?:es)?|terrazas?|patios?|piscinas?|m2|metros?|arriendos?|arrendar|arrendo|alquiler(?:es)?|alquilar|comprar?|compras?|compro|comprarme|ventas?|vender|vendo|adquirir|adquisici(?:on|ones)|canon|inmobiliaria|inmobiliario|habitat\s+capital|catalogo|disponibles?|ofertas?|presupuesto|mill(?:on|ones)|palos?|asesor(?:a)?|asesor[ií]a|agente|visitas?|agendar|citas?|negociar|descuento|escrituras?|notar[ií]a|contratos?|lotes?|terrenos?|locales?|oficinas?|bodegas?|fincas?|consultorios?|cali|medellin|bogota|barranquilla|bucaramanga|manizales|pereira|ibague|tolima|ciudad jardin|el poblado|poblado|laureles|chapinero|el vergel|cadiz|la pola|calambeo|piedra pintada|jordan|belen|interlaken|picale[nñ]a|la macarena|santa helena|el salado|prados del norte|arkacentro|mirolindo|varsovia|campestre|valparaiso|otras?\s+zonas?|otras?\s+opciones?)\b/i;
 
   return patronInmobiliario.test(clean);
 }
@@ -186,6 +211,47 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
   const codeMatch = userMessage.match(/\b((?:IBG|HC)-\d{4})\b/i);
   const codigo = codeMatch ? codeMatch[1].toUpperCase() : null;
 
+  // Ciudad real mencionada (Cali, Medellín, Bogotá, etc.)
+  const ciudadDetectada = detectarCiudad(userMessage);
+
+  // Barrios y sectores conocidos a nivel nacional y local
+  const knownBarrios = [
+    'Ciudad Jardín', 'El Poblado', 'Poblado', 'Laureles', 'Chapinero', 'Zona Chapinero',
+    'Valle del Lili', 'Lili', 'Pance', 'El Ingenio', 'El Prado', 'El Limonar', 'San Fernando',
+    'Caney', 'La América', 'Robledo', 'Castilla', 'Guayabal', 'Usaquén', 'Suba', 'Cedritos',
+    'Teusaquillo', 'Chicó', 'Rosales', 'Salitre', 'Cabecera', 'Cañaveral',
+    'El Vergel', 'Cádiz', 'La Macarena', 'Piedra Pintada', 'Jordán',
+    'Calambeo', 'Interlaken', 'Prados del Norte', 'El Salado', 'Santa Helena',
+    'La Pola', 'Campestre', 'Santa Ana', 'Picaleña', 'Centro', 'Arkacentro',
+    'El Totumo', 'Mirolindo', 'Ambalá', 'Belén', 'Topacio', 'Varsovia',
+    'Valparaíso', 'La Floresta', 'Santa Bárbara', 'Ibagué 2000'
+  ];
+
+  const detectedBarrios: string[] = [];
+  const cleanUserMessage = stripAccents(userMessage);
+
+  for (const b of knownBarrios) {
+    const cleanB = stripAccents(b);
+    const regex = new RegExp(`(^|\\W)${cleanB.replace(/\s+/g, '\\s+')}($|\\W)`, 'i');
+    if (regex.test(cleanUserMessage)) {
+      detectedBarrios.push(b);
+    }
+  }
+
+  // Detección complementaria de sectores
+  const sectorPattern = /\b(?:en\s+el\s+sector(?:\s+de)?|en\s+el\s+barrio(?:\s+de)?|sector(?:\s+de)?|barrio(?:\s+de)?|por\s+el\s+sector(?:\s+de)?)\s+([a-záéíóúñ0-9\s]{3,30})/i;
+  const matchSector = userMessage.match(sectorPattern);
+  if (matchSector) {
+    const candidate = matchSector[1].trim();
+    if (!/^(arriendo|venta|comprar|alquiler|casa|apartamento|inmueble)/i.test(candidate)) {
+      const words = candidate.split(/\s+/).filter(Boolean);
+      const formatted = words.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+      if (!detectedBarrios.some(b => stripAccents(b) === stripAccents(formatted))) {
+        detectedBarrios.push(formatted);
+      }
+    }
+  }
+
   // Detección de intención
   let intencion: ExtractedUnderstanding['intencion'] = 'saludo_o_otro';
   const solicitaAsesor = /asesor|humano|persona|agendar|visita|negociar|descuento|escritura|notar[ií]a|abogado/i.test(lower);
@@ -197,7 +263,12 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     intencion = 'hablar_con_asesor';
   } else if (codigo || (/qu[eé] precio tiene|cu[aá]nto vale|d[oó]nde queda|qu[eé] amenidades|m[aá]s informaci[oó]n de (?:la|el)/i.test(lower) && !/busco|quiero/i.test(lower))) {
     intencion = 'detalle_inmueble';
-  } else if (/busco|arrendar|arriendo|alquilar|comprar|venta|casa|apartamento|apto|local|lote|oficina|inmueble|habitacion|barrio|presupuesto|mill[oó]n|millones|palos?|\bmil\b|\b\d+k\b|mu[eé]strame|ver\b|opciones\b|ens[eé][nñ]ame|otras?\s+zonas?/i.test(lower) || money.max != null || money.min != null) {
+  } else if (
+    /busco|arrendar|arriendo|alquilar|comprar|venta|casa|apartamento|apto|local|lote|oficina|inmueble|habitacion|barrio|presupuesto|mill[oó]n|millones|palos?|\bmil\b|\b\d+k\b|mu[eé]strame|ver\b|opciones\b|ens[eé][nñ]ame|otras?\s+zonas?/i.test(lower) ||
+    money.max != null || money.min != null ||
+    detectedBarrios.length > 0 ||
+    Boolean(ciudadDetectada)
+  ) {
     intencion = 'buscar';
   } else if (/hola|buenos d[ií]as|buenas tardes|buenas noches|quiubo|buenas|c[oó]mo est[aá]s|que tal|reiniciar|inicio/i.test(lower)) {
     intencion = 'saludo_o_otro';
@@ -238,40 +309,6 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     tipo_no_soportado = 'bodega';
   } else if (/\bfinca(?:s)?\b/i.test(lower)) {
     tipo_no_soportado = 'finca';
-  }
-
-  // Barrios y sectores conocidos en Ibagué
-  const knownBarrios = [
-    'El Vergel', 'Cádiz', 'La Macarena', 'Piedra Pintada', 'Jordán',
-    'Calambeo', 'Interlaken', 'Prados del Norte', 'El Salado', 'Santa Helena',
-    'La Pola', 'Campestre', 'Santa Ana', 'Picaleña', 'Centro', 'Arkacentro',
-    'El Totumo', 'Mirolindo', 'Ambalá', 'Belén', 'Topacio', 'Varsovia',
-    'Valparaíso', 'La Floresta', 'Santa Bárbara', 'Ibagué 2000'
-  ];
-
-  const detectedBarrios: string[] = [];
-  const cleanUserMessage = stripAccents(userMessage);
-
-  for (const b of knownBarrios) {
-    const cleanB = stripAccents(b);
-    const regex = new RegExp(`(^|\\W)${cleanB.replace(/\s+/g, '\\s+')}($|\\W)`, 'i');
-    if (regex.test(cleanUserMessage)) {
-      detectedBarrios.push(b);
-    }
-  }
-
-  // Detección complementaria de sectores
-  const sectorPattern = /\b(?:en\s+el\s+sector(?:\s+de)?|en\s+el\s+barrio(?:\s+de)?|sector(?:\s+de)?|barrio(?:\s+de)?|por\s+el\s+sector(?:\s+de)?)\s+([a-záéíóúñ0-9\s]{3,30})/i;
-  const matchSector = userMessage.match(sectorPattern);
-  if (matchSector) {
-    const candidate = matchSector[1].trim();
-    if (!/^(arriendo|venta|comprar|alquiler|casa|apartamento|inmueble)/i.test(candidate)) {
-      const words = candidate.split(/\s+/).filter(Boolean);
-      const formatted = words.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-      if (!detectedBarrios.some(b => stripAccents(b) === stripAccents(formatted))) {
-        detectedBarrios.push(formatted);
-      }
-    }
   }
 
   const finalMoney = normalizeColombianMoney(userMessage, operacion);
@@ -378,6 +415,7 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     operacion,
     solicitaAsesor,
     barrios: detectedBarrios,
+    ciudad: ciudadDetectada,
     moneyMin: finalMoney.min,
     moneyMax: finalMoney.max,
     presupuestoInvalido,
@@ -389,15 +427,12 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     intencion = 'fuera_de_tema';
   }
 
-  // Ciudad real mencionada; el default del catálogo es Ibagué
-  const ciudadDetectada = detectarCiudad(userMessage);
-
   return {
     intencion,
     operacion,
     criterios_duros: {
       tipo,
-      ciudad: ciudadDetectada || 'Ibagué',
+      ciudad: ciudadDetectada || null,
       barrios: detectedBarrios.length > 0 ? detectedBarrios : null,
       precio_min: finalMoney.min || null,
       precio_max: finalMoney.max || null,

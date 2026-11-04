@@ -191,18 +191,57 @@ def consultar_inmuebles(
     Returns:
         Cadena JSON formateada con la lista de inmuebles encontrados y resumen estadístico.
     """
-    # 1. Intentar consultar backend en vivo con fallback
+    # 1. Intentar consultar backend en vivo o dataset limpio local de respaldo
     items = list(INMUEBLES_SEED)
-    try:
-        with httpx.Client(timeout=2.0) as client:
-            resp = client.get(f"{BACKEND_URL}/inmuebles")
-            if resp.status_code == 200:
-                live_data = resp.json()
-                if isinstance(live_data, list) and len(live_data) > 0:
-                    items = live_data
-    except Exception:
-        # Fallback silencioso a la base local de semillas
-        pass
+    cargado = False
+
+    # A) Intentar consultar API live (Render o local)
+    for url in [BACKEND_URL, "http://localhost:3000"]:
+        if not url:
+            continue
+        try:
+            with httpx.Client(timeout=1.5) as client:
+                resp = client.get(f"{url}/inmuebles")
+                if resp.status_code == 200:
+                    live_data = resp.json()
+                    if isinstance(live_data, list) and len(live_data) > 0:
+                        items = live_data
+                        cargado = True
+                        break
+        except Exception:
+            pass
+
+    # B) Si no hay API en vivo disponible, cargar directamente el dataset local sincronizado con MongoDB
+    if not cargado:
+        local_dataset = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "backend", "src", "inmuebles", "co_inmuebles_clean.json"
+        )
+        if os.path.exists(local_dataset):
+            try:
+                with open(local_dataset, "r", encoding="utf-8") as f:
+                    clean_data = json.load(f)
+                    if isinstance(clean_data, list) and len(clean_data) > 0:
+                        items = [
+                            {
+                                "id": f"HC-{str(i+1).zfill(4)}",
+                                "titulo": m.get("nombre", f"{m.get('tipo', 'Inmueble')} en {m.get('ciudad', '')}"),
+                                "tipo": str(m.get("tipo", "apartamento")).lower(),
+                                "operacion": "venta" if (m.get("estado") in ["Para la venta", "Vendida"]) else "arriendo",
+                                "ciudad": m.get("ciudad", "Colombia"),
+                                "barrio": m.get("barrio", "Sector Residencial"),
+                                "direccion": m.get("dir", ""),
+                                "precio": float(m.get("valor", 0)),
+                                "area_m2": float(m.get("area", 75)),
+                                "habitaciones": int(m.get("habitaciones", 2)),
+                                "banos": int(m.get("banos", 2)),
+                                "estado": "disponible" if m.get("estado") in ["Sin arrendar", "Para la venta"] else "no disponible",
+                                "foto": m.get("foto", "")
+                            }
+                            for i, m in enumerate(clean_data)
+                        ]
+            except Exception:
+                pass
 
     # 2. Aplicar filtros
     resultado: List[Dict[str, Any]] = []
@@ -211,7 +250,7 @@ def consultar_inmuebles(
         tipo_item = str(item.get("tipo", "")).lower()
         ciudad_item = str(item.get("ciudad", "")).lower()
         estado_item = str(item.get("estado", "")).lower()
-        precio_item = float(item.get("precio", 0.0))
+        precio_item = float(item.get("precio", item.get("valor", 0.0)))
 
         if tipo != "todos" and tipo.lower() not in tipo_item:
             continue

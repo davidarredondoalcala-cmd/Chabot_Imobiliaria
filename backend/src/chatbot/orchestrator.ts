@@ -1,6 +1,6 @@
 import { Property, ChatResponse } from './types';
 import { getConversationState, saveConversationState, mergeConversationCriterios, recordMessage, getConversationMessages } from './state';
-import { understandUserMessage, tieneContextoInmobiliario, extractHeuristicUnderstanding } from './nlu';
+import { understandUserMessage, tieneContextoInmobiliario, extractHeuristicUnderstanding, stripAccents } from './nlu';
 import { evaluateClarificationPolicy } from './clarification';
 import { buscarInmuebles, getAllCatalogProperties } from './search';
 import { obtenerDetalleInmueble } from './detail';
@@ -62,7 +62,7 @@ export async function processUserMessage(
   // Agradecimiento o cortesía
   const isThankYou = /^\s*(gracias|muchas gracias|mil gracias|gracias vale|excelente gracias|vale gracias|perfecto gracias|todo claro|ok gracias|listo gracias)[\s\.,!¡?¿]*$/i.test(userMessage.trim());
   if (isThankYou) {
-    const thankReply = 'Con el mayor gusto. En Habitat Capital estamos a tu completa disposición para orientarte en Ibagué. Si deseas conocer otra zona o agendar una visita a cualquier inmueble, estaré atenta para apoyarte.';
+    const thankReply = 'Con el mayor gusto. En Habitat Capital estamos a tu completa disposición para orientarte en la búsqueda de tu próximo hogar. Si deseas conocer otra zona o agendar una visita a cualquier inmueble, estaré atenta para apoyarte.';
     await recordMessage(conversationId, 'user', userMessage);
     await recordMessage(conversationId, 'assistant', thankReply, meta);
     return {
@@ -77,7 +77,7 @@ export async function processUserMessage(
   // Preguntas sobre el asistente o cómo está
   const isSmallTalk = /^\s*(c[oó]mo est[aá]s|c[oó]mo te va|qu[eé] tal|quiubo|c[oó]mo andas|qui[eé]n eres)[\s\.,!¡?¿]*$/i.test(userMessage.trim());
   if (isSmallTalk) {
-    const talkReply = 'Hola, un gusto saludarte. Soy Jarvis, asesor inmobiliario de Habitat Capital en Ibagué. ¿Estás buscando arrendar o comprar casa o apartamento? Con gusto te orientaré.';
+    const talkReply = 'Hola, un gusto saludarte. Soy Jarvis, asesor inmobiliario de Habitat Capital. ¿Estás buscando arrendar o comprar casa o apartamento? Con gusto te orientaré.';
     await recordMessage(conversationId, 'user', userMessage);
     await recordMessage(conversationId, 'assistant', talkReply, meta);
     return {
@@ -108,7 +108,7 @@ export async function processUserMessage(
     const saludoHora = (hora >= 5 && hora < 12) ? '¡Buenos días!' : (hora >= 12 && hora < 18) ? '¡Buenas tardes!' : '¡Buenas noches!';
 
     const greetingReply =
-      `${saludoHora} Qué alegría saludarte. Soy **Jarvis**, tu asesor inmobiliario personal de Habitat Capital en Ibagué.\n\nCuéntame un poco sobre lo que buscas para guiarte de la mejor manera:\n\n1. **¿Prefieres en arriendo o para comprar?**\n2. **¿Casa o apartamento?**\n3. **¿Tienes algún barrio favorito** (como El Vergel, La Pola, Calambeo, Cádiz o Piedra Pintada) o presupuesto estimado?`;
+      `${saludoHora} Qué alegría saludarte. Soy **Jarvis**, tu asesor inmobiliario personal de Habitat Capital.\n\nCuéntame un poco sobre lo que buscas para guiarte de la mejor manera:\n\n1. **¿Prefieres en arriendo o para comprar?**\n2. **¿Casa o apartamento?**\n3. **¿Tienes alguna ciudad o barrio favorito** (como Cali, Medellín, Bogotá, El Poblado, Ciudad Jardín, El Vergel) o presupuesto estimado?`;
 
     await recordMessage(conversationId, 'user', userMessage);
     await recordMessage(conversationId, 'assistant', greetingReply, meta);
@@ -125,7 +125,7 @@ export async function processUserMessage(
   // Ayuda y capacidades de Habitat Capital
   const isHelpOrCapabilities = /^\s*(ayuda|qu[eé] puedes hacer|qu[eé] haces|c[oó]mo funciona|servicios|qu[eé] me recomiendas)[\s\.,!¡?¿]*$/i.test(userMessage.trim());
   if (isHelpOrCapabilities) {
-    const helpReply = 'Con muchísimo gusto. Como asistente virtual de **Habitat Capital** en Ibagué, puedo orientarte en:\n\n• **Búsqueda en catálogo:** Encontrar casas y apartamentos disponibles en arriendo o para comprar en Ibagué.\n• **Filtros por zona:** Opciones en sectores como El Vergel, Piedra Pintada, La Pola, Calambeo, Cádiz o Centro.\n• **Presupuesto y características:** Filtrar por precio mensual, valor de compra, habitaciones o baños.\n• **Atención personalizada:** Brindarte fichas de inmuebles o comunicarte con un asesor comercial por WhatsApp.\n\n¿Qué tipo de inmueble te gustaría consultar hoy?';
+    const helpReply = 'Con muchísimo gusto. Como asistente virtual de **Habitat Capital**, puedo orientarte en:\n\n• **Búsqueda en catálogo:** Encontrar casas y apartamentos disponibles en arriendo o para comprar a nivel nacional.\n• **Filtros por zona:** Opciones en ciudades como Cali, Medellín, Bogotá, Manizales, Pereira, Barranquilla, Bucaramanga e Ibagué.\n• **Presupuesto y características:** Filtrar por precio mensual, valor de compra, habitaciones o baños.\n• **Atención personalizada:** Brindarte fichas de inmuebles o comunicarte con un asesor comercial por WhatsApp.\n\n¿Qué tipo de inmueble te gustaría consultar hoy?';
     await recordMessage(conversationId, 'user', userMessage);
     await recordMessage(conversationId, 'assistant', helpReply, meta);
     return {
@@ -135,8 +135,8 @@ export async function processUserMessage(
       needsHuman: false,
       suggestionChips: [
         'Apartamentos en arriendo',
-        'Casas en venta en Ibagué',
-        'Propiedades en El Vergel',
+        'Casas en venta',
+        'Propiedades en El Poblado',
         'Hablar con un asesor'
       ],
       metadata: meta,
@@ -159,8 +159,8 @@ export async function processUserMessage(
     const reply = respuestaFueraDeTema();
     const suggestionChips = [
       'Apartamentos en arriendo',
-      'Casas en venta en Ibagué',
-      'Propiedades en El Vergel',
+      'Casas en venta',
+      'Propiedades en El Poblado',
       'Hablar con un asesor'
     ];
     await recordMessage(conversationId, 'user', userMessage);
@@ -175,7 +175,7 @@ export async function processUserMessage(
     };
   }
 
-  // Búsqueda en una ciudad fuera de la cobertura del catálogo (solo Ibagué)
+  // Búsqueda en una ciudad fuera de la cobertura del catálogo nacional
   const ciudadMencionada = understanding.criterios_duros?.ciudad || null;
   const hayCriteriosBusqueda =
     understanding.operacion ||
@@ -191,9 +191,21 @@ export async function processUserMessage(
     /arriendo|arrendar|alquil|comprar?|vender|ventas?|casas?|apartamento|apto|inmueble|busco|buscando|disponible|ofertas?\b/i.test(
       userMessage
     );
+
+  const catalogProps = getAllCatalogProperties(extraProperties);
+  const catalogCities = new Set(
+    catalogProps
+      .map(p => (p.ciudad ? stripAccents(p.ciudad) : ''))
+      .filter(Boolean)
+  );
+  const ciudadMencionadaNorm = ciudadMencionada ? stripAccents(ciudadMencionada) : '';
+  const ciudadTieneInmuebles = ciudadMencionadaNorm
+    ? [...catalogCities].some(c => c.includes(ciudadMencionadaNorm) || ciudadMencionadaNorm.includes(c))
+    : true;
+
   const esCiudadNoCubierta =
     ciudadMencionada &&
-    !/ibagu[ée\u00fc]/i.test(ciudadMencionada) &&
+    !ciudadTieneInmuebles &&
     hayIntencionInmobiliaria &&
     !understanding.codigo_inmueble_mencionado &&
     !understanding.solicita_asesor &&
@@ -272,7 +284,7 @@ export async function processUserMessage(
       motivo: 'asesor'
     });
 
-    const reply = `Actualmente nuestro catálogo se especializa única y exclusivamente en **casas y apartamentos** en Ibagué.\n\n¿Te gustaría que busquemos una casa o un apartamento residencial? O si requieres asesoría comercial para un ${understanding.tipo_no_soportado}, con gusto te puedo comunicar con un asesor por WhatsApp.`;
+    const reply = `Actualmente nuestro catálogo se especializa única y exclusivamente en **casas y apartamentos** residenciales.\n\n¿Te gustaría que busquemos una casa o un apartamento residencial? O si requieres asesoría comercial para un ${understanding.tipo_no_soportado}, con gusto te puedo comunicar con un asesor por WhatsApp.`;
 
     await recordMessage(conversationId, 'user', userMessage);
     await recordMessage(conversationId, 'assistant', reply, meta);
@@ -295,7 +307,7 @@ export async function processUserMessage(
       motivo: /visita/i.test(userMessage) ? 'visita' : (/negociar|descuento/i.test(userMessage) ? 'negociacion' : 'asesor')
     });
 
-    const reply = '¡Con mucho gusto! Para trámites notariales, visitas presenciales o negociación comercial, te comunico directamente con nuestro asesor especializado en Ibagué. Haz clic en el siguiente enlace para chatear por WhatsApp.';
+    const reply = '¡Con mucho gusto! Para trámites notariales, visitas presenciales o negociación comercial, te comunico directamente con nuestro equipo comercial especializado. Haz clic en el siguiente enlace para chatear por WhatsApp.';
 
     await recordMessage(conversationId, 'user', userMessage);
     await recordMessage(conversationId, 'assistant', reply, meta);
@@ -452,7 +464,7 @@ export async function processUserMessage(
     if (rawReply.includes('Con tu presupuesto no tenemos opciones')) {
       rawReply = `Como te mencionaba, en nuestro catálogo actual los inmuebles con esas características parten de ese rango. Si deseas, podemos mirar en la modalidad de ${state.criterios.operacion === 'venta' ? 'arriendo' : 'venta'} o ajustar las habitaciones para mostrarte alternativas disponibles. ¿Qué prefieres?`;
     } else {
-      rawReply = `Con gusto puedo orientarte con otras opciones en Ibagué. Cuéntame si deseas cambiar de barrio, número de habitaciones o modalidad (arriendo o venta).`;
+      rawReply = `Con gusto puedo orientarte con otras opciones en el catálogo. Cuéntame si deseas cambiar de ciudad, sector, número de habitaciones o modalidad (arriendo o venta).`;
     }
   }
 
@@ -463,11 +475,11 @@ export async function processUserMessage(
   // Chips dinámicos según el contexto de búsqueda
   const dynamicChips = propertiesToReturn.length > 0
     ? (state.criterios.operacion === 'venta'
-        ? ['Ver más en venta', 'Casas en El Vergel', 'Hablar con un asesor']
-        : ['Ver más en arriendo', 'Apartamentos en La Pola', 'Hablar con un asesor'])
+        ? ['Ver más en venta', 'Casas en venta', 'Hablar con un asesor']
+        : ['Ver más en arriendo', 'Apartamentos en arriendo', 'Hablar con un asesor'])
     : (searchResult.criterio_relajado && searchResult.criterio_relajado.includes('otras zonas')
-        ? ['Sí, otras zonas', 'Ver toda la ciudad', 'Hablar con un asesor']
-        : ['Apartamentos en arriendo', 'Casas en venta en Ibagué', 'Hablar con un asesor']);
+        ? ['Sí, otras zonas', 'Ver todas las opciones', 'Hablar con un asesor']
+        : ['Apartamentos en arriendo', 'Casas en venta', 'Hablar con un asesor']);
 
   await recordMessage(conversationId, 'user', userMessage);
   await recordMessage(conversationId, 'assistant', rawReply, meta);

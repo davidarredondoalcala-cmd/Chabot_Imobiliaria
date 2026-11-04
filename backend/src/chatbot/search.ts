@@ -1,6 +1,7 @@
 import { Property, Operacion, TipoInmueble, CriteriosDuros, SearchResultItem, SearchResponse } from './types';
 import { SEED_PROPERTIES } from './seed';
 import { generateStructuredJSON } from './llm';
+import { stripAccents } from './nlu';
 
 export interface SearchInmueblesParams extends CriteriosDuros {
   operacion?: Operacion | null;
@@ -35,9 +36,25 @@ export function executeFilterSearch(
   if (criterios.tipo) {
     list = list.filter(p => p.tipo.toLowerCase() === criterios.tipo?.toLowerCase());
   }
+  if (criterios.ciudad) {
+    const cNorm = stripAccents(criterios.ciudad);
+    list = list.filter(p => p.ciudad && stripAccents(p.ciudad).includes(cNorm));
+  }
   if (criterios.barrios && criterios.barrios.length > 0) {
     list = list.filter(p =>
-      criterios.barrios!.some(b => p.barrio.toLowerCase().includes(b.toLowerCase()))
+      criterios.barrios!.some(b => {
+        const bNorm = stripAccents(b);
+        const barrioNorm = stripAccents(p.barrio || '');
+        const tituloNorm = stripAccents(p.titulo || '');
+        const dirNorm = stripAccents(p.direccion_aproximada || '');
+        const descNorm = stripAccents(p.descripcion || '');
+        return (
+          barrioNorm.includes(bNorm) ||
+          tituloNorm.includes(bNorm) ||
+          dirNorm.includes(bNorm) ||
+          descNorm.includes(bNorm)
+        );
+      })
     );
   }
   if (criterios.precio_min != null && criterios.precio_min > 0) {
@@ -273,11 +290,13 @@ export function mensajeZonaSinResultados(
     const minimo = getCatalogMinPrice(params.operacion, params.tipo, catalog);
     if (minimo) {
       const periodo = minimo.operacion === 'arriendo' ? ' al mes' : '';
-      mensaje += `\n\nTen en cuenta que en Ibagué los ${sujeto} ${accion} parten desde ${cop(minimo.precio)}${periodo}.`;
+      const ubicacionPrecio = params.ciudad ? `en ${params.ciudad} ` : '';
+      mensaje += `\n\nTen en cuenta que ${ubicacionPrecio}los ${sujeto} ${accion} parten desde ${cop(minimo.precio)}${periodo}.`;
     }
   }
 
-  mensaje += `\n\n**¿Quieres que te muestre opciones en otras zonas de Ibagué?** Dime “sí, otras zonas” y con mucho gusto te las traigo.`;
+  const zonaContexto = params.ciudad ? `en otras zonas de ${params.ciudad}` : 'en otras zonas';
+  mensaje += `\n\n**¿Quieres que te muestre opciones ${zonaContexto}?** Dime “sí, otras zonas” y con mucho gusto te las traigo.`;
   return mensaje;
 }
 

@@ -139,7 +139,7 @@ export function responderPreguntaInformativa(
 
     case 'mascotas': {
       return {
-        reply: `¡Entiendo perfectamente! Las mascotas son miembros esenciales del hogar.\n\nEn **Habitat Capital**, la gran mayoría de nuestras casas y apartamentos residenciales en Ibagué permiten mascotas sin inconvenientes. En el caso de apartamentos en conjuntos cerrados o edificios, se rige por el manual de convivencia de propiedad horizontal.\n\nSi te interesa un inmueble en específico o un sector (como El Vergel, Calambeo, La Pola o Cádiz), cuéntame cuál buscas y te confirmo al instante las condiciones de ese inmueble.`,
+        reply: `¡Entiendo perfectamente! Las mascotas son miembros esenciales del hogar.\n\nEn **Habitat Capital**, la gran mayoría de nuestras casas y apartamentos residenciales permiten mascotas sin inconvenientes. En el caso de apartamentos en conjuntos cerrados o edificios, se rige por el manual de convivencia de propiedad horizontal.\n\nSi te interesa un inmueble en específico o un sector (como Ciudad Jardín, El Poblado, El Vergel o Laureles), cuéntame cuál buscas y te confirmo al instante las condiciones de ese inmueble.`,
         properties: [],
         suggestionChips: [
           'Apartamentos en arriendo',
@@ -152,11 +152,11 @@ export function responderPreguntaInformativa(
 
     case 'ubicacion_contacto': {
       return {
-        reply: `¡Con mucho gusto! **Habitat Capital** opera con sede en la ciudad de **Ibagué, Tolima**, brindando cobertura en los mejores sectores de la ciudad.\n\n• **Ciudad:** Ibagué, Tolima, Colombia.\n• **Horario de atención:** Lunes a Viernes de 8:00 a.m. a 6:00 p.m. y Sábados de 9:00 a.m. a 1:00 p.m.\n• **Canal digital:** Atención personalizada por chat web y WhatsApp inmediato para visitas o consultas comerciales.\n\n¿En qué tipo de inmueble te gustaría que te oriente hoy?`,
+        reply: `¡Con mucho gusto! **Habitat Capital** cuenta con sede administrativa en **Ibagué, Tolima**, y catálogo comercial con cobertura en principales ciudades del país (como Cali, Medellín, Bogotá, Manizales, Pereira, Barranquilla, Bucaramanga e Ibagué).\n\n• **Sede principal:** Ibagué, Tolima, Colombia.\n• **Horario de atención:** Lunes a Viernes de 8:00 a.m. a 6:00 p.m. y Sábados de 9:00 a.m. a 1:00 p.m.\n• **Canal digital:** Atención personalizada por chat web y WhatsApp inmediato para visitas o consultas comerciales.\n\n¿En qué ciudad o tipo de inmueble te gustaría que te oriente hoy?`,
         properties: [],
         suggestionChips: [
           'Apartamentos en arriendo',
-          'Casas en venta en Ibagué',
+          'Casas en venta',
           'Hablar con un asesor'
         ],
         whatsappUrl: waLink,
@@ -164,16 +164,18 @@ export function responderPreguntaInformativa(
     }
 
     case 'barrios_disponibles': {
-      const barriosSet = new Set(catalog.filter(p => p.disponible !== false).map(p => p.barrio));
+      const ciudadesSet = new Set(catalog.filter(p => p.disponible !== false).map(p => p.ciudad).filter(Boolean));
+      const barriosSet = new Set(catalog.filter(p => p.disponible !== false).map(p => p.barrio).filter(b => b && b !== 'Sector Residencial'));
+      const listaCiudades = Array.from(ciudadesSet).slice(0, 8).join(', ');
       const listaBarrios = Array.from(barriosSet).slice(0, 10).join(', ');
 
       return {
-        reply: `¡Contamos con opciones en los sectores más estratégicos y acogedores de **Ibagué**!\n\nActualmente tenemos inmuebles registrados en sectores como:\n• **${listaBarrios || 'El Vergel, Cádiz, La Pola, Calambeo, Piedra Pintada, Jordán, El Salado, Santa Helena, Campestre'}**.\n\n¿Hay algún barrio en especial que prefieras, o te gustaría ver opciones en arriendo o compra?`,
+        reply: `¡Contamos con opciones en ciudades y sectores estratégicos de Colombia!\n\n• **Ciudades con catálogo:** ${listaCiudades || 'Cali, Medellín, Bogotá, Barranquilla, Bucaramanga, Manizales, Pereira, Ibagué'}.\n• **Sectores destacados:** ${listaBarrios || 'El Poblado, Ciudad Jardín, Laureles, Chapinero, El Vergel, Calambeo'}.\n\n¿Hay alguna ciudad o barrio en especial que prefieras consultar?`,
         properties: [],
         suggestionChips: [
-          'Propiedades en El Vergel',
-          'Apartamentos en La Pola',
-          'Casas en venta en Ibagué',
+          'Casas en Cali',
+          'Apartamentos en Medellín',
+          'Propiedades en Bogotá',
           'Hablar con un asesor'
         ],
         whatsappUrl: waLink,

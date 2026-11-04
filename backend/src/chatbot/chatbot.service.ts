@@ -18,17 +18,20 @@ export class ChatbotService {
       const operacion: 'venta' | 'arriendo' = isVenta ? 'venta' : 'arriendo';
       const codigo = `HC-${String(idx + 1).padStart(4, '0')}`;
       const tipo: 'casa' | 'apartamento' = (m.tipo || 'Casa').toLowerCase() === 'apartamento' ? 'apartamento' : 'casa';
+      const ciudad = m.ciudad || 'Colombia';
+      const barrio = m.barrio || 'Sector residencial';
+      const dir = m.dir || `${barrio}, ${ciudad}`;
 
       return {
         id: String(m._id || codigo),
         codigo,
         operacion,
         tipo,
-        titulo: m.nombre || `${m.tipo} en ${m.barrio || 'Ibagué'}`,
-        descripcion: `${m.tipo} ubicada en ${m.barrio || 'Ibagué'}. Dirección: ${m.dir || 'Sector residencial'}. Linderos: ${m.lind || 'Sector tranquilo con excelentes vías de acceso'}.`,
-        ciudad: 'Ibagué',
-        barrio: m.barrio || 'Centro',
-        direccion_aproximada: m.dir || 'Ibagué, Tolima',
+        titulo: m.nombre || `${m.tipo} en ${barrio}, ${ciudad}`,
+        descripcion: m.descripcion || `${m.tipo} ubicada en ${barrio}, ${ciudad}. Dirección: ${dir}. Linderos: ${m.lind || 'Sector tranquilo con excelentes vías de acceso'}.`,
+        ciudad,
+        barrio,
+        direccion_aproximada: dir,
         precio: Number(m.valor) || 0,
         area_m2: Number(m.area) || 75,
         habitaciones: Number(m.habitaciones) || 2,
