@@ -60,8 +60,19 @@ export function mergeConversationCriterios(
     merged.presupuesto_insuficiente_anterior = false;
   }
 
-  // 2. Operación (arriendo / venta):
-  if (extracted.operacion) {
+  // 2. Operación (arriendo / venta / ambas):
+  const pideAmbasOperaciones =
+    Boolean(extracted.ambas_operaciones) ||
+    /\b(ambas?\s*(?:opciones|modalidades|alternativas)?|(?:en\s+)?arriendo\s+o\s+(?:en\s+)?venta|(?:en\s+)?venta\s+o\s+(?:en\s+)?arriendo|(?:en\s+)?alquiler\s+o\s+(?:en\s+)?venta|(?:en\s+)?venta\s+o\s+(?:en\s+)?alquiler|(?:en\s+)?arriendo\s+y\s+(?:en\s+)?venta|(?:en\s+)?venta\s+y\s+(?:en\s+)?arriendo|comprar\s+o\s+arrendar|arrendar\s+o\s+comprar|alquilar\s+o\s+comprar|comprar\s+o\s+alquilar)\b/i.test(lower);
+
+  if (pideAmbasOperaciones) {
+    merged.operacion = null;
+    merged.ambas_operaciones = true;
+    merged.precio_min = null;
+    merged.precio_max = null;
+    merged.presupuesto_insuficiente_anterior = false;
+  } else if (extracted.operacion) {
+    merged.ambas_operaciones = false;
     if (current.operacion && current.operacion !== extracted.operacion) {
       // Cambio explícito de operación: el presupuesto de compra no aplica a arriendo ni viceversa
       merged.operacion = extracted.operacion;

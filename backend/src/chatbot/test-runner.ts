@@ -421,6 +421,38 @@ async function runTests() {
     `props=${r34.properties.map(p => `${p.codigo}:$${p.precio}`).join(', ')}`
   );
 
+  // Test 35: Consulta simultánea de arriendo o venta entrega opciones de AMBAS modalidades
+  const r35 = await processUserMessage('test-35-ambas', '¿Tienen en arriendo o en venta en Cali?');
+  assert(
+    r35.properties.length >= 2 &&
+      r35.properties.some(p => p.operacion === 'arriendo') &&
+      r35.properties.some(p => p.operacion === 'venta') &&
+      r35.reply.toLowerCase().includes('arriendo') &&
+      r35.reply.toLowerCase().includes('venta') &&
+      !r35.reply.includes('¿Estás buscando en **arriendo o para comprar**?'),
+    'Preguntar por "en arriendo o en venta" entrega opciones de ambas modalidades simultáneamente',
+    `props=${r35.properties.map(p => `${p.codigo}:${p.operacion}`).join(', ')} reply=${r35.reply.slice(0, 100)}`
+  );
+
+  // Test 36: Multi-turno: pasar de arriendo exclusivo a "en arriendo o en venta" no se queda bloqueado en arriendo
+  const conv36 = 'test-36-multiturn-ambas';
+  const r36a = await processUserMessage(conv36, 'busco apartamento en arriendo en cali con 2.5 millones');
+  assert(
+    r36a.properties.length > 0 && r36a.properties.every(p => p.operacion === 'arriendo'),
+    'Turno 1: Búsqueda exclusiva en arriendo devuelve arriendos',
+    `props=${r36a.properties.map(p => `${p.codigo}:${p.operacion}`).join(', ')}`
+  );
+  const r36b = await processUserMessage(conv36, '¿tienen en arriendo o en venta?');
+  assert(
+    r36b.properties.length >= 2 &&
+      r36b.properties.some(p => p.operacion === 'arriendo') &&
+      r36b.properties.some(p => p.operacion === 'venta') &&
+      r36b.reply.toLowerCase().includes('arriendo') &&
+      r36b.reply.toLowerCase().includes('venta'),
+    'Turno 2: Al preguntar "en arriendo o en venta" se desbloquea arriendo y entrega ambas modalidades',
+    `props=${r36b.properties.map(p => `${p.codigo}:${p.operacion}`).join(', ')} reply=${r36b.reply.slice(0, 100)}`
+  );
+
   console.log(`\n=== Resultado de pruebas: ${passed}/${total} superadas (${Math.round((passed/total)*100)}%) ===\n`);
   if (passed !== total) {
     process.exit(1);

@@ -65,6 +65,11 @@ export function evaluateClarificationPolicy(criterios: ConversationCriterios): C
     };
   }
 
+  // Si el usuario pidió explícitamente ambas modalidades, no insistir en que elija una
+  if (criterios.ambas_operaciones) {
+    return { needsClarification: false };
+  }
+
   // Falta operación (arriendo o venta) y tampoco hay zona especificada
   if (!criterios.operacion) {
     const inmuebleTexto = criterios.tipo === 'casa'

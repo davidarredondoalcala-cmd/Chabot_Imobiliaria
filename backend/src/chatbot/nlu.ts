@@ -278,8 +278,13 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
   let operacion: Operacion | null = null;
   const isArriendo = /\b(arriendos?|arrendar|alquiler(?:es)?|alquilar|arrendo)\b/i.test(lower);
   const isVenta = /\b(comprar?|compras?|compro|comprarme|adquirir|adquisici[oó]n|ventas?|vender)\b/i.test(lower);
+  const mentionsAmbas = /\b(ambas?\s*(?:opciones|modalidades|alternativas)?|(?:en\s+)?arriendo\s+o\s+(?:en\s+)?venta|(?:en\s+)?venta\s+o\s+(?:en\s+)?arriendo|(?:en\s+)?alquiler\s+o\s+(?:en\s+)?venta|(?:en\s+)?venta\s+o\s+(?:en\s+)?alquiler|(?:en\s+)?arriendo\s+y\s+(?:en\s+)?venta|(?:en\s+)?venta\s+y\s+(?:en\s+)?arriendo|comprar\s+o\s+arrendar|arrendar\s+o\s+comprar|alquilar\s+o\s+comprar|comprar\s+o\s+alquilar)\b/i.test(lower);
+  const ambasOperaciones = mentionsAmbas || (isArriendo && isVenta);
 
-  if (isVenta && !isArriendo) {
+  if (ambasOperaciones) {
+    operacion = null;
+    intencion = 'buscar';
+  } else if (isVenta && !isArriendo) {
     operacion = 'venta';
   } else if (isArriendo && !isVenta) {
     operacion = 'arriendo';
@@ -430,6 +435,7 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
   return {
     intencion,
     operacion,
+    ambas_operaciones: ambasOperaciones,
     criterios_duros: {
       tipo,
       ciudad: ciudadDetectada || null,
@@ -505,6 +511,11 @@ export async function understandUserMessage(
     const ciudadHeuristica = heuristic.criterios_duros.ciudad;
     if (ciudadHeuristica && !/ibagu[ée\u00fc]/i.test(ciudadHeuristica)) {
       llmResult.criterios_duros.ciudad = ciudadHeuristica;
+    }
+    if (heuristic.ambas_operaciones) {
+      llmResult.ambas_operaciones = true;
+      llmResult.operacion = null;
+      llmResult.intencion = 'buscar';
     }
     if (heuristic.fuera_de_tema || llmResult.fuera_de_tema) {
       llmResult.fuera_de_tema = true;

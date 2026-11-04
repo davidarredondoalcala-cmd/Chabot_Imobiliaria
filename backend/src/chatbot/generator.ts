@@ -88,32 +88,74 @@ export function generateDeterministicSearchReply(
     : criterios?.tipo === 'apartamento'
       ? 'apartamentos'
       : 'propiedades';
-  const accion = (criterios as any)?.operacion === 'venta' ? 'en venta' : (criterios as any)?.operacion === 'arriendo' ? 'en arriendo' : '';
-  const amensText = (criterios as any)?.amenidades && (criterios as any).amenidades.length > 0
-    ? ` con ${(criterios as any).amenidades.join(', ')}`
-    : '';
-  const headerText = (criterios as any)?.acepta_otras_zonas
-    ? `¡Con mucho gusto! Encontré estas excelentes opciones de ${tipoInm} ${accion}${amensText} disponibles en otras zonas:`
-    : `Encontré estas excelentes opciones de ${tipoInm} ${accion}${amensText} disponibles${sector}:`;
-  lines.push(headerText);
 
-  items.slice(0, 3).forEach((item, idx) => {
-    const p = item.inmueble;
-    const habText = p.habitaciones > 0 ? `${p.habitaciones} hab` : '';
-    const banText = p.banos > 0 ? `${p.banos} baños` : '';
-    const details = [habText, banText, `${p.area_m2} m²`].filter(Boolean).join(' • ');
-    const ubicacion = [p.barrio, p.ciudad].filter(Boolean).join(', ');
+  const arriendos = items.filter(it => it.inmueble.operacion === 'arriendo');
+  const ventas = items.filter(it => it.inmueble.operacion === 'venta');
+  const tieneAmbas = arriendos.length > 0 && ventas.length > 0;
 
-    lines.push(
-      `${idx + 1}. **${p.titulo}** (${p.codigo})\n   • Ubicación: ${ubicacion} | Valor: ${formatCOP(p.precio)}\n   • Detalles: ${details}${item.razon ? `\n   • Destacado: ${item.razon}` : ''}`
-    );
-  });
+  if (tieneAmbas) {
+    const headerText = (criterios as any)?.acepta_otras_zonas
+      ? `¡Con mucho gusto! Encontré estas excelentes opciones de ${tipoInm} disponibles en otras zonas, tanto en **arriendo** como en **venta**:`
+      : `Encontré estas excelentes opciones de ${tipoInm} disponibles${sector}, tanto en **arriendo** como en **venta**:`;
+    lines.push(headerText);
 
-  const sinOperacion = !(criterios as any)?.operacion;
-  if (sinOperacion) {
-    lines.push('¿Estás buscando en **arriendo o para comprar**? Si tienes un presupuesto estimado o número de habitaciones deseado, indícamelo y con gusto afinamos los resultados.');
+    lines.push('**Opciones en arriendo:**');
+    arriendos.forEach((item, idx) => {
+      const p = item.inmueble;
+      const habText = p.habitaciones > 0 ? `${p.habitaciones} hab` : '';
+      const banText = p.banos > 0 ? `${p.banos} baños` : '';
+      const details = [habText, banText, `${p.area_m2} m²`].filter(Boolean).join(' • ');
+      const ubicacion = [p.barrio, p.ciudad].filter(Boolean).join(', ');
+      lines.push(
+        `${idx + 1}. **${p.titulo}** (${p.codigo})\n   • Ubicación: ${ubicacion} | Canon: ${formatCOP(p.precio)}/mes\n   • Detalles: ${details}${item.razon ? `\n   • Destacado: ${item.razon}` : ''}`
+      );
+    });
+
+    lines.push('**Opciones en venta:**');
+    ventas.forEach((item, idx) => {
+      const p = item.inmueble;
+      const habText = p.habitaciones > 0 ? `${p.habitaciones} hab` : '';
+      const banText = p.banos > 0 ? `${p.banos} baños` : '';
+      const details = [habText, banText, `${p.area_m2} m²`].filter(Boolean).join(' • ');
+      const ubicacion = [p.barrio, p.ciudad].filter(Boolean).join(', ');
+      lines.push(
+        `${arriendos.length + idx + 1}. **${p.titulo}** (${p.codigo})\n   • Ubicación: ${ubicacion} | Valor: ${formatCOP(p.precio)}\n   • Detalles: ${details}${item.razon ? `\n   • Destacado: ${item.razon}` : ''}`
+      );
+    });
+
+    if ((criterios as any)?.ambas_operaciones) {
+      lines.push('¿Cuál de las dos modalidades se adapta mejor a lo que buscas? También podemos coordinar una visita presencial si alguna te llama la atención.');
+    } else {
+      lines.push('¿Estás buscando en **arriendo o para comprar**? Si tienes un presupuesto estimado o número de habitaciones deseado, indícamelo y con gusto afinamos los resultados.');
+    }
   } else {
-    lines.push('Puedes hacer clic en el botón **"Ver en la plataforma"** de cualquier tarjeta para ver su ficha completa, o si prefieres, podemos coordinar una visita presencial. ¿Cuál te llama más la atención?');
+    const accion = (criterios as any)?.operacion === 'venta' ? 'en venta' : (criterios as any)?.operacion === 'arriendo' ? 'en arriendo' : '';
+    const amensText = (criterios as any)?.amenidades && (criterios as any).amenidades.length > 0
+      ? ` con ${(criterios as any).amenidades.join(', ')}`
+      : '';
+    const headerText = (criterios as any)?.acepta_otras_zonas
+      ? `¡Con mucho gusto! Encontré estas excelentes opciones de ${tipoInm} ${accion}${amensText} disponibles en otras zonas:`
+      : `Encontré estas excelentes opciones de ${tipoInm} ${accion}${amensText} disponibles${sector}:`;
+    lines.push(headerText);
+
+    items.slice(0, 3).forEach((item, idx) => {
+      const p = item.inmueble;
+      const habText = p.habitaciones > 0 ? `${p.habitaciones} hab` : '';
+      const banText = p.banos > 0 ? `${p.banos} baños` : '';
+      const details = [habText, banText, `${p.area_m2} m²`].filter(Boolean).join(' • ');
+      const ubicacion = [p.barrio, p.ciudad].filter(Boolean).join(', ');
+
+      lines.push(
+        `${idx + 1}. **${p.titulo}** (${p.codigo})\n   • Ubicación: ${ubicacion} | Valor: ${formatCOP(p.precio)}\n   • Detalles: ${details}${item.razon ? `\n   • Destacado: ${item.razon}` : ''}`
+      );
+    });
+
+    const sinOperacion = !(criterios as any)?.operacion;
+    if (sinOperacion) {
+      lines.push('¿Estás buscando en **arriendo o para comprar**? Si tienes un presupuesto estimado o número de habitaciones deseado, indícamelo y con gusto afinamos los resultados.');
+    } else {
+      lines.push('Puedes hacer clic en el botón **"Ver en la plataforma"** de cualquier tarjeta para ver su ficha completa, o si prefieres, podemos coordinar una visita presencial. ¿Cuál te llama más la atención?');
+    }
   }
   return lines.join('\n\n');
 }
@@ -149,19 +191,20 @@ export async function generateGroundedSearchReply(
   items: SearchResultItem[],
   userMessage: string,
   criterioRelajado?: string | null,
-  criterios?: { barrios?: string[]; tipo?: string }
+  criterios?: { barrios?: string[]; tipo?: string; ambas_operaciones?: boolean }
 ): Promise<string> {
   if (items.length === 0) {
     return generateDeterministicSearchReply([], criterioRelajado, criterios);
   }
 
-  const catalogContext = items.slice(0, 3).map(item => {
+  const catalogContext = items.slice(0, 4).map(item => {
     const p = item.inmueble;
     return `Código: ${p.codigo}
 Título: ${p.titulo}
 Operación: ${p.operacion}
 Tipo: ${p.tipo}
 Barrio: ${p.barrio}
+Ciudad: ${p.ciudad}
 Precio: ${p.precio} COP (${formatCOP(p.precio)})
 Área: ${p.area_m2} m2
 Habitaciones: ${p.habitaciones}
@@ -172,6 +215,7 @@ Razón de encaje: ${item.razon || 'Buena ubicación'}`;
   }).join('\n---\n');
 
   const sectorMencionado = criterios?.barrios && criterios.barrios.length > 0 ? criterios.barrios.join(', ') : null;
+  const tieneAmbasModalidades = items.some(i => i.inmueble.operacion === 'arriendo') && items.some(i => i.inmueble.operacion === 'venta');
 
   const messages: LLMMessage[] = [
     {
@@ -181,6 +225,7 @@ Razón de encaje: ${item.razon || 'Buena ubicación'}`;
 INSTRUCCIÓN CRÍTICA DE GENERACIÓN ANCLADA:
 Debes redactar una respuesta cálida en español colombiano basada ÚNICAMENTE en los siguientes ${items.length} inmuebles devueltos por el catálogo.
 ${sectorMencionado ? `El usuario preguntó específicamente por el sector "${sectorMencionado}". Confirma y menciona explícitamente ese sector (${sectorMencionado}) en la respuesta.` : ''}
+${tieneAmbasModalidades ? 'El inventario incluye opciones en arriendo y en venta. Debes presentarlas distinguiendo claramente cuáles están en arriendo y cuáles en venta.' : ''}
 PROHIBIDO inventar cualquier dato, código, precio o amenidad. Cita exactamente el código entre paréntesis, ej. (IBG-0001).
 ${criterioRelajado ? `Menciona con amabilidad y transparencia este ajuste: "${criterioRelajado}".` : ''}
 Máximo ~120 palabras. Cierra con una pregunta útil o llamado a la acción.

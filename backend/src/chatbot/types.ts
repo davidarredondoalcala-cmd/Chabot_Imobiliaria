@@ -47,6 +47,7 @@ export interface CriteriosDuros {
 export interface ExtractedUnderstanding {
   intencion: 'buscar' | 'detalle_inmueble' | 'hablar_con_asesor' | 'saludo_o_otro' | 'fuera_de_tema';
   operacion?: Operacion | null;
+  ambas_operaciones?: boolean | null;
   criterios_duros: CriteriosDuros;
   criterios_blandos?: string | null;
   codigo_inmueble_mencionado?: string | null;
@@ -58,6 +59,7 @@ export interface ExtractedUnderstanding {
 
 export interface ConversationCriterios extends CriteriosDuros {
   operacion?: Operacion | null;
+  ambas_operaciones?: boolean | null;
   criterios_blandos?: string | null;
   turnos_aclaracion?: number;
   turnos_presupuesto?: number;

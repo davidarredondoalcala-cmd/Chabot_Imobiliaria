@@ -5,6 +5,7 @@ import { stripAccents } from './nlu';
 
 export interface SearchInmueblesParams extends CriteriosDuros {
   operacion?: Operacion | null;
+  ambas_operaciones?: boolean | null;
   criterios_blandos?: string | null;
   excluir_codigos?: string[];
 }
@@ -103,6 +104,22 @@ export function executeFilterSearch(
     list = list.filter(p => !set.has(p.codigo.toUpperCase()));
   }
 
+  if (!criterios.operacion) {
+    const arriendos = list.filter(p => p.operacion === 'arriendo');
+    const ventas = list.filter(p => p.operacion === 'venta');
+
+    if (arriendos.length > 0 && ventas.length > 0) {
+      if (criterios.orden_precio === 'desc') {
+        arriendos.sort((a, b) => b.precio - a.precio);
+        ventas.sort((a, b) => b.precio - a.precio);
+      } else {
+        arriendos.sort((a, b) => a.precio - b.precio);
+        ventas.sort((a, b) => a.precio - b.precio);
+      }
+      return [...arriendos.slice(0, 10), ...ventas.slice(0, 10)];
+    }
+  }
+
   if (criterios.orden_precio === 'desc') {
     list.sort((a, b) => b.precio - a.precio);
   } else {
@@ -119,6 +136,24 @@ async function rerankCandidates(
   candidates: Property[],
   criterios: SearchInmueblesParams
 ): Promise<SearchResultItem[]> {
+  const arriendos = candidates.filter(c => c.operacion === 'arriendo');
+  const ventas = candidates.filter(c => c.operacion === 'venta');
+
+  // Si no hay operación única fijada y hay opciones en ambas modalidades,
+  // entregamos una selección balanceada de 2 en arriendo y 2 en venta (hasta 4 opciones)
+  if (!criterios.operacion && arriendos.length > 0 && ventas.length > 0) {
+    const topArriendos = arriendos.slice(0, 2);
+    const topVentas = ventas.slice(0, 2);
+    const balanced = [...topArriendos, ...topVentas];
+    return balanced.map(c => ({
+      inmueble: c,
+      razon: criterios.orden_precio === 'desc'
+        ? `Propiedad de alta gama en ${c.operacion} en ${c.barrio} por valor de COP $${Number(c.precio).toLocaleString('es-CO')}.`
+        : (criterios.orden_precio === 'asc'
+          ? `Opción de máxima economía en ${c.operacion} en ${c.barrio} por valor de COP $${Number(c.precio).toLocaleString('es-CO')}.`
+          : `Opción destacada en ${c.operacion} en ${c.barrio} por valor de COP $${Number(c.precio).toLocaleString('es-CO')}.`)
+    }));
+  }
   if (candidates.length <= 3 || criterios.orden_precio) {
     return candidates.slice(0, 3).map(c => ({
       inmueble: c,

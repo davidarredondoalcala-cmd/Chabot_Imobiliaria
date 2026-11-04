@@ -476,7 +476,9 @@ export async function processUserMessage(
   const dynamicChips = propertiesToReturn.length > 0
     ? (state.criterios.operacion === 'venta'
         ? ['Ver más en venta', 'Casas en venta', 'Hablar con un asesor']
-        : ['Ver más en arriendo', 'Apartamentos en arriendo', 'Hablar con un asesor'])
+        : state.criterios.operacion === 'arriendo'
+          ? ['Ver más en arriendo', 'Apartamentos en arriendo', 'Hablar con un asesor']
+          : ['Ver más en arriendo', 'Ver más en venta', 'Hablar con un asesor'])
     : (searchResult.criterio_relajado && searchResult.criterio_relajado.includes('otras zonas')
         ? ['Sí, otras zonas', 'Ver todas las opciones', 'Hablar con un asesor']
         : ['Apartamentos en arriendo', 'Casas en venta', 'Hablar con un asesor']);
