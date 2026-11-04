@@ -53,6 +53,7 @@ export function filtrar(lista, f) {
     if (pMin != null && !(i.valor >= pMin)) return false;
     if (pMax != null && !(i.valor <= pMax)) return false;
     if (f.estado === 'Por vencer') { if (!estaPorVencer(i)) return false; }
+    else if (f.estado === 'En arriendo') { if (i.estado !== 'Sin arrendar' && i.estado !== 'Arrendada') return false; }
     else if (f.estado && i.estado !== f.estado) return false;
 
     // Filtro por tiempo arrendada (para gestión de historiales de arrendamiento)
