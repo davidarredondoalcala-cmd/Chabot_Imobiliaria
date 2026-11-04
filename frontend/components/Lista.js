@@ -240,12 +240,6 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
                 <span className="kpi-label">{s.label}</span>
                 <span className="kpi-value">{s.val}</span>
               </div>
-              <div className="kpi-footer-status">
-                <span className="kpi-status-dot" aria-hidden="true" />
-                <span className="kpi-status-text">
-                  {s.activo ? (s.esFiltro ? 'Apartado activo' : 'Mostrando todo') : (s.esFiltro ? 'Filtrar apartado' : 'Ver catálogo')}
-                </span>
-              </div>
             </button>
           ))}
         </div>
