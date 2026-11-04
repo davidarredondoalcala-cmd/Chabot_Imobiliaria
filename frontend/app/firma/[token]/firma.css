@@ -1,5 +1,5 @@
 /* ===== Módulo de firmas electrónicas — estilos propios de la ruta /firma/[token]
-   No modifica globals.css; reutiliza sus variables (--ac, --card, --bd, etc.). */
+   Paleta Glassy Dashboard V2: Reutiliza variables (--ac, --card, --bd, etc.). */
 
 .fm-main { max-width: 980px; margin: 0 auto; padding: 28px 24px 72px }
 
@@ -10,23 +10,24 @@
   display: inline-block;
   font-weight: 600;
   font-size: .92rem;
-  border: 1.5px solid rgba(255, 170, 51, 0.65);
-  background: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #ff7700 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  background: var(--gold-grad, linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%));
   color: #ffffff;
-  border-radius: 10px;
-  padding: 10px 18px;
+  border-radius: 12px;
+  padding: 11px 20px;
   text-decoration: none;
-  box-shadow: 0 0 16px rgba(234, 88, 12, 0.45);
+  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.35);
   transition: all .2s ease;
 }
 .btn-pdf:hover {
-  background: linear-gradient(135deg, #ea580c 0%, #ff7700 45%, #ffe082 100%);
-  border-color: #ffe082;
-  box-shadow: 0 0 25px rgba(255, 200, 60, 0.7), 0 0 40px rgba(234, 88, 12, 0.4);
+  background: var(--gold-grad, linear-gradient(135deg, #2563eb 0%, #3b82f6 100%));
+  border-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.45);
+  transform: translateY(-2px);
 }
 
 /* ---------- Verificación e estados ---------- */
-.fm-verif { border-left: 4px solid var(--ac); box-shadow: 0 0 16px rgba(255, 119, 0, 0.18) }
+.fm-verif { border-left: 4px solid var(--ac); box-shadow: 0 4px 18px rgba(37, 99, 235, 0.15) }
 .fm-verif.mal { border-left-color: var(--red) }
 .fm-espera .fm-estados { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 8px }
 .fm-espera .fm-estados li { display: flex; align-items: center; gap: 10px; font-size: .92rem }
@@ -44,26 +45,26 @@
 .fm-tabs button { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; text-align: left; transition: all .2s ease }
 .fm-tabs button small { color: var(--mut); font-weight: 400; font-size: .78rem }
 .fm-tabs button.on {
-  background: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #ff7700 100%);
-  border-color: #ffaa33;
+  background: var(--gold-grad, linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%));
+  border-color: rgba(255, 255, 255, 0.5);
   color: #ffffff;
-  box-shadow: 0 0 16px rgba(255, 136, 0, 0.5);
+  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.35);
 }
 .fm-tabs button.on small { color: rgba(255, 255, 255, .88) }
 @media (max-width: 700px) { .fm-tabs { grid-template-columns: 1fr } }
 
 /* ---------- Áreas de dibujo y preview ---------- */
 .fm-caja {
-  background: #fff;
-  border: 1.5px dashed rgba(255, 136, 0, 0.55);
-  border-radius: 12px;
+  background: var(--card, #fff);
+  border: 1.5px dashed rgba(59, 130, 246, 0.5);
+  border-radius: 14px;
   min-height: 170px;
   display: grid;
   place-items: center;
   padding: 12px;
   background-image: radial-gradient(var(--bd) 1px, transparent 1px);
   background-size: 18px 18px;
-  box-shadow: 0 0 15px rgba(255, 119, 0, 0.15);
+  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.08);
 }
 .fm-prev img { max-width: 100%; height: auto; max-height: 180px }
 .fm-lienzo {
@@ -71,12 +72,12 @@
   height: 240px;
   touch-action: none;
   cursor: crosshair;
-  background: #fff;
-  border: 1.5px dashed rgba(255, 136, 0, 0.55);
-  border-radius: 12px;
+  background: #ffffff;
+  border: 1.5px dashed rgba(59, 130, 246, 0.5);
+  border-radius: 14px;
   background-image: radial-gradient(var(--bd) 1px, transparent 1px);
   background-size: 18px 18px;
-  box-shadow: 0 0 18px rgba(255, 119, 0, 0.18);
+  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.08);
 }
 
 /* ---------- Fuentes tipográficas ---------- */
@@ -93,29 +94,12 @@
 .fm-err { color: var(--red); font-size: .88rem; margin: 8px 0 0 }
 
 /* ---------- Condiciones ---------- */
-.fm-cond { background: var(--bg); border: 1px solid var(--bd); border-radius: 12px; padding: 14px 16px; margin: 16px 0 }
+.fm-cond { background: var(--bg); border: 1px solid var(--bd); border-radius: 14px; padding: 14px 18px; margin: 16px 0 }
 .fm-cond label { display: flex; gap: 10px; align-items: flex-start; margin: 0; font-weight: 500; color: var(--tx); font-size: .88rem; line-height: 1.5 }
 .fm-cond input[type="checkbox"] { width: auto; margin-top: 4px }
 
 /* ---------- Imagen de firma dentro del contrato ---------- */
-.firma-img { display: block; max-width: 180px; max-height: 72px; margin: 0 auto 4px; object-fit: contain }
-
-/* ---------- Tabla de evidencia ---------- */
-.fm-tabla-env { overflow-x: auto; margin: 10px 0 }
-.fm-tabla { border-collapse: collapse; width: 100%; font-size: .82rem }
-.fm-tabla th, .fm-tabla td { border-bottom: 1px solid var(--bd); padding: 8px 10px; text-align: left; white-space: nowrap }
-.fm-tabla th { color: var(--mut); font-size: .74rem; text-transform: uppercase; letter-spacing: .03em }
-.fm-hash { font-size: .76rem; background: var(--bg); padding: 2px 6px; border-radius: 6px; word-break: break-all; white-space: normal }
-
-/* ---------- Contrato en la pantalla de firma ---------- */
-.fm-contrato { margin: 22px 0 }
-
-/* ---------- Impresión (añade a las reglas globales de globals.css) ---------- */
-@media print {
-    .fm-main { max-width: none; padding: 0 }
-    .fm-cab, .fm-tabs, .fm-metodo, .fm-cond, .fm-espera, .fm-rechazo, .fm-verif, .fm-nota, #toast { display: none !important }
-    .fm-contrato { margin: 0 }
-    .firma-img { max-width: 150px; max-height: 60px }
-    .fm-tabla { font-size: 9pt }
-    .card { border: 0; box-shadow: none; padding: 0; background: #fff; color: #000 }
-}
+.hoja .sig .firma-img { display: inline-block; max-height: 60px; max-width: 180px; object-fit: contain; margin: 0 auto 4px }
+.hoja .sig .firma-linea { border-bottom: 1px solid #111; min-height: 50px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px; margin-bottom: 4px }
+.hoja .sig .firma-sub { font-size: .8rem; color: #444; font-family: system-ui, sans-serif }
+.hoja .sig .firma-sub b { display: block; color: #111; font-size: .86rem }
