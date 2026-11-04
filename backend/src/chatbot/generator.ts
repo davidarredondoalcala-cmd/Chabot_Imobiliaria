@@ -60,21 +60,34 @@ Dime algo como: "**arriendo con 2.5 millones**", "**comprar con 150 millones**" 
 export function generateDeterministicSearchReply(
   items: SearchResultItem[],
   criterioRelajado?: string | null,
-  criterios?: { barrios?: string[]; tipo?: string }
+  criterios?: { barrios?: string[]; tipo?: string; ciudad?: string; operacion?: string; ambas_operaciones?: boolean; acepta_otras_zonas?: boolean; amenidades?: string[]; correccion?: any }
 ): string {
+  const corr = (criterios as any)?.correccion;
+  const prefijoCorr = corr?.ciudad
+    ? `¿Te referías a **${corr.ciudad.corregida}**? Entendí que buscas en ${corr.ciudad.corregida}.\n\n`
+    : corr?.barrio
+      ? `¿Te referías a **${corr.barrio.corregida}**? Entendí que buscas en el sector de ${corr.barrio.corregida}.\n\n`
+      : '';
+
   if (items.length === 0) {
     if (criterioRelajado) {
-      return criterioRelajado;
+      return `${prefijoCorr}${criterioRelajado}`;
     }
     const sector = (criterios?.barrios && criterios.barrios.length > 0)
       ? ` en ${criterios.barrios.join(', ')}`
       : (criterios as any)?.ciudad
         ? ` en ${(criterios as any).ciudad}`
         : '';
-    return `Revisé con detalle nuestro inventario y en este momento no encontré propiedades disponibles con esas características exactas${sector}.\n\n¿Te gustaría que miremos en un sector cercano o con un rango de presupuesto un poco más amplio? Con gusto te busco más alternativas.`;
+    return `${prefijoCorr}Revisé con detalle nuestro inventario y en este momento no encontré propiedades disponibles con esas características exactas${sector}.\n\n¿Te gustaría que miremos en un sector cercano o con un rango de presupuesto un poco más amplio? Con gusto te busco más alternativas.`;
   }
 
   const lines: string[] = [];
+  if (corr?.ciudad) {
+    lines.push(`¿Te referías a **${corr.ciudad.corregida}**? Entendí que buscas en ${corr.ciudad.corregida}.`);
+  } else if (corr?.barrio) {
+    lines.push(`¿Te referías a **${corr.barrio.corregida}**? Entendí que buscas en el sector de ${corr.barrio.corregida}.`);
+  }
+
   if (criterioRelajado) {
     lines.push(criterioRelajado);
   }
@@ -191,7 +204,7 @@ export async function generateGroundedSearchReply(
   items: SearchResultItem[],
   userMessage: string,
   criterioRelajado?: string | null,
-  criterios?: { barrios?: string[]; tipo?: string; ambas_operaciones?: boolean }
+  criterios?: { barrios?: string[]; tipo?: string; ambas_operaciones?: boolean; correccion?: any }
 ): Promise<string> {
   if (items.length === 0) {
     return generateDeterministicSearchReply([], criterioRelajado, criterios);
@@ -224,6 +237,8 @@ Razón de encaje: ${item.razon || 'Buena ubicación'}`;
 
 INSTRUCCIÓN CRÍTICA DE GENERACIÓN ANCLADA:
 Debes redactar una respuesta cálida en español colombiano basada ÚNICAMENTE en los siguientes ${items.length} inmuebles devueltos por el catálogo.
+${(criterios as any)?.correccion?.ciudad ? `El usuario escribió "${(criterios as any).correccion.ciudad.original}" con un posible error tipográfico. Debes abrir amablemente confirmando: "¿Te referías a ${(criterios as any).correccion.ciudad.corregida}? Entendí que buscas en ${(criterios as any).correccion.ciudad.corregida}."` : ''}
+${(criterios as any)?.correccion?.barrio ? `El usuario escribió "${(criterios as any).correccion.barrio.original}" con un posible error tipográfico. Debes abrir amablemente confirmando: "¿Te referías a ${(criterios as any).correccion.barrio.corregida}? Entendí que buscas en el sector de ${(criterios as any).correccion.barrio.corregida}."` : ''}
 ${sectorMencionado ? `El usuario preguntó específicamente por el sector "${sectorMencionado}". Confirma y menciona explícitamente ese sector (${sectorMencionado}) en la respuesta.` : ''}
 ${tieneAmbasModalidades ? 'El inventario incluye opciones en arriendo y en venta. Debes presentarlas distinguiendo claramente cuáles están en arriendo y cuáles en venta.' : ''}
 PROHIBIDO inventar cualquier dato, código, precio o amenidad. Cita exactamente el código entre paréntesis, ej. (IBG-0001).

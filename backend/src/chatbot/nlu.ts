@@ -1,6 +1,7 @@
-import { ExtractedUnderstanding, Operacion, TipoInmueble } from './types';
+import { ExtractedUnderstanding, Operacion, TipoInmueble, CorreccionesDetectadas } from './types';
 import { generateStructuredJSON } from './llm';
 import { normalizeColombianMoney } from './normalizer';
+import { buscarCiudadFuzzy, buscarBarrioFuzzy } from './fuzzy';
 
 const SYSTEM_NLU_PROMPT = `
 Eres un módulo de NLU especializado en el mercado inmobiliario colombiano para Habitat Capital.
@@ -103,8 +104,17 @@ export const CIUDADES_CONOCIDAS: Record<string, string> = {
  * Detecta la ciudad objetivo citada en el mensaje.
  * Prioriza primero las preposiciones directas de búsqueda ("en Cali", "hacia Bogotá", "para Medellín").
  * Luego reconoce la presencia directa de la ciudad.
+ * Finalmente evalúa coincidencia difusa para errores tipográficos ("en Celi" -> "Cali").
  */
 export function detectarCiudad(userMessage: string): string | null {
+  const detalle = detectarCiudadConDetalle(userMessage);
+  return detalle ? detalle.ciudad : null;
+}
+
+/**
+ * Detecta la ciudad e indica si fue producto de una corrección tipográfica difusa.
+ */
+export function detectarCiudadConDetalle(userMessage: string): { ciudad: string; original?: string; esCorreccion: boolean } | null {
   const clean = stripAccents(userMessage);
   const ordenadas = [...Object.keys(CIUDADES_CONOCIDAS)].sort((a, b) => b.length - a.length);
 
@@ -115,7 +125,7 @@ export function detectarCiudad(userMessage: string): string | null {
       'i'
     );
     if (regexTarget.test(clean)) {
-      return CIUDADES_CONOCIDAS[ciudadKey];
+      return { ciudad: CIUDADES_CONOCIDAS[ciudadKey], esCorreccion: false };
     }
   }
 
@@ -126,8 +136,14 @@ export function detectarCiudad(userMessage: string): string | null {
       'i'
     );
     if (regexAny.test(clean)) {
-      return CIUDADES_CONOCIDAS[ciudadKey];
+      return { ciudad: CIUDADES_CONOCIDAS[ciudadKey], esCorreccion: false };
     }
+  }
+
+  // 3. Tercera prioridad: coincidencia difusa tolerante a errores ortográficos (ej. "Celi" -> "Cali", "Vogota" -> "Bogotá")
+  const fuzzy = buscarCiudadFuzzy(userMessage);
+  if (fuzzy) {
+    return { ciudad: fuzzy.match, original: fuzzy.original, esCorreccion: true };
   }
 
   return null;
@@ -211,8 +227,12 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
   const codeMatch = userMessage.match(/\b((?:IBG|HC)-\d{4})\b/i);
   const codigo = codeMatch ? codeMatch[1].toUpperCase() : null;
 
-  // Ciudad real mencionada (Cali, Medellín, Bogotá, etc.)
-  const ciudadDetectada = detectarCiudad(userMessage);
+  // Ciudad real mencionada (Cali, Medellín, Bogotá, etc.) con detección de errores tipográficos
+  const ciudadDetalle = detectarCiudadConDetalle(userMessage);
+  const ciudadDetectada = ciudadDetalle ? ciudadDetalle.ciudad : null;
+  const correccionCiudad = (ciudadDetalle && ciudadDetalle.esCorreccion && ciudadDetalle.original)
+    ? { original: ciudadDetalle.original, corregida: ciudadDetalle.ciudad }
+    : undefined;
 
   // Barrios y sectores conocidos a nivel nacional y local
   const knownBarrios = [
@@ -252,6 +272,23 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     }
   }
 
+  // Coincidencia difusa para barrios si no se detectó ninguno exacto
+  let correccionBarrio: { original: string; corregida: string } | undefined;
+  if (detectedBarrios.length === 0) {
+    const fuzzyB = buscarBarrioFuzzy(userMessage, knownBarrios);
+    if (fuzzyB) {
+      detectedBarrios.push(fuzzyB.match);
+      correccionBarrio = { original: fuzzyB.original, corregida: fuzzyB.match };
+    }
+  }
+
+  const correccion: CorreccionesDetectadas | null = (correccionCiudad || correccionBarrio)
+    ? {
+        ciudad: correccionCiudad,
+        barrio: correccionBarrio,
+      }
+    : null;
+
   // Detección de intención
   let intencion: ExtractedUnderstanding['intencion'] = 'saludo_o_otro';
   const solicitaAsesor = /asesor|humano|persona|agendar|visita|negociar|descuento|escritura|notar[ií]a|abogado/i.test(lower);
@@ -274,11 +311,11 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     intencion = 'saludo_o_otro';
   }
 
-  // Operación (prioridad absoluta a palabras clave explícitas)
+  // Operación (prioridad absoluta a palabras clave explícitas con tolerancia a errores ortográficos)
   let operacion: Operacion | null = null;
-  const isArriendo = /\b(arriendos?|arrendar|alquiler(?:es)?|alquilar|arrendo)\b/i.test(lower);
-  const isVenta = /\b(comprar?|compras?|compro|comprarme|adquirir|adquisici[oó]n|ventas?|vender)\b/i.test(lower);
-  const mentionsAmbas = /\b(ambas?\s*(?:opciones|modalidades|alternativas)?|(?:en\s+)?arriendo\s+o\s+(?:en\s+)?venta|(?:en\s+)?venta\s+o\s+(?:en\s+)?arriendo|(?:en\s+)?alquiler\s+o\s+(?:en\s+)?venta|(?:en\s+)?venta\s+o\s+(?:en\s+)?alquiler|(?:en\s+)?arriendo\s+y\s+(?:en\s+)?venta|(?:en\s+)?venta\s+y\s+(?:en\s+)?arriendo|comprar\s+o\s+arrendar|arrendar\s+o\s+comprar|alquilar\s+o\s+comprar|comprar\s+o\s+alquilar)\b/i.test(lower);
+  const isArriendo = /\b(arriendos?|arrendar(?:me)?|ariendos?|alquiler(?:es)?|alquilar(?:me)?|arrendo|alquilo)\b/i.test(lower);
+  const isVenta = /\b(comprar?(?:me)?|compras?|compro|conprar?(?:me)?|conpras?|conpro|adquirir|adquisici[oó]n|ventas?|vender|vendo)\b/i.test(lower);
+  const mentionsAmbas = /\b(ambas?\s*(?:opciones|modalidades|alternativas)?|(?:en\s+)?(?:arriendo|ariendo)\s+o\s+(?:en\s+)?(?:venta|conpra|compra)|(?:en\s+)?(?:venta|conpra|compra)\s+o\s+(?:en\s+)?(?:arriendo|ariendo)|(?:en\s+)?alquiler\s+o\s+(?:en\s+)?venta|(?:en\s+)?venta\s+o\s+(?:en\s+)?alquiler|(?:en\s+)?(?:arriendo|ariendo)\s+y\s+(?:en\s+)?venta|(?:en\s+)?venta\s+y\s+(?:en\s+)?(?:arriendo|ariendo)|comprar\s+o\s+arrendar|arrendar\s+o\s+comprar|alquilar\s+o\s+comprar|comprar\s+o\s+alquilar)\b/i.test(lower);
   const ambasOperaciones = mentionsAmbas || (isArriendo && isVenta);
 
   if (ambasOperaciones) {
@@ -297,12 +334,12 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     }
   }
 
-  // Tipo de inmueble
+  // Tipo de inmueble (con tolerancia a errores de tipeo comunes)
   let tipo: TipoInmueble | null = null;
   let tipo_no_soportado: string | null = null;
-  if (/apartamento|apto|apartaestudio/i.test(lower)) {
+  if (/(?:apartamentos?|aptos?|apartaestudios?|apartametos?|aprtamentos?|apartamnetos?|aprtament)/i.test(lower)) {
     tipo = 'apartamento';
-  } else if (/casa/i.test(lower)) {
+  } else if (/(?:casas?|cazas?|casitas?)/i.test(lower)) {
     tipo = 'casa';
   } else if (/\blocal(?:es)?\b/i.test(lower)) {
     tipo_no_soportado = 'local comercial';
@@ -458,6 +495,7 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     tipo_no_soportado,
     fuera_de_tema: esFueraDeTema,
     presupuesto_invalido: presupuestoInvalido,
+    correccion,
   };
 }
 
@@ -511,6 +549,9 @@ export async function understandUserMessage(
     const ciudadHeuristica = heuristic.criterios_duros.ciudad;
     if (ciudadHeuristica && !/ibagu[ée\u00fc]/i.test(ciudadHeuristica)) {
       llmResult.criterios_duros.ciudad = ciudadHeuristica;
+    }
+    if (heuristic.correccion) {
+      llmResult.correccion = heuristic.correccion;
     }
     if (heuristic.ambas_operaciones) {
       llmResult.ambas_operaciones = true;

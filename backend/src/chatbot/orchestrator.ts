@@ -212,7 +212,10 @@ export async function processUserMessage(
     understanding.intencion !== 'hablar_con_asesor' &&
     understanding.intencion !== 'fuera_de_tema';
   if (esCiudadNoCubierta) {
-    const reply = respuestaCiudadNoSoportada(ciudadMencionada);
+    let reply = respuestaCiudadNoSoportada(ciudadMencionada);
+    if (understanding.correccion?.ciudad) {
+      reply = `¿Te referías a **${understanding.correccion.ciudad.corregida}**? ${reply}`;
+    }
     await recordMessage(conversationId, 'user', userMessage);
     await recordMessage(conversationId, 'assistant', reply, meta);
     return {

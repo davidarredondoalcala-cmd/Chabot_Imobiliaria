@@ -184,5 +184,8 @@ export function mergeConversationCriterios(
     }
   }
 
+  // Correcciones tipográficas detectadas en este turno
+  merged.correccion = extracted.correccion || null;
+
   return merged;
 }

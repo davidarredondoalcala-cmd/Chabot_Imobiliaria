@@ -1,4 +1,4 @@
-import { Property, Operacion, TipoInmueble, CriteriosDuros, SearchResultItem, SearchResponse } from './types';
+import { Property, Operacion, TipoInmueble, CriteriosDuros, SearchResultItem, SearchResponse, CorreccionesDetectadas } from './types';
 import { SEED_PROPERTIES } from './seed';
 import { generateStructuredJSON } from './llm';
 import { stripAccents } from './nlu';
@@ -8,6 +8,7 @@ export interface SearchInmueblesParams extends CriteriosDuros {
   ambas_operaciones?: boolean | null;
   criterios_blandos?: string | null;
   excluir_codigos?: string[];
+  correccion?: CorreccionesDetectadas | null;
 }
 
 export function getAllCatalogProperties(extraProperties?: Property[]): Property[] {

@@ -453,6 +453,49 @@ async function runTests() {
     `props=${r36b.properties.map(p => `${p.codigo}:${p.operacion}`).join(', ')} reply=${r36b.reply.slice(0, 100)}`
   );
 
+  // Test 37: Tolerancia a typo en ciudad ("Celi" -> "Cali") según requerimiento exacto del usuario
+  const r37 = await processUserMessage('test-37-celi', 'quiero que busques casas en Celi');
+  assert(
+    r37.properties.length > 0 &&
+      r37.properties.every(p => p.ciudad.toLowerCase().includes('cali') && p.tipo === 'casa') &&
+      r37.reply.includes('Cali') &&
+      r37.reply.includes('¿Te referías a **Cali**?'),
+    'Typo "en Celi" se detecta como Cali, pregunta amablemente confirmando y entrega casas de Cali',
+    `props=${r37.properties.length} reply=${r37.reply.slice(0, 120)}`
+  );
+
+  // Test 38: Tolerancia a typo en barrio ("el pobaldo" -> "El Poblado")
+  const r38 = await processUserMessage('test-38-pobaldo', 'apartamento en el pobaldo');
+  assert(
+    r38.properties.length > 0 &&
+      r38.properties.some(p => p.barrio.toLowerCase().includes('poblado')) &&
+      r38.properties.every(p => p.tipo === 'apartamento') &&
+      r38.reply.includes('El Poblado') &&
+      r38.reply.includes('¿Te referías a **El Poblado**?'),
+    'Typo "el pobaldo" se detecta como El Poblado, confirma cordialmente y entrega apartamentos de El Poblado',
+    `props=${r38.properties.length} reply=${r38.reply.slice(0, 120)}`
+  );
+
+  // Test 39: Tolerancia a typo en ciudad no soportada ("Pastoo" -> "Pasto")
+  const r39 = await processUserMessage('test-39-pastoo', 'arriendo en Pastoo');
+  assert(
+    r39.properties.length === 0 &&
+      r39.reply.includes('Pasto') &&
+      r39.reply.includes('¿Te referías a **Pasto**?'),
+    'Typo "Pastoo" se detecta como Pasto y responde oportunamente sobre la cobertura',
+    `reply=${r39.reply.slice(0, 120)}`
+  );
+
+  // Test 40: Múltiples typos combinados ("caza en ariendo en Medelin")
+  const r40 = await processUserMessage('test-40-combo', 'caza en ariendo en Medelin');
+  assert(
+    r40.properties.length > 0 &&
+      r40.properties.every(p => p.tipo === 'casa' && p.operacion === 'arriendo' && p.ciudad.toLowerCase().includes('medell')) &&
+      r40.reply.includes('Medellín'),
+    'Combinación "caza en ariendo en Medelin" se interpreta correctamente como casa en arriendo en Medellín',
+    `props=${r40.properties.length} reply=${r40.reply.slice(0, 120)}`
+  );
+
   console.log(`\n=== Resultado de pruebas: ${passed}/${total} superadas (${Math.round((passed/total)*100)}%) ===\n`);
   if (passed !== total) {
     process.exit(1);

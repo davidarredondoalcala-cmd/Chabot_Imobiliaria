@@ -44,6 +44,16 @@ export interface CriteriosDuros {
   orden_precio?: 'asc' | 'desc' | null;
 }
 
+export interface InfoCorreccion {
+  original: string;
+  corregida: string;
+}
+
+export interface CorreccionesDetectadas {
+  ciudad?: InfoCorreccion;
+  barrio?: InfoCorreccion;
+}
+
 export interface ExtractedUnderstanding {
   intencion: 'buscar' | 'detalle_inmueble' | 'hablar_con_asesor' | 'saludo_o_otro' | 'fuera_de_tema';
   operacion?: Operacion | null;
@@ -55,6 +65,7 @@ export interface ExtractedUnderstanding {
   tipo_no_soportado?: string | null;
   fuera_de_tema?: boolean;
   presupuesto_invalido?: boolean;
+  correccion?: CorreccionesDetectadas | null;
 }
 
 export interface ConversationCriterios extends CriteriosDuros {
@@ -66,6 +77,7 @@ export interface ConversationCriterios extends CriteriosDuros {
   acepta_otras_zonas?: boolean;
   presupuesto_insuficiente_anterior?: boolean;
   explorando_sin_presupuesto?: boolean;
+  correccion?: CorreccionesDetectadas | null;
 }
 
 export interface ConversationState {
