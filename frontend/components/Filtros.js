@@ -17,8 +17,7 @@ const TIEMPOS_ARRIENDO = [
 ];
 
 // Selector desplegable: un botón que, al pulsarlo, despliega las opciones como píldoras.
-function Desplegable({ valor, opciones, onChange, etiqueta, otro = false }) {
-  const [abierto, setAbierto] = useState(false);
+function Desplegable({ valor, opciones, onChange, etiqueta, otro = false, abierto, setAbierto }) {
   const ref = useRef(null);
   // Con "Otro…" el valor puede ser un número libre que no está en la lista
   const esOtro = otro && valor !== '' && !opciones.some(([v]) => v === valor);
@@ -33,7 +32,7 @@ function Desplegable({ valor, opciones, onChange, etiqueta, otro = false }) {
     document.addEventListener('mousedown', fuera);
     document.addEventListener('keydown', tecla);
     return () => { document.removeEventListener('mousedown', fuera); document.removeEventListener('keydown', tecla); };
-  }, [abierto]);
+  }, [abierto, setAbierto]);
 
   // Flechas para moverse entre las opciones
   const mover = (e) => {
@@ -78,6 +77,7 @@ function Desplegable({ valor, opciones, onChange, etiqueta, otro = false }) {
 }
 
 export default function Filtros({ f, setF, total, mostrados }) {
+  const [abiertoKey, setAbiertoKey] = useState(null);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const rango = (a, b, u) => (
     <div className="rango">
@@ -88,10 +88,18 @@ export default function Filtros({ f, setF, total, mostrados }) {
 
   // Desplegables: al hacer clic se abren las opciones como píldoras.
   const lista = (k, opciones, etiqueta, otro = false) => (
-    <Desplegable valor={f[k]} opciones={opciones} etiqueta={etiqueta} otro={otro} onChange={(v) => setF({ ...f, [k]: v })} />
+    <Desplegable
+      valor={f[k]}
+      opciones={opciones}
+      etiqueta={etiqueta}
+      otro={otro}
+      abierto={abiertoKey === k}
+      setAbierto={(v) => setAbiertoKey(v ? k : null)}
+      onChange={(v) => setF({ ...f, [k]: v })}
+    />
   );
   return (
-    <div className="card filtros noprint">
+    <div className={`card filtros noprint ${abiertoKey ? 'dd-activo' : ''}`}>
       <div className="filtros-top"><b className="ft"><IcoBuscar /> Filtrar inmuebles</b><span className="mut">Mostrando {mostrados} de {total}</span></div>
       <div className="filtros-grid">
         <div><label className="filtro-lbl">Habitaciones<span className="chips-hint"> (o más)</span></label>{lista('hab', MIN, 'Habitaciones', true)}</div>

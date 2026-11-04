@@ -902,6 +902,8 @@ main {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
+    position: relative;
+    z-index: 1;
 }
 
 .lista .card {
@@ -916,12 +918,14 @@ main {
     cursor: pointer;
     border-radius: 20px;
     position: relative;
+    z-index: 1;
 }
 
 .item:hover:not(.estatica) {
     transform: translateY(-6px) scale(1.008);
     box-shadow: var(--sh2);
     border-color: rgba(96, 165, 250, 0.85);
+    z-index: 2;
 }
 
 .item:active:not(.estatica) {
@@ -1226,6 +1230,8 @@ button:disabled {
     gap: 12px;
     flex-wrap: wrap;
     margin: 28px 0 18px;
+    position: relative;
+    z-index: 2;
 }
 
 .toolbar h2 {
@@ -1328,13 +1334,24 @@ button:disabled {
 }
 
 /* Desplegables con panel de cristal */
+.card.filtros {
+    position: relative;
+    z-index: 40;
+}
+
+.card.filtros.dd-activo,
+.card.filtros:has(.dd.abierto),
+.card.filtros:focus-within {
+    z-index: 100;
+}
+
 .dd {
     position: relative;
     min-width: 0;
 }
 
 .dd.abierto {
-    z-index: 20;
+    z-index: 110;
 }
 
 .dd-btn {
@@ -1377,15 +1394,29 @@ button:disabled {
     left: 0;
     width: min(340px, calc(100vw - 4rem));
     padding: 14px;
-    background: var(--card);
-    -webkit-backdrop-filter: blur(24px) saturate(190%);
-    backdrop-filter: blur(24px) saturate(190%);
+    background: rgba(255, 255, 255, 0.96);
+    -webkit-backdrop-filter: blur(28px) saturate(190%);
+    backdrop-filter: blur(28px) saturate(190%);
     border: 1.5px solid var(--bd);
     border-radius: 18px;
-    box-shadow: var(--sh2);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.5);
     transform-origin: top left;
     animation: dd-abrir 0.25s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-    z-index: 40;
+    z-index: 120;
+}
+
+[data-theme="dark"] .dd-panel {
+    background: rgba(15, 23, 42, 0.97);
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* En columnas finales, alinear hacia la derecha para que no se desborde fuera de pantalla */
+.filtros-grid > div:last-child .dd-panel,
+.filtros-grid > div:nth-child(3n) .dd-panel {
+    left: auto;
+    right: 0;
+    transform-origin: top right;
 }
 
 @keyframes dd-abrir {
