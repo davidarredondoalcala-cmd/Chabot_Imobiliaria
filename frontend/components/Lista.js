@@ -156,15 +156,11 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
         <Skyline />
         
         <div className="portada-header-wrap">
-          <div className="portada-badge-top">
-            <span className="portada-sparkle-dot"></span>
-            <span>Glassy Dashboard · Habitat Capital</span>
-          </div>
-          <h2>Welcome Back! ✨</h2>
+          <h2>Habitat Capital, siempre al día</h2>
           <p>
             {esAdmin
-              ? 'Consulta el estado de cada casa y apartamento, controla vencimientos y gestiona contratos con elegancia.'
-              : 'Explora casas y apartamentos disponibles en Ibagué, revisa características detalladas y contacta con nuestros asesores.'}
+              ? 'Consulta el estado de cada casa y apartamento, controla los vencimientos y genera contratos listos para firmar.'
+              : 'Explora casas y apartamentos disponibles, revisa características detalladas y contacta con nuestros asesores.'}
           </p>
         </div>
 

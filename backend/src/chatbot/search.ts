@@ -266,7 +266,7 @@ export function mensajeZonaSinResultados(
   const sujeto = params.tipo === 'casa' ? 'casas' : params.tipo === 'apartamento' ? 'apartamentos' : 'casas y apartamentos';
   const accion = params.operacion === 'venta' ? 'para comprar' : params.operacion === 'arriendo' ? 'en arriendo' : 'disponibles';
 
-  let mensaje = `Miré con calma nuestro catálogo y, por el momento, no tenemos ${sujeto} ${accion} en **${zona}**. 🏘️`;
+  let mensaje = `Miré con calma nuestro catálogo y, por el momento, no tenemos ${sujeto} ${accion} en **${zona}**.`;
 
   const hayPresupuesto = (params.precio_max != null && params.precio_max > 0) || (params.precio_min != null && params.precio_min > 0);
   if (hayPresupuesto) {

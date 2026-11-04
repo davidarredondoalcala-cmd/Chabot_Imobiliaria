@@ -259,7 +259,7 @@ export default function ChatWidget() {
 
   const lastBotMsg = messages.length > 0 ? [...messages].reverse().find(m => m.role === 'assistant') : null;
   const currentChips = showResumePrompt
-    ? ['💬 Retomar conversación', '✨ Empezar una nueva']
+    ? ['Retomar conversación', 'Empezar una nueva']
     : (lastBotMsg?.suggestionChips || undefined);
 
   return (

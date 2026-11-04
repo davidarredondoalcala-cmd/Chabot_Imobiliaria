@@ -23,7 +23,7 @@ NUNCA inventes códigos de inmuebles ni precios.`;
  */
 export function respuestaCiudadNoSoportada(ciudad: string): string {
   const ciudadBonita = (ciudad || '').trim() || 'otra ciudad';
-  return `¡Claro que te entiendo! Lo que pasa es que, por ahora, nuestro catálogo vive 100% en **Ibagué** (Tolima), así que todavía no tenemos casas ni apartamentos disponibles en ${ciudadBonita}. 🏡
+  return `¡Claro que te entiendo! Lo que pasa es que, por ahora, nuestro catálogo vive 100% en **Ibagué** (Tolima), así que todavía no tenemos casas ni apartamentos disponibles en ${ciudadBonita}.
 
 Si te animas a quedarte por acá, te cuento que tenemos buenos sectores: **El Vergel**, **La Pola**, **Piedra Pintada**, **Calambeo** y **Cádiz**, tanto en arriendo como para comprar.
 
@@ -52,7 +52,7 @@ Para colaborarte de la mejor manera, te recomiendo realizar consultas sobre:
  * Pide aclaración sin celebrar ni aceptar el dato como válido.
  */
 export function respuestaPresupuestoInvalido(): string {
-  return `Esa me da curiosidad 😄, pero para poder ayudarte de verdad necesito tu presupuesto en **pesos colombianos**.
+  return `Esa me da curiosidad, pero para poder ayudarte de verdad necesito tu presupuesto en **pesos colombianos**.
 
 Dime algo como: "**arriendo con 2.5 millones**", "**comprar con 150 millones**" o solo "**1.2 millones**".
 

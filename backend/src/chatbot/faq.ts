@@ -99,7 +99,7 @@ export function responderPreguntaInformativa(
   switch (tipo) {
     case 'requisitos_arriendo': {
       return {
-        reply: `¡Con muchísimo gusto te explico los requisitos para arrendar con **Habitat Capital**! 📝🏡\n\nEl proceso es muy ágil, 100% digital y sin papeleos innecesarios:\n\n1. **Formulario de solicitud:** Se diligencia en línea para estudio de la aseguradora.\n2. **Documento de identidad:** Cédula de ciudadanía del solicitante y codeudor.\n3. **Comprobantes de ingresos:** Extractos bancarios de los últimos 3 meses o desprendibles de nómina (ingresos mínimos del doble del valor del canon).\n4. **Codeudor solvente:** Una persona con estabilidad laboral o finca raíz.\n\nLa respuesta del estudio se entrega en menos de 24 horas hábiles. ¿Te gustaría ver las opciones en arriendo que tenemos disponibles o prefieres contactar a un asesor por WhatsApp?`,
+        reply: `¡Con muchísimo gusto te explico los requisitos para arrendar con **Habitat Capital**!\n\nEl proceso es muy ágil, 100% digital y sin papeleos innecesarios:\n\n1. **Formulario de solicitud:** Se diligencia en línea para estudio de la aseguradora.\n2. **Documento de identidad:** Cédula de ciudadanía del solicitante y codeudor.\n3. **Comprobantes de ingresos:** Extractos bancarios de los últimos 3 meses o desprendibles de nómina (ingresos mínimos del doble del valor del canon).\n4. **Codeudor solvente:** Una persona con estabilidad laboral o finca raíz.\n\nLa respuesta del estudio se entrega en menos de 24 horas hábiles. ¿Te gustaría ver las opciones en arriendo que tenemos disponibles o prefieres contactar a un asesor por WhatsApp?`,
         properties: [],
         suggestionChips: [
           'Apartamentos en arriendo',
@@ -112,7 +112,7 @@ export function responderPreguntaInformativa(
 
     case 'requisitos_compra': {
       return {
-        reply: `¡Excelente iniciativa invertir en tu patrimonio con **Habitat Capital**! 🔑🏢\n\nComprar con nosotros es un proceso seguro y transparente en cada paso:\n\n1. **Elección y visita:** Conoces el inmueble de manera presencial junto a un asesor comercial.\n2. **Estudio de títulos:** Nuestro equipo jurídico revisa la tradición y libertad del inmueble para total tranquilidad.\n3. **Promesa de compraventa:** Se fijan plazos, valor pactado y forma de pago.\n4. **Financiación:** Aceptamos recursos propios, créditos hipotecarios preaprobados o leasing habitacional de cualquier entidad bancaria.\n5. **Escrituración:** Firma en notaría y entrega material del inmueble con llaves y paz y salvos.\n\n¿Te gustaría que te muestre casas o apartamentos en venta disponibles en Ibagué?`,
+        reply: `¡Excelente iniciativa invertir en tu patrimonio con **Habitat Capital**!\n\nComprar con nosotros es un proceso seguro y transparente en cada paso:\n\n1. **Elección y visita:** Conoces el inmueble de manera presencial junto a un asesor comercial.\n2. **Estudio de títulos:** Nuestro equipo jurídico revisa la tradición y libertad del inmueble para total tranquilidad.\n3. **Promesa de compraventa:** Se fijan plazos, valor pactado y forma de pago.\n4. **Financiación:** Aceptamos recursos propios, créditos hipotecarios preaprobados o leasing habitacional de cualquier entidad bancaria.\n5. **Escrituración:** Firma en notaría y entrega material del inmueble con llaves y paz y salvos.\n\n¿Te gustaría que te muestre casas o apartamentos en venta disponibles en Ibagué?`,
         properties: [],
         suggestionChips: [
           'Casas en venta en Ibagué',
@@ -125,7 +125,7 @@ export function responderPreguntaInformativa(
 
     case 'consignar_inmueble': {
       return {
-        reply: `¡Qué gran noticia! En **Habitat Capital** nos encargamos de todo para que arriendes o vendas tu inmueble en Ibagué sin preocupaciones y con total respaldo legal. 🤝🏘️\n\n**Beneficios para propietarios:**\n• **Publicidad profesional:** Fotografías de alta calidad y promoción destacada en portal web y redes.\n• **Filtro riguroso:** Verificación de capacidad financiera y antecedentes de los prospectos.\n• **Garantía total de canon (Arriendos):** Póliza de arrendamiento que te asegura el pago puntual de tu canon mensual.\n• **Elaboración de contratos:** Documentación jurídica blindada bajo la Ley 820 de 2003.\n\nNuestro equipo comercial puede agendar la visita a tu predio hoy mismo. ¿Deseas comunicarte por WhatsApp con el área de consignaciones?`,
+        reply: `¡Qué gran noticia! En **Habitat Capital** nos encargamos de todo para que arriendes o vendas tu inmueble en Ibagué sin preocupaciones y con total respaldo legal.\n\n**Beneficios para propietarios:**\n• **Publicidad profesional:** Fotografías de alta calidad y promoción destacada en portal web y redes.\n• **Filtro riguroso:** Verificación de capacidad financiera y antecedentes de los prospectos.\n• **Garantía total de canon (Arriendos):** Póliza de arrendamiento que te asegura el pago puntual de tu canon mensual.\n• **Elaboración de contratos:** Documentación jurídica blindada bajo la Ley 820 de 2003.\n\nNuestro equipo comercial puede agendar la visita a tu predio hoy mismo. ¿Deseas comunicarte por WhatsApp con el área de consignaciones?`,
         properties: [],
         suggestionChips: [
           'Hablar con un asesor',
@@ -139,7 +139,7 @@ export function responderPreguntaInformativa(
 
     case 'mascotas': {
       return {
-        reply: `¡Entiendo perfectamente! Las mascotas son miembros esenciales del hogar. 🐾🐶🐱\n\nEn **Habitat Capital**, la gran mayoría de nuestras casas y apartamentos residenciales en Ibagué permiten mascotas sin inconvenientes. En el caso de apartamentos en conjuntos cerrados o edificios, se rige por el manual de convivencia de propiedad horizontal.\n\nSi te interesa un inmueble en específico o un sector (como El Vergel, Calambeo, La Pola o Cádiz), cuéntame cuál buscas y te confirmo al instante las condiciones de ese inmueble.`,
+        reply: `¡Entiendo perfectamente! Las mascotas son miembros esenciales del hogar.\n\nEn **Habitat Capital**, la gran mayoría de nuestras casas y apartamentos residenciales en Ibagué permiten mascotas sin inconvenientes. En el caso de apartamentos en conjuntos cerrados o edificios, se rige por el manual de convivencia de propiedad horizontal.\n\nSi te interesa un inmueble en específico o un sector (como El Vergel, Calambeo, La Pola o Cádiz), cuéntame cuál buscas y te confirmo al instante las condiciones de ese inmueble.`,
         properties: [],
         suggestionChips: [
           'Apartamentos en arriendo',
@@ -152,7 +152,7 @@ export function responderPreguntaInformativa(
 
     case 'ubicacion_contacto': {
       return {
-        reply: `¡Con mucho gusto! **Habitat Capital** opera con sede en la ciudad de **Ibagué, Tolima**, brindando cobertura en los mejores sectores de la ciudad. 📍🏢\n\n• **Ciudad:** Ibagué, Tolima, Colombia.\n• **Horario de atención:** Lunes a Viernes de 8:00 a.m. a 6:00 p.m. y Sábados de 9:00 a.m. a 1:00 p.m.\n• **Canal digital:** Atención personalizada por chat web y WhatsApp inmediato para visitas o consultas comerciales.\n\n¿En qué tipo de inmueble te gustaría que te oriente hoy?`,
+        reply: `¡Con mucho gusto! **Habitat Capital** opera con sede en la ciudad de **Ibagué, Tolima**, brindando cobertura en los mejores sectores de la ciudad.\n\n• **Ciudad:** Ibagué, Tolima, Colombia.\n• **Horario de atención:** Lunes a Viernes de 8:00 a.m. a 6:00 p.m. y Sábados de 9:00 a.m. a 1:00 p.m.\n• **Canal digital:** Atención personalizada por chat web y WhatsApp inmediato para visitas o consultas comerciales.\n\n¿En qué tipo de inmueble te gustaría que te oriente hoy?`,
         properties: [],
         suggestionChips: [
           'Apartamentos en arriendo',
@@ -168,7 +168,7 @@ export function responderPreguntaInformativa(
       const listaBarrios = Array.from(barriosSet).slice(0, 10).join(', ');
 
       return {
-        reply: `¡Contamos con opciones en los sectores más estratégicos y acogedores de **Ibagué**! 🏡✨\n\nActualmente tenemos inmuebles registrados en sectores como:\n• **${listaBarrios || 'El Vergel, Cádiz, La Pola, Calambeo, Piedra Pintada, Jordán, El Salado, Santa Helena, Campestre'}**.\n\n¿Hay algún barrio en especial que prefieras, o te gustaría ver opciones en arriendo o compra?`,
+        reply: `¡Contamos con opciones en los sectores más estratégicos y acogedores de **Ibagué**!\n\nActualmente tenemos inmuebles registrados en sectores como:\n• **${listaBarrios || 'El Vergel, Cádiz, La Pola, Calambeo, Piedra Pintada, Jordán, El Salado, Santa Helena, Campestre'}**.\n\n¿Hay algún barrio en especial que prefieras, o te gustaría ver opciones en arriendo o compra?`,
         properties: [],
         suggestionChips: [
           'Propiedades en El Vergel',
@@ -230,7 +230,7 @@ export function responderPreguntaInformativa(
 
     case 'visitas_citas': {
       return {
-        reply: `¡Claro que sí! Puedes programar una visita presencial para conocer cualquier propiedad de nuestro catálogo en Ibagué. 🗓️🏡\n\nLas visitas se realizan de **Lunes a Sábado** en compañía de un asesor comercial de Habitat Capital. Solo debes indicarme el código del inmueble (por ejemplo: IBG-0001) o hacer clic en el botón de WhatsApp a continuación para coordinar día y hora con nuestro asesor comercial.`,
+        reply: `¡Claro que sí! Puedes programar una visita presencial para conocer cualquier propiedad de nuestro catálogo en Ibagué.\n\nLas visitas se realizan de **Lunes a Sábado** en compañía de un asesor comercial de Habitat Capital. Solo debes indicarme el código del inmueble (por ejemplo: IBG-0001) o hacer clic en el botón de WhatsApp a continuación para coordinar día y hora con nuestro asesor comercial.`,
         properties: [],
         suggestionChips: [
           'Hablar con un asesor',
