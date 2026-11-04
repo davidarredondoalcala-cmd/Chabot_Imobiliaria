@@ -2,124 +2,12 @@ import { BadRequestException, Injectable, NotFoundException, OnModuleInit } from
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Inmueble, InmuebleDoc } from './inmueble.schema';
-import { SEED_PROPERTIES } from '../chatbot/seed';
-
-const F = ['Pepito', 'Juanito', 'Andres'];
-const SEMILLA = [
-  {
-    tipo: 'Casa',
-    nombre: 'Casa Piedra Pintada',
-    habitaciones: 3,
-    banos: 2,
-    area: 110,
-    estado: 'Arrendada',
-    venc: '2026-12-30',
-    diaPago: 5,
-    valor: 1000000,
-    dir: 'Cll 10 # 5 - 20',
-    barrio: 'Piedra Pintada',
-    lind: 'Al norte la calle, al sur la casa #, al este el edificio rojo, al oeste la casa de don Juan.',
-    descripcion: 'Acogedora casa familiar con excelente distribución, tres habitaciones iluminadas, patio interior y garaje cubierto en un sector residencial tranquilo y central.',
-    foto: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1000&q=80',
-    contratos: [{ tipo: 'Arriendo', vig: true, fecha: '2025-12-30', firm: F }, { tipo: 'Arriendo', vig: false, fecha: '2024-12-30', firm: F }],
-  },
-  {
-    tipo: 'Casa',
-    nombre: 'Casa El Vergel',
-    habitaciones: 4,
-    banos: 3,
-    area: 140,
-    estado: 'Arrendada',
-    venc: '2027-03-15',
-    diaPago: 5,
-    valor: 1200000,
-    dir: 'Cll 12 # 8 - 14',
-    barrio: 'El Vergel',
-    lind: '',
-    descripcion: 'Espaciosa residencia de dos niveles en conjunto cerrado, con amplios ventanales, cocina integral, acabados modernos y agradable entorno campestre.',
-    foto: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80',
-    contratos: [{ tipo: 'Arriendo', vig: true, fecha: '2026-03-15', firm: ['Maria', 'Luis'] }],
-  },
-  {
-    tipo: 'Casa',
-    nombre: 'Casa Jordán',
-    habitaciones: 3,
-    banos: 2,
-    area: 95,
-    estado: 'Sin arrendar',
-    valor: 900000,
-    dir: 'Cra 3 # 4 - 10',
-    barrio: 'Jordán',
-    lind: '',
-    descripcion: 'Cómoda vivienda sobre vía principal con fácil acceso a transporte, comercios y colegios, ideal para familias que buscan practicidad y confort.',
-    foto: 'https://images.unsplash.com/photo-1598228723793-52759bba239c?auto=format&fit=crop&w=1000&q=80',
-  },
-  {
-    tipo: 'Casa',
-    nombre: 'Casa Interlaken',
-    habitaciones: 4,
-    banos: 3,
-    area: 180,
-    estado: 'Para la venta',
-    valor: 300000000,
-    dir: 'Cll 20 # 1 - 5',
-    barrio: 'Interlaken',
-    lind: '',
-    descripcion: 'Gran casa tradicional con generosos espacios, patio de ropas independiente, jardín frontal y ubicación privilegiada en zona de alta valorización.',
-    foto: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1000&q=80',
-  },
-  {
-    tipo: 'Apartamento',
-    nombre: 'Apto Torres del Parque 302',
-    habitaciones: 2,
-    banos: 2,
-    area: 68,
-    estado: 'Arrendada',
-    venc: '2026-11-20',
-    diaPago: 10,
-    valor: 850000,
-    dir: 'Cra 5 # 30 - 12 Apto 302',
-    barrio: 'La Pola',
-    lind: '',
-    descripcion: 'Apartamento moderno con linda vista al cañón del Combeima, sala-comedor ventilada, balcón privado y vigilancia permanente las 24 horas.',
-    foto: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=1000&q=80',
-    contratos: [{ tipo: 'Arriendo', vig: true, fecha: '2025-11-20', firm: ['Carlos', 'Ana'] }],
-  },
-  {
-    tipo: 'Apartamento',
-    nombre: 'Apto Mirador 601',
-    habitaciones: 3,
-    banos: 2,
-    area: 85,
-    estado: 'Sin arrendar',
-    valor: 1100000,
-    dir: 'Cll 60 # 4 - 55 Apto 601',
-    barrio: 'Ambalá',
-    lind: '',
-    descripcion: 'Inmueble iluminado en piso alto con ascensor, tres alcobas con clóset, cocina semi-integral y cercanía a centros comerciales y universidades.',
-    foto: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1000&q=80',
-  },
-  {
-    tipo: 'Apartamento',
-    nombre: 'Apto Central 204',
-    habitaciones: 2,
-    banos: 1,
-    area: 55,
-    estado: 'Para la venta',
-    valor: 210000000,
-    dir: 'Cll 11 # 3 - 40 Apto 204',
-    barrio: 'Centro',
-    lind: '',
-    descripcion: 'Apartamento funcional y bien ubicado a pasos del centro financiero, ideal para inversión o personas que buscan practicidad y bajos costos.',
-    foto: 'https://images.unsplash.com/photo-1534349762230-e0cadf78f5da?auto=format&fit=crop&w=1000&q=80',
-  },
-];
 
 @Injectable()
 export class InmueblesService implements OnModuleInit {
   constructor(@InjectModel(Inmueble.name) private model: Model<InmuebleDoc>) {}
 
-  // Carga la base de datos limpia de propiedades (Casas y Apartamentos)
+  // Carga la base de datos limpia de propiedades desde co_properties.csv
   async onModuleInit() {
     let cleanDataset: any[] = [];
     try {
@@ -129,13 +17,10 @@ export class InmueblesService implements OnModuleInit {
     }
 
     const currentCount = await this.model.countDocuments();
-    // Si la base de datos está vacía o tiene los datos de prueba anteriores, reemplaza con la base limpia
-    if (cleanDataset.length > 0 && currentCount < 100) {
+    // Si la base de datos está vacía o tiene datos antiguos, reemplaza con el dataset limpio del archivo CSV
+    if (cleanDataset.length > 0 && currentCount < 500) {
       await this.model.deleteMany({});
       await this.model.insertMany(cleanDataset);
-    } else if (cleanDataset.length > 0) {
-      // Asegura que todos los documentos tengan el campo ciudad
-      await this.model.updateMany({ ciudad: { $exists: false } }, { $set: { ciudad: 'Ibagué' } });
     }
   }
 

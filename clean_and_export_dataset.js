@@ -5,7 +5,6 @@ const csv = require('./backend/node_modules/csv-parser');
 const CSV_PATH = 'c:\\Users\\david\\Documents\\Universidad\\6to smestre\\SIstemas Inteligentes\\co_properties.csv\\co_properties.csv';
 const OUTPUT_PATH = path.join(__dirname, 'backend', 'src', 'inmuebles', 'co_inmuebles_clean.json');
 
-// Curated pool of high resolution real estate photos for Casas and Apartamentos
 const FOTOS_CASAS = [
   'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1000&q=80',
   'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80',
@@ -32,6 +31,25 @@ const FOTOS_APTOS = [
   'https://images.unsplash.com/photo-1502005229762-ee1b2b81e4b5?auto=format&fit=crop&w=1000&q=80',
 ];
 
+function decodeHtmlEntities(str) {
+  if (!str) return '';
+  return str
+    .replace(/&aacute;/gi, 'á')
+    .replace(/&eacute;/gi, 'é')
+    .replace(/&iacute;/gi, 'í')
+    .replace(/&oacute;/gi, 'ó')
+    .replace(/&uacute;/gi, 'ú')
+    .replace(/&ntilde;/gi, 'ñ')
+    .replace(/&Aacute;/g, 'Á')
+    .replace(/&Eacute;/g, 'É')
+    .replace(/&Iacute;/g, 'Í')
+    .replace(/&Oacute;/g, 'Ó')
+    .replace(/&Uacute;/g, 'Ú')
+    .replace(/&Ntilde;/g, 'Ñ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&');
+}
+
 function stripEmojis(str) {
   if (!str) return '';
   return str.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '').trim();
@@ -39,7 +57,7 @@ function stripEmojis(str) {
 
 function stripHtml(str) {
   if (!str) return '';
-  return str.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
+  return decodeHtmlEntities(str).replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
 }
 
 function toTitleCase(str) {
@@ -52,7 +70,22 @@ function toTitleCase(str) {
     .join(' ');
 }
 
-// Clean and normalize city
+function cleanTitle(raw, tipo, barrio, ciudad) {
+  if (!raw) return `${tipo} en ${barrio}, ${ciudad}`;
+  let t = stripHtml(stripEmojis(raw));
+  // Remove listing reference numbers at the end (e.g. "3476093")
+  t = t.replace(/\b\d{6,10}\b/g, '').trim();
+  // Remove prefix like "ALQUILA " or "VENDE "
+  t = t.replace(/^(alquila|vende|se arrienda|se vende)\s+/i, '').trim();
+  if (t === t.toUpperCase() || t.length < 5) {
+    t = toTitleCase(t);
+  }
+  if (t.length < 5 || /^inmueble/i.test(t)) {
+    return `${tipo} en ${barrio}, ${ciudad}`;
+  }
+  return t.slice(0, 60).trim();
+}
+
 function normalizeCity(raw) {
   if (!raw) return '';
   let c = stripHtml(stripEmojis(raw)).trim();
@@ -75,15 +108,13 @@ function normalizeCity(raw) {
 }
 
 async function run() {
-  console.log('Extracting and cleaning dataset from CSV...');
+  console.log('Extracting 1,000 PURE properties strictly from co_properties.csv...');
 
   const results = [];
-  const TARGET_TOTAL = 1000; // 1,000 properties = 20 pages of 50
+  const TARGET_TOTAL = 1000;
   let scanned = 0;
   let casaIdx = 0;
   let aptoIdx = 0;
-
-  // Track counts per city and type to maintain high diversity across Colombia
   const countsPerCityType = {};
 
   let stream;
@@ -93,56 +124,19 @@ async function run() {
       if (finished) return;
       finished = true;
       if (stream) stream.destroy();
-      
-      // Also integrate the Ibagué reference properties from seed
-      try {
-        const seedPath = path.join(__dirname, 'backend', 'src', 'chatbot', 'seed.ts');
-        const seedContent = fs.readFileSync(seedPath, 'utf8');
-        // Extract basic Ibagué properties
-        const matches = [...seedContent.matchAll(/titulo:\s*'([^']+)',[\s\S]*?barrio:\s*'([^']+)',[\s\S]*?precio:\s*(\d+),[\s\S]*?area_m2:\s*(\d+),[\s\S]*?habitaciones:\s*(\d+),[\s\S]*?banos:\s*(\d+),[\s\S]*?operacion:\s*'([^']+)',[\s\S]*?tipo:\s*'([^']+)'/g)];
-        for (const m of matches) {
-          const [_, titulo, barrio, precio, area, hab, ban, op, tipo] = m;
-          const propTipo = tipo.toLowerCase() === 'apartamento' ? 'Apartamento' : 'Casa';
-          results.unshift({
-            tipo: propTipo,
-            nombre: titulo,
-            ciudad: 'Ibagué',
-            barrio: barrio,
-            dir: `Sector ${barrio}`,
-            valor: Number(precio),
-            estado: op === 'venta' ? 'Para la venta' : 'Sin arrendar',
-            venc: '',
-            diaPago: 5,
-            habitaciones: Number(hab),
-            banos: Number(ban),
-            area: Number(area),
-            descripcion: `Inmueble tipo ${propTipo.toLowerCase()} ubicado en el sector ${barrio} de Ibagué.`,
-            lind: `Norte: Vía pública, Sur: Predio privado, Oriente y Occidente: Predios colindantes en ${barrio}.`,
-            foto: propTipo === 'Casa' ? FOTOS_CASAS[0] : FOTOS_APTOS[0],
-            contratos: [],
-          });
-        }
-        console.log(`Added ${matches.length} reference Ibagué properties.`);
-      } catch (e) {
-        console.warn('Could not read seed.ts:', e.message);
-      }
 
       console.log(`Scan completed. Total collected: ${results.length}`);
       fs.writeFileSync(OUTPUT_PATH, JSON.stringify(results, null, 2), 'utf8');
-      console.log(`Cleaned dataset successfully saved to: ${OUTPUT_PATH}`);
+      console.log(`Saved clean dataset: ${OUTPUT_PATH}`);
 
-      // Summary stats
       const citySummary = {};
       const typeSummary = {};
-      const stateSummary = {};
       for (const item of results) {
         citySummary[item.ciudad] = (citySummary[item.ciudad] || 0) + 1;
         typeSummary[item.tipo] = (typeSummary[item.tipo] || 0) + 1;
-        stateSummary[item.estado] = (stateSummary[item.estado] || 0) + 1;
       }
       console.log('Types:', typeSummary);
-      console.log('States:', stateSummary);
-      console.log('Top Cities:', Object.entries(citySummary).sort((a,b) => b[1] - a[1]));
+      console.log('Cities distribution:', Object.entries(citySummary).sort((a,b) => b[1] - a[1]));
       resolve(results);
     };
 
@@ -156,6 +150,7 @@ async function run() {
         }
 
         const propType = (row.property_type || '').trim();
+        // Strictly Casa or Apartamento
         if (propType !== 'Casa' && propType !== 'Apartamento') return;
 
         const price = Number(row.price);
@@ -168,7 +163,7 @@ async function run() {
         const opType = (row.operation_type || '').trim();
         if (opType !== 'Venta' && opType !== 'Arriendo' && opType !== 'Arriendo temporal') return;
 
-        // Realistic price range filters
+        // Realistic price range
         if (opType === 'Venta') {
           if (price < 40000000 || price > 5000000000) return;
         } else {
@@ -176,33 +171,18 @@ async function run() {
         }
 
         const cityTypeKey = `${city}_${propType}_${opType === 'Venta' ? 'Venta' : 'Arriendo'}`;
-        // Cap any individual city-type-op combination at 40 items so all regions get represented
-        if ((countsPerCityType[cityTypeKey] || 0) >= 35) return;
+        // Cap any single city/type/op to ensure geographic diversity across Colombia
+        if ((countsPerCityType[cityTypeKey] || 0) >= 30) return;
 
         countsPerCityType[cityTypeKey] = (countsPerCityType[cityTypeKey] || 0) + 1;
 
-        // Clean barrio
         let barrio = stripHtml(stripEmojis(row.l4 || row.l5 || '')).trim();
         if (!barrio || barrio.length < 2) barrio = 'Sector Residencial';
         else barrio = toTitleCase(barrio);
 
-        // Address
         const dir = `Sector ${barrio}`;
+        const nombre = cleanTitle(row.title, propType, barrio, city);
 
-        // Clean title
-        let rawTitle = stripHtml(stripEmojis(row.title || '')).trim();
-        if (rawTitle.length < 5 || rawTitle.toLowerCase().includes('inmueble') && rawTitle.length < 15) {
-          rawTitle = `${propType} en ${barrio}, ${city}`;
-        } else {
-          // If all caps, title case it
-          if (rawTitle === rawTitle.toUpperCase() && rawTitle.length > 5) {
-            rawTitle = toTitleCase(rawTitle);
-          }
-        }
-        // Ensure title is clean and no more than 60 chars
-        let nombre = rawTitle.slice(0, 60).trim();
-
-        // Bedrooms / Bathrooms / Area
         let habitaciones = Number(row.bedrooms || row.rooms);
         if (!habitaciones || isNaN(habitaciones) || habitaciones <= 0 || habitaciones > 12) {
           habitaciones = propType === 'Casa' ? 3 : 2;
@@ -218,7 +198,6 @@ async function run() {
           area = propType === 'Casa' ? 120 : 65;
         }
 
-        // Clean description
         let desc = stripHtml(stripEmojis(row.description || '')).trim();
         if (desc.length < 25) {
           desc = `Excelente ${propType.toLowerCase()} con excelente iluminación y distribución en ${barrio}, ${city}. Cuenta con ${habitaciones} habitaciones, ${banos} baños y ${area} m² de área privada en un sector con fácil acceso y tranquilidad.`;
@@ -226,7 +205,6 @@ async function run() {
           desc = desc.slice(0, 350).trim();
         }
 
-        // Estado: 'Para la venta' / 'Sin arrendar' / 'Arrendada'
         let estado = 'Sin arrendar';
         let venc = '';
         let diaPago = 5;
@@ -235,7 +213,6 @@ async function run() {
         if (opType === 'Venta') {
           estado = 'Para la venta';
         } else {
-          // Make ~20% of rentals currently 'Arrendada' for realistic admin management
           if (results.length % 5 === 0) {
             estado = 'Arrendada';
             venc = '2026-12-30';
@@ -253,7 +230,6 @@ async function run() {
           }
         }
 
-        // Photo
         const foto = propType === 'Casa'
           ? FOTOS_CASAS[casaIdx++ % FOTOS_CASAS.length]
           : FOTOS_APTOS[aptoIdx++ % FOTOS_APTOS.length];
@@ -278,14 +254,14 @@ async function run() {
         });
 
         if (results.length % 100 === 0) {
-          console.log(`Gathered ${results.length} clean properties (scanned ${scanned} rows)...`);
+          console.log(`Processed ${results.length} clean properties (scanned ${scanned} rows)...`);
         }
       })
       .on('end', () => {
         finish();
       })
       .on('error', (err) => {
-        console.error('Error parsing:', err);
+        console.error('Error:', err);
         reject(err);
       });
   });
