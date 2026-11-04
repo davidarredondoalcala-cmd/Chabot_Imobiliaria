@@ -180,7 +180,7 @@ export default function EditorClausulas({
   if (!abierto || !montado) return null;
 
   return createPortal(
-    <div className="editor-clausulas-overlay" role="dialog" aria-modal="true" aria-label={titulo}>
+    <div className="editor-clausulas-overlay" role="dialog" aria-modal="true" aria-label={titulo} onClick={cerrar}>
       <div className="editor-clausulas-shell" onClick={(e) => e.stopPropagation()}>
         <div className="editor-clausulas-header">
           <div className="editor-clausulas-title">
@@ -289,31 +289,19 @@ export default function EditorClausulas({
                     </>
                   ) : (
                     <>
-                      <div
+                      <input
                         id={`cl-pre-${it.id}`}
-                        ref={(el) => {
-                          if (!el) {
-                            titulos.current.delete(it.id);
-                            return;
-                          }
-                          titulos.current.set(it.id, el);
-                          if (el.dataset.clTituloInicializado !== it.id) {
-                            el.textContent = it.pre;
-                            el.dataset.clTituloInicializado = it.id;
-                          }
-                        }}
                         className="editor-clausula-pre"
-                        contentEditable
-                        suppressContentEditableWarning
-                        spellCheck
-                        role="textbox"
+                        value={it.pre}
+                        maxLength={200}
+                        placeholder="Título de la cláusula (ej: PRIMERA – Objeto.)"
                         aria-label={`Título de la cláusula ${idx + 1}`}
-                        data-placeholder="Título de la cláusula (ej: PRIMERA – Objeto.)"
-                        onFocus={() => setActivo(it.id)}
-                        onInput={() => {
-                          setActivo(it.id);
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setItems((prev) => prev.map((x) => (x.id === it.id ? { ...x, pre: val } : x)));
                           setDirty(true);
                         }}
+                        onFocus={() => setActivo(it.id)}
                       />
                       <div
                         ref={(el) => {

@@ -527,6 +527,57 @@ main {
     line-height: 1.6;
 }
 
+/* =====================================================================
+   ESTADÍSTICAS HORIZONTALES DE LA PORTADA
+   ===================================================================== */
+.stats {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px 0;
+    margin: 10px 0 0;
+}
+.stats > div {
+    padding: 0 32px;
+    border-left: 1px solid rgba(255, 255, 255, 0.28);
+    animation: subir 0.8s var(--ease) backwards;
+    transition: transform 0.3s var(--suave);
+}
+.stats > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+}
+.stats > div:hover {
+    transform: translateY(-4px) scale(1.05);
+}
+.stats dd {
+    margin: 0;
+    font-size: 2.3rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #ffffff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+.stats dt {
+    margin-top: 4px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+}
+@media(max-width: 700px) {
+    .stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    .stats > div, .stats > div:first-child {
+        padding: 0;
+        border: 0;
+    }
+}
+
+
 /* Cuadrícula de Tarjetas KPI estilo Video Glassy Dashboard V2 */
 .glassy-kpi-grid {
     position: relative;
@@ -2179,4 +2230,461 @@ input:focus, textarea:focus, select:focus {
 
 @media(prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
+}
+
+
+/* =====================================================================
+   FORMULARIOS Y VISTA PREVIA DE CONTRATOS (LAYOUT DE 2 COLUMNAS)
+   ===================================================================== */
+.grid, .grid-contrato {
+    display: grid;
+    grid-template-columns: minmax(360px, 1fr) minmax(460px, 1.25fr);
+    gap: 28px;
+    align-items: start;
+}
+.grid-preview-sticky {
+    position: sticky;
+    top: 84px;
+    align-self: start;
+}
+@media(max-width: 960px) {
+    .grid, .grid-contrato {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .grid-preview-sticky {
+        position: static;
+    }
+}
+.visor {
+    max-width: 660px;
+    margin: 0 auto 12px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-weight: 600;
+    color: var(--mut);
+}
+.grid > div > .visor,
+.grid-contrato > div > .visor {
+    margin-left: 0;
+}
+
+/* =====================================================================
+   EDITOR DE CLÁUSULAS (Modal tipo procesador de texto / Word)
+   ===================================================================== */
+.editor-clausulas-resumen {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+.editor-clausulas-resumen-item {
+    background: var(--bg);
+    border: 1px solid var(--bd);
+    border-radius: 10px;
+    padding: 9px 12px;
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+.editor-clausulas-resumen-item b {
+    display: block;
+    color: var(--ac);
+    font-size: 0.82rem;
+    margin-bottom: 2px;
+}
+.editor-clausulas-resumen-item span {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: var(--mut);
+}
+
+.editor-clausulas-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 100000 !important;
+    background: rgba(15, 23, 42, 0.72);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    animation: fade .25s ease both;
+}
+
+.editor-clausulas-shell {
+    width: 100%;
+    max-width: 920px;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--card-solid);
+    border: 1.5px solid var(--bd);
+    border-radius: 20px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35), 0 0 1px rgba(255, 255, 255, 0.6) inset;
+    overflow: hidden;
+    animation: subir .3s var(--ease) both;
+}
+
+.editor-clausulas-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--bd);
+    background: var(--card);
+    flex-shrink: 0;
+}
+
+.editor-clausulas-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.editor-clausulas-ico {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gold-grad);
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 4px 14px var(--gold-glow);
+}
+
+.editor-clausulas-title-txt {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.editor-clausulas-title-txt strong {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--tx);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.editor-clausulas-title-txt span {
+    font-size: 0.78rem;
+    color: var(--mut);
+}
+
+.editor-clausulas-header-btns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.editor-clausulas-cerrar {
+    color: var(--mut);
+    padding: 8px !important;
+    border-radius: 10px !important;
+}
+.editor-clausulas-cerrar:hover {
+    color: var(--tx);
+    background: var(--bg);
+}
+
+.editor-clausulas-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--bd);
+    background: var(--bg);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+.editor-clausulas-grupo {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.editor-clausulas-tool {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 11px;
+    border-radius: 9px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--mut);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.editor-clausulas-tool:hover {
+    background: var(--card-solid);
+    border-color: var(--bd);
+    color: var(--ac);
+    box-shadow: var(--sh);
+}
+
+.editor-clausulas-tool svg {
+    width: 16px;
+    height: 16px;
+}
+
+.editor-clausulas-add-top {
+    font-size: 0.82rem;
+    padding: 6px 12px;
+}
+
+.editor-clausulas-scroll {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 24px 20px 32px;
+    background: var(--bg);
+}
+
+.editor-clausulas-paper {
+    max-width: 820px;
+    min-height: 600px;
+    margin: 0 auto;
+    background: #ffffff;
+    color: #1a202c;
+    border-radius: 4px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    padding: 48px 56px 40px;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.editor-clausula {
+    position: relative;
+    background: transparent;
+    color: inherit;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    font-family: inherit;
+    margin: 0 0 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed #e5e7eb;
+}
+.editor-clausula:last-child {
+    border-bottom: 0;
+    margin-bottom: 12px;
+    padding-bottom: 0;
+}
+
+.editor-clausula-barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 20px;
+    margin-bottom: 4px;
+}
+
+.editor-clausula-num {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    height: auto;
+    border-radius: 0;
+    background: none;
+    color: #94a3b8;
+    font: 700 0.72rem/1 system-ui, sans-serif;
+    letter-spacing: 0.1em;
+}
+
+.editor-clausula.activa .editor-clausula-num {
+    color: var(--ac);
+}
+
+.editor-clausula-barra-btns {
+    display: flex;
+    gap: 3px;
+    opacity: 0.5;
+    transition: opacity 0.15s ease;
+}
+
+.editor-clausula:hover .editor-clausula-barra-btns,
+.editor-clausula:focus-within .editor-clausula-barra-btns {
+    opacity: 1;
+}
+
+.editor-clausula-barra-btns button {
+    padding: 3px 8px;
+    font-size: 0.85rem;
+    color: #64748b;
+    border-radius: 6px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+}
+
+.editor-clausula-barra-btns button:hover:not(:disabled) {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.editor-clausulas-eliminar:hover:not(:disabled) {
+    color: #dc2626 !important;
+    background: #fee2e2 !important;
+    border-color: #fca5a5 !important;
+}
+
+.editor-clausula-pre {
+    width: 100%;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: #1e3a8a;
+    font: 700 0.95rem/1.5 Georgia, serif;
+    padding: 4px 6px;
+    margin: 0 0 6px -6px;
+    outline: none;
+    transition: all .2s ease;
+}
+.editor-clausula-pre:hover {
+    border-color: #e2e8f0;
+    background: #f8fafc;
+}
+.editor-clausula-pre:focus {
+    border-color: var(--ac);
+    background: #eff6ff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.editor-clausula-pre-texto {
+    color: #1e3a8a;
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 6px;
+}
+
+.editor-clausula-cuerpo {
+    min-height: 2em;
+    margin-top: 0;
+    padding: 6px 8px;
+    margin-left: -8px;
+    margin-right: -8px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    font-size: 0.92rem;
+    line-height: 1.8;
+    color: #1e293b;
+    outline: none;
+    text-align: justify;
+    overflow-wrap: anywhere;
+    transition: all .2s ease;
+}
+.editor-clausula-cuerpo:hover {
+    border-color: #e2e8f0;
+    background: #fafafa;
+}
+.editor-clausula-cuerpo:focus {
+    border-color: var(--ac);
+    background: #f8fafc;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.editor-clausula-cuerpo:empty::before {
+    content: attr(data-placeholder);
+    color: #94a3b8;
+    font-style: italic;
+    pointer-events: none;
+}
+
+.editor-clausula-cuerpo ul,
+.editor-clausula-cuerpo ol {
+    margin: 6px 0 6px 22px;
+    padding: 0;
+}
+.editor-clausula-cuerpo li {
+    margin: 2px 0;
+}
+
+.editor-clausulas-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1.5px dashed #cbd5e1;
+    background: transparent;
+    color: var(--mut);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.editor-clausulas-add:hover:not(:disabled) {
+    border-color: var(--ac);
+    background: #eff6ff;
+    color: var(--ac);
+}
+
+.editor-clausulas-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 22px;
+    border-top: 1px solid var(--bd);
+    background: var(--card-solid);
+    color: var(--mut);
+    font-size: 0.78rem;
+    flex-shrink: 0;
+}
+
+.editor-clausulas-footer strong {
+    color: var(--ac);
+    font-weight: 700;
+}
+
+@media (max-width: 760px) {
+    .editor-clausulas-overlay {
+        padding: 0 !important;
+    }
+    .editor-clausulas-shell {
+        max-height: 100vh !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+        border: 0 !important;
+    }
+    .editor-clausulas-header { padding: 12px 14px; }
+    .editor-clausulas-title-txt strong { font-size: 0.92rem; }
+    .editor-clausulas-toolbar { padding: 8px 10px; }
+    .editor-clausulas-tool { padding: 8px; }
+    .editor-clausulas-tool span { display: none; }
+    .editor-clausulas-add-top { font-size: 0.78rem; padding: 7px 10px; }
+    .editor-clausulas-scroll { padding: 14px 10px 20px; }
+    .editor-clausulas-paper {
+        min-height: calc(100vh - 210px);
+        padding: 24px 16px 28px;
+        border-radius: 0;
+    }
+    .editor-clausula { padding: 0; margin-bottom: 20px; }
+    .editor-clausula-barra-btns { opacity: 1; }
+    .editor-clausulas-footer { padding: 8px 14px; font-size: 0.72rem; }
 }

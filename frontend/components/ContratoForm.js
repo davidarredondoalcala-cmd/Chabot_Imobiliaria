@@ -361,7 +361,7 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
   return (
     <div className="view">
       <div className="noprint"><button className="l" onClick={volver}>← Volver al inmueble</button></div>
-      <div className="grid">
+      <div className="grid grid-contrato">
         <div className="card noprint">
           <div className="modo">
             <button className={modo === 'arriendo' ? 'on' : ''} onClick={() => cambiarModo('arriendo')}>Arriendo</button>
@@ -514,7 +514,7 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
           </div>
         </div>
 
-        <div>
+        <div className="grid-preview-sticky">
           <div className="visor noprint"><span className="tag pulse" style={{ margin: 0 }}>En vivo</span> Vista previa interactiva del contrato</div>
           <Hoja modo={modo} S={{ ...S, clausulas }} firmas={firmasPreview} />
           <div className="row noprint" style={{ justifyContent: 'center', marginTop: 18 }}>
