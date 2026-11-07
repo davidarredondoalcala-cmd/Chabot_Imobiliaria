@@ -41,6 +41,17 @@ export async function recordMessage(conversationId: string, role: 'user' | 'assi
 }
 
 /**
+ * Serializa los últimos turnos de la conversación para dar contexto al NLU y al generador.
+ */
+export function buildHistoryContext(conversationId: string, maxMensajes = 6): string {
+  const msgs = conversationMessages.get(conversationId) || [];
+  return msgs
+    .slice(-maxMensajes)
+    .map(m => `${m.role === 'user' ? 'Usuario' : 'Jarvis'}: ${(m.content || '').replace(/\s+/g, ' ').slice(0, 220)}`)
+    .join('\n');
+}
+
+/**
  * Fusiona los criterios acumulados con los nuevos extraídos del último mensaje.
  * Si el usuario cambia una preferencia explícita, la nueva reemplaza a la anterior.
  */

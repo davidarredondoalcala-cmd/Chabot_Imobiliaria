@@ -351,5 +351,61 @@
     ],
     "espera_propiedades": false,
     "espera_asesor": false
+  },
+  {
+    "id": 31,
+    "categoria": "seguimiento_zona",
+    "descripcion": "Seguimiento elíptico de zona: cambia el barrio sin repetir la consulta completa",
+    "mensajes": [
+      "busco apartamento en arriendo en Cádiz por 1.6 millones",
+      "y en villa del prado"
+    ],
+    "espera_propiedades": true,
+    "espera_asesor": false,
+    "criterios_esperados": {
+      "operacion": "arriendo",
+      "tipo": "apartamento",
+      "barrios": ["Villa del Prado"]
+    }
+  },
+  {
+    "id": 32,
+    "categoria": "seguimiento_precio",
+    "descripcion": "Seguimiento de precio: pide ver opciones más baratas",
+    "mensajes": [
+      "busco apartamento en arriendo en Cádiz por 1.6 millones",
+      "y en villa del prado",
+      "¿y más baratas?"
+    ],
+    "espera_propiedades": true,
+    "espera_asesor": false
+  },
+  {
+    "id": 33,
+    "categoria": "seguimiento_habitaciones",
+    "descripcion": "Seguimiento de habitaciones: agrega filtro de alcobas",
+    "mensajes": [
+      "busco apartamento en arriendo en Cádiz por 1.6 millones",
+      "¿y con 3 habitaciones?"
+    ],
+    "espera_propiedades": true,
+    "espera_asesor": false,
+    "criterios_esperados": {
+      "operacion": "arriendo",
+      "tipo": "apartamento"
+    }
+  },
+  {
+    "id": 34,
+    "categoria": "reclamo_usuario",
+    "descripcion": "Queja del usuario tras respuesta errónea: disculpa formal y reintento con la última zona pedida (Villa del Prado), no El Vergel",
+    "mensajes": [
+      "quiero ver casas en venta en El Vergel",
+      "y en villa del prado",
+      "como que no me puedes responder, estoy pidiendo un inmueble"
+    ],
+    "espera_propiedades": false,
+    "espera_asesor": false,
+    "zona_esperada_final": "Villa del Prado"
   }
 ]
