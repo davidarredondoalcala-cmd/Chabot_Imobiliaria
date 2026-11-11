@@ -1,6 +1,6 @@
-import { Property, ChatResponse } from './types';
+import { Property, ChatResponse, ExtractedUnderstanding } from './types';
 import { getConversationState, saveConversationState, mergeConversationCriterios, recordMessage, getConversationMessages } from './state';
-import { understandUserMessage, tieneContextoInmobiliario, extractHeuristicUnderstanding, stripAccents } from './nlu';
+import { understandUserMessage, tieneContextoInmobiliario, extractHeuristicUnderstanding, stripAccents, esReclamoUsuario, esBarrioConocido } from './nlu';
 import { evaluateClarificationPolicy } from './clarification';
 import { buscarInmuebles, getAllCatalogProperties } from './search';
 import { obtenerDetalleInmueble } from './detail';
@@ -11,7 +11,9 @@ import {
   generateDeterministicDetailReply,
   respuestaCiudadNoSoportada,
   respuestaFueraDeTema,
-  respuestaPresupuestoInvalido
+  respuestaPresupuestoInvalido,
+  respuestaDisculpaFormal,
+  respuestaReclamoSinRegistro
 } from './generator';
 import { verifyReplyIntegrity } from './verifier';
 import { buildWhatsAppLink } from './whatsapp';
@@ -58,6 +60,95 @@ export async function processUserMessage(
   // 2. Comprensión (NLU estructurada con historial)
   const understanding = await understandUserMessage(userMessage, historyContext);
   meta.understanding = understanding;
+
+  // Si el usuario mencionó un barrio conocido que EMBIBE el nombre de un municipio
+  // (ej. "Villa del Prado" contiene "Prado"), la ciudad detectada NO debe aplicarse:
+  // es parte del nombre del barrio y buscaría en el municipio equivocado.
+  if (
+    understanding.criterios_duros.ciudad &&
+    esBarrioConocido(userMessage) &&
+    (understanding.criterios_duros.barrios?.length || 0) > 0 &&
+    stripAccents(userMessage).includes(stripAccents(understanding.criterios_duros.ciudad))
+  ) {
+    understanding.criterios_duros.ciudad = null;
+  }
+
+  // Reclamos del usuario: disculpa formal y reintento inmediato con el último pedido válido
+  if (esReclamoUsuario(userMessage, understanding.es_reclamo)) {
+    const ultimo = state.ultimo_pedido;
+    if (ultimo?.understanding) {
+      // Fusionar el último pedido con lo que el reclamo traiga de nuevo
+      // (el reclamo puede corregir la zona o añadir criterios: prevalece lo explícito)
+      const base = ultimo.understanding;
+      const criteriosNuevos = Object.fromEntries(
+        Object.entries(understanding.criterios_duros).filter(([, v]) => v != null)
+      );
+      const combinada: ExtractedUnderstanding = {
+        ...base,
+        operacion: understanding.operacion || base.operacion || null,
+        ambas_operaciones: understanding.ambas_operaciones || base.ambas_operaciones || null,
+        criterios_duros: {
+          ...base.criterios_duros,
+          ...criteriosNuevos,
+        },
+        criterios_blandos: understanding.criterios_blandos || base.criterios_blandos,
+        codigo_inmueble_mencionado: understanding.codigo_inmueble_mencionado || base.codigo_inmueble_mencionado,
+        presupuesto_invalido: false,
+      };
+      // La operación y el tipo del pedido original se usan solo si el reclamo no los trae
+      combinada.operacion = understanding.operacion || base.operacion || null;
+      combinada.criterios_duros.tipo = understanding.criterios_duros.tipo || base.criterios_duros.tipo || null;
+
+      state.criterios = mergeConversationCriterios(state.criterios, combinada, ultimo.mensaje);
+      state.criterios.turnos_aclaracion = 0;
+      state.criterios.turnos_presupuesto = 0;
+      state.ultimo_listado_ids = [];
+
+      const searchResult = await buscarInmuebles({ ...state.criterios }, extraProperties);
+      let propsReintento = searchResult.inmuebles.map(i => i.inmueble);
+      if (state.criterios.precio_max != null && state.criterios.precio_max > 0) {
+        propsReintento = propsReintento.filter(p => p.precio <= state.criterios.precio_max!);
+      }
+      if (state.criterios.tipo) {
+        propsReintento = propsReintento.filter(p => p.tipo.toLowerCase() === state.criterios.tipo!.toLowerCase());
+      }
+
+      const disculpa = respuestaDisculpaFormal(state.criterios);
+      let replyReclamo: string;
+      if (propsReintento.length > 0) {
+        state.ultimo_listado_ids = propsReintento.map(p => p.codigo);
+        replyReclamo = `${disculpa}\n\n${generateDeterministicSearchReply(searchResult.inmuebles, null, state.criterios)}`;
+      } else {
+        replyReclamo = disculpa;
+      }
+
+      state.ultimo_reply = replyReclamo;
+      await saveConversationState(state);
+      await recordMessage(conversationId, 'user', userMessage);
+      await recordMessage(conversationId, 'assistant', replyReclamo, meta);
+
+      return {
+        conversationId,
+        reply: replyReclamo,
+        properties: propsReintento,
+        needsHuman: false,
+        metadata: meta,
+      };
+    }
+
+    // Reclamo sin un pedido anterior registrado: disculpa formal y pedir criterios
+    const reply = respuestaReclamoSinRegistro();
+    await saveConversationState(state);
+    await recordMessage(conversationId, 'user', userMessage);
+    await recordMessage(conversationId, 'assistant', reply, meta);
+    return {
+      conversationId,
+      reply,
+      properties: [],
+      needsHuman: false,
+      metadata: meta,
+    };
+  }
 
   // Agradecimiento o cortesía
   const isThankYou = /^\s*(gracias|muchas gracias|mil gracias|gracias vale|excelente gracias|vale gracias|perfecto gracias|todo claro|ok gracias|listo gracias)[\s\.,!¡?¿]*$/i.test(userMessage.trim());
@@ -152,10 +243,36 @@ export async function processUserMessage(
     !understanding.criterios_duros.tipo &&
     !understanding.criterios_duros.barrios &&
     !understanding.criterios_duros.precio_max &&
+    !understanding.criterios_duros.orden_precio &&
     !understanding.tipo_no_soportado &&
     !understanding.codigo_inmueble_mencionado;
 
   if (esFueraDeTema) {
+    // Seguimiento corto ("y en ...", "¿y más baratas?") con criterios activos en memoria:
+    // es continuación de la búsqueda previa, no fuera de tema: aclarar brevemente.
+    const textoSeguimiento = userMessage.trim();
+    const esSeguimientoCorto =
+      /^(?:¿)?(?:y|e)\s/i.test(textoSeguimiento) &&
+      textoSeguimiento.split(/\s+/).filter(Boolean).length <= 8;
+    const hayCriteriosActivos =
+      state.criterios.operacion ||
+      state.criterios.tipo ||
+      (state.criterios.barrios && state.criterios.barrios.length > 0);
+    if (esSeguimientoCorto && hayCriteriosActivos) {
+      const modalidad = state.criterios.operacion === 'venta' ? 'en venta' : state.criterios.operacion === 'arriendo' ? 'en arriendo' : 'en arriendo o venta';
+      const tipoTxt = state.criterios.tipo ? ` tipo **${state.criterios.tipo}**` : '';
+      const zonaTxt = state.criterios.barrios && state.criterios.barrios.length > 0 ? ` en la zona de **${state.criterios.barrios.join(', ')}**` : '';
+      const reply = `Con gusto le atiendo de nuevo. Tengo registrada su búsqueda de un inmueble ${modalidad}${tipoTxt}${zonaTxt}. ¿Desea que le muestre esas opciones o prefiere indicar otra zona o criterio?`;
+      await recordMessage(conversationId, 'user', userMessage);
+      await recordMessage(conversationId, 'assistant', reply, meta);
+      return {
+        conversationId,
+        reply,
+        properties: [],
+        needsHuman: false,
+        metadata: meta,
+      };
+    }
     const reply = respuestaFueraDeTema();
     const suggestionChips = [
       'Apartamentos en arriendo',
@@ -352,6 +469,11 @@ export async function processUserMessage(
 
   // Fusión de estado
   state.criterios = mergeConversationCriterios(state.criterios, understanding, userMessage);
+
+  // Registrar el último pedido válido para poder reintentarlo si el usuario reclama
+  if (understanding.intencion === 'buscar') {
+    state.ultimo_pedido = { mensaje: userMessage, understanding };
+  }
 
   // Política de aclaración
   const clarification = evaluateClarificationPolicy(state.criterios);

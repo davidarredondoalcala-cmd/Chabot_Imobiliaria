@@ -65,6 +65,7 @@ export interface ExtractedUnderstanding {
   tipo_no_soportado?: string | null;
   fuera_de_tema?: boolean;
   presupuesto_invalido?: boolean;
+  es_reclamo?: boolean;
   correccion?: CorreccionesDetectadas | null;
 }
 
@@ -86,6 +87,7 @@ export interface ConversationState {
   ultimo_listado_ids: string[];
   ultimo_reply?: string;
   ultimo_mensaje_usuario?: string;
+  ultimo_pedido?: { mensaje: string; understanding: ExtractedUnderstanding };
   updated_at: Date;
 }
 
