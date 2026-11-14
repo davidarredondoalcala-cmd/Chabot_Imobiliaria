@@ -6,7 +6,8 @@ import { IcoBuscar } from './Iconos';
 
 const MIN = [['', 'Cualquiera'], ['1', '1+'], ['2', '2+'], ['3', '3+'], ['4', '4+'], ['5', '5+']];
 
-const ESTADOS = [['', 'Todos'], ['Arrendada', 'Arrendada'], ['Por vencer', 'Por vencer'], ['Sin arrendar', 'Sin arrendar'], ['Para la venta', 'Para la venta'], ['Vendida', 'Vendida']];
+// Estados del filtro: solo los disponibles en catálogo (el admin ve Sin arrendar y Para la venta)
+const ESTADOS = [['', 'Todos'], ['Sin arrendar', 'Sin arrendar'], ['Para la venta', 'Para la venta']];
 
 const TIEMPOS_ARRIENDO = [
   ['', 'Cualquiera'],
@@ -106,7 +107,7 @@ function Desplegable({ valor, opciones, onChange, etiqueta, otro = false, conBus
   );
 }
 
-export default function Filtros({ f, setF, total, mostrados, ciudades = [] }) {
+export default function Filtros({ f, setF, total, mostrados, ciudades = [], esAdmin = false }) {
   const [abiertoKey, setAbiertoKey] = useState(null);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const rango = (a, b, u) => (
@@ -154,7 +155,7 @@ export default function Filtros({ f, setF, total, mostrados, ciudades = [] }) {
       <div className="filtros-top"><b className="ft"><IcoBuscar /> Filtrar inmuebles</b><span className="mut">Mostrando {mostrados} de {total}</span></div>
       <div className="filtros-grid">
         <div><label className="filtro-lbl">Ciudad</label>{lista('ciudad', opcionesCiudades, 'Ciudad', false, true, CIUDADES_PRINCIPALES.length + 1)}</div>
-        <div><label className="filtro-lbl">Estado</label>{lista('estado', ESTADOS, 'Estado')}</div>
+        {esAdmin && <div><label className="filtro-lbl">Estado</label>{lista('estado', ESTADOS, 'Estado')}</div>}
         <div><label className="filtro-lbl">Habitaciones<span className="chips-hint"> (o más)</span></label>{lista('hab', MIN, 'Habitaciones', true)}</div>
         <div><label className="filtro-lbl">Baños<span className="chips-hint"> (o más)</span></label>{lista('ban', MIN, 'Baños', true)}</div>
         <div><label className="filtro-lbl">Tamaño (m²)</label>{rango('areaMin', 'areaMax', 'Área')}</div>

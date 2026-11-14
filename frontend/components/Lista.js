@@ -130,22 +130,31 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
         </button>
       </div>
 
-      <Filtros f={filtros} setF={setFiltros} total={data.length} mostrados={base.length} ciudades={ciudades} />
+      <Filtros f={filtros} setF={setFiltros} total={data.length} mostrados={base.length} ciudades={ciudades} esAdmin={esAdmin} />
 
       <div className="toolbar">
         <h2>{tab === 'Todos' ? 'Todos los inmuebles' : tab === 'Casa' ? 'Casas' : 'Apartamentos'}</h2>
-        <button
-          type="button"
-          className={`btn-ver-cerradas ${verCerradas ? 'on' : ''}`}
-          aria-pressed={verCerradas}
-          onClick={() => setVerCerradas(!verCerradas)}
-          title={verCerradas ? 'Volver a la lista de inmuebles disponibles' : 'Ver las casas y apartamentos ya vendidas o arrendadas'}
-        >
-          {verCerradas ? 'Vendidas y arrendadas' : 'Ver vendidas y arrendadas'}
-        </button>
+        {/* Solo el administrador puede ver las vendidas y arrendadas */}
+        {esAdmin && (
+          <button
+            type="button"
+            className={`btn-ver-cerradas ${verCerradas ? 'on' : ''}`}
+            aria-pressed={verCerradas}
+            onClick={() => setVerCerradas(!verCerradas)}
+            title={verCerradas ? 'Volver a la lista de inmuebles disponibles' : 'Ver las casas y apartamentos ya vendidas o arrendadas'}
+          >
+            {verCerradas ? 'Vendidas y arrendadas' : 'Ver vendidas y arrendadas'}
+          </button>
+        )}
       </div>
 
-      {items.length === 0 && <div className="card vacio">Ningún inmueble coincide con la vista actual. Prueba el botón "Ver vendidas y arrendadas", amplia los rangos de los filtros o cambia de pestaña.</div>}
+      {items.length === 0 && (
+        <div className="card vacio">
+          {esAdmin
+            ? 'Ningún inmueble coincide con la vista actual. Prueba el botón "Ver vendidas y arrendadas", amplia los rangos de los filtros o cambia de pestaña.'
+            : 'Ningún inmueble coincide con la vista actual. Amplía los rangos de los filtros o cambia de pestaña.'}
+        </div>
+      )}
 
       <div className="lista">
         {itemsPaginados.map((i) => <Tarjeta key={i._id} i={i} esAdmin={esAdmin} abrir={() => abrir(i._id)} />)}
