@@ -21,7 +21,8 @@ const normalizarTxt = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\
 
 // Selector desplegable: un botón que, al pulsarlo, despliega las opciones como píldoras.
 // Con conBuscador=true muestra un campo que filtra las opciones mientras se escribe (usado en ciudades).
-function Desplegable({ valor, opciones, onChange, etiqueta, otro = false, conBuscador = false, abierto, setAbierto }) {
+// Con maxSinBusqueda=N solo se muestran las primeras N píldoras hasta que el usuario busque (el resto se encuentra con el buscador).
+function Desplegable({ valor, opciones, onChange, etiqueta, otro = false, conBuscador = false, maxSinBusqueda = 0, abierto, setAbierto }) {
   const ref = useRef(null);
   const [busqueda, setBusqueda] = useState('');
   // Con "Otro…" el valor puede ser un número libre que no está en la lista
@@ -46,7 +47,7 @@ function Desplegable({ valor, opciones, onChange, etiqueta, otro = false, conBus
 
   const opcionesFiltradas = conBuscador && busqueda.trim()
     ? opciones.filter(([, t]) => normalizarTxt(t).includes(normalizarTxt(busqueda.trim())))
-    : opciones;
+    : (conBuscador && maxSinBusqueda > 0 ? opciones.slice(0, maxSinBusqueda) : opciones);
 
   // Flechas para moverse entre las opciones
   const mover = (e) => {
@@ -115,37 +116,34 @@ export default function Filtros({ f, setF, total, mostrados, ciudades = [] }) {
     </div>
   );
 
+  // Ciudades principales visibles como píldoras; las demás se encuentran con el buscador
+  const CIUDADES_PRINCIPALES = ['Ibagué', 'Bogotá', 'Medellín', 'Cali', 'Barranquilla'];
+  const ordenarCiudades = (a, b) => {
+    const ia = CIUDADES_PRINCIPALES.indexOf(a), ib = CIUDADES_PRINCIPALES.indexOf(b);
+    if (ia !== -1 && ib !== -1) return ia - ib;
+    if (ia !== -1) return -1;
+    if (ib !== -1) return 1;
+    return a.localeCompare(b, 'es');
+  };
+  const listaCiudades = (ciudades && ciudades.length > 0
+    ? ciudades
+    : CIUDADES_PRINCIPALES
+  ).slice().sort(ordenarCiudades);
+
   const opcionesCiudades = [
     ['', 'Todas las ciudades'],
-    ...(ciudades && ciudades.length > 0
-      ? ciudades.map((c) => [c, c])
-      : [
-          ['Bogotá', 'Bogotá'],
-          ['Medellín', 'Medellín'],
-          ['Cali', 'Cali'],
-          ['Barranquilla', 'Barranquilla'],
-          ['Bucaramanga', 'Bucaramanga'],
-          ['Manizales', 'Manizales'],
-          ['Pereira', 'Pereira'],
-          ['Ibagué', 'Ibagué'],
-          ['Cartagena', 'Cartagena'],
-          ['Santa Marta', 'Santa Marta'],
-          ['Cúcuta', 'Cúcuta'],
-          ['Envigado', 'Envigado'],
-          ['Popayán', 'Popayán'],
-          ['Armenia', 'Armenia'],
-          ['Chía', 'Chía'],
-        ]),
+    ...listaCiudades.map((c) => [c, c]),
   ];
 
   // Desplegables: al hacer clic se abren las opciones como píldoras.
-  const lista = (k, opciones, etiqueta, otro = false, conBuscador = false) => (
+  const lista = (k, opciones, etiqueta, otro = false, conBuscador = false, maxSinBusqueda = 0) => (
     <Desplegable
       valor={f[k]}
       opciones={opciones}
       etiqueta={etiqueta}
       otro={otro}
       conBuscador={conBuscador}
+      maxSinBusqueda={maxSinBusqueda}
       abierto={abiertoKey === k}
       setAbierto={(v) => setAbiertoKey(v ? k : null)}
       onChange={(v) => setF({ ...f, [k]: v })}
@@ -155,7 +153,7 @@ export default function Filtros({ f, setF, total, mostrados, ciudades = [] }) {
     <div className={`card filtros noprint ${abiertoKey ? 'dd-activo' : ''}`}>
       <div className="filtros-top"><b className="ft"><IcoBuscar /> Filtrar inmuebles</b><span className="mut">Mostrando {mostrados} de {total}</span></div>
       <div className="filtros-grid">
-        <div><label className="filtro-lbl">Ciudad</label>{lista('ciudad', opcionesCiudades, 'Ciudad', false, true)}</div>
+        <div><label className="filtro-lbl">Ciudad</label>{lista('ciudad', opcionesCiudades, 'Ciudad', false, true, CIUDADES_PRINCIPALES.length + 1)}</div>
         <div><label className="filtro-lbl">Estado</label>{lista('estado', ESTADOS, 'Estado')}</div>
         <div><label className="filtro-lbl">Habitaciones<span className="chips-hint"> (o más)</span></label>{lista('hab', MIN, 'Habitaciones', true)}</div>
         <div><label className="filtro-lbl">Baños<span className="chips-hint"> (o más)</span></label>{lista('ban', MIN, 'Baños', true)}</div>
