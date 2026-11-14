@@ -9,7 +9,7 @@ function Casa() {
         <stop offset="100%" stopColor="#2563eb" />
       </radialGradient>
       <linearGradient id="casa-techo" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#1e40af" />
+        <stop offset="0%" stopColor="#3b82f6" />
         <stop offset="100%" stopColor="#0f172a" />
       </linearGradient>
       <linearGradient id="casa-muro" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -21,7 +21,7 @@ function Casa() {
     <rect x="0" y="136" width="320" height="40" fill="#0f172a" opacity=".55" />
     <circle cx="46" cy="106" r="24" fill="#1e293b" opacity=".7" /><rect x="44" y="122" width="5" height="16" fill="#0f172a" opacity=".8" />
     <circle cx="284" cy="116" r="17" fill="#1e293b" opacity=".7" /><rect x="282" y="128" width="4" height="10" fill="#0f172a" opacity=".8" />
-    <rect x="196" y="44" width="14" height="28" fill="#1e3a8a" />
+    <rect x="196" y="44" width="14" height="28" fill="#1d4ed8" />
     <rect x="96" y="80" width="128" height="58" fill="url(#casa-muro)" rx="3" />
     <polygon points="84,83 160,36 236,83" fill="url(#casa-techo)" />
     <rect x="106" y="96" width="26" height="22" rx="3" fill="#38bdf8" opacity=".95" filter="drop-shadow(0 0 6px rgba(56,189,248,0.6))" />
@@ -44,7 +44,7 @@ function Edificio() {
           width="12"
           height="11"
           rx="2"
-          fill={on ? '#38bdf8' : '#1e3a8a'}
+          fill={on ? '#38bdf8' : '#1d4ed8'}
           opacity={on ? 1 : 0.65}
           filter={on ? 'drop-shadow(0 0 4px rgba(56,189,248,0.7))' : 'none'}
         />
@@ -56,14 +56,14 @@ function Edificio() {
     <defs>
       <radialGradient id="edif-luna" cx="50%" cy="50%" r="50%">
         <stop offset="0%" stopColor="#38bdf8" />
-        <stop offset="100%" stopColor="#1d4ed8" />
+        <stop offset="100%" stopColor="#2563eb" />
       </radialGradient>
       <linearGradient id="edif-torre-1" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#1e293b" />
         <stop offset="100%" stopColor="#0f172a" />
       </linearGradient>
       <linearGradient id="edif-torre-central" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#1e3a8a" />
+        <stop offset="0%" stopColor="#1d4ed8" />
         <stop offset="100%" stopColor="#0f172a" />
       </linearGradient>
     </defs>

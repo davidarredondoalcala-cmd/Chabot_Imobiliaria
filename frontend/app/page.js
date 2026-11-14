@@ -168,9 +168,7 @@ export default function Home() {
                 <><IcoEscudo /> Administrador (probar vista cliente)</>
               )}
             </button>
-          ) : (
-            <span className="tag-rol tag-usuario">Modo Cliente</span>
-          )}
+          ) : null}
           <p>Gestión de inmuebles y contratos</p>
           <TemaBtn />
           <div className="usuario">

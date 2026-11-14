@@ -26,7 +26,7 @@
 
     /* Etiquetas de Estado con vidrio translúcido */
     --st-sin-bg: rgba(16, 185, 129, 0.12);     --st-sin-tx: #059669;
-    --st-arr-bg: rgba(37, 99, 235, 0.12);      --st-arr-tx: #1d4ed8;
+    --st-arr-bg: rgba(59, 130, 246, 0.12);     --st-arr-tx: #2563eb;
     --st-ven-bg: rgba(139, 92, 246, 0.12);     --st-ven-tx: #6d28d9;
     --st-vdd-bg: rgba(148, 163, 184, 0.16);    --st-vdd-tx: #475569;
     --st-pv-bg: rgba(245, 158, 11, 0.14);      --st-pv-tx: #b45309;
@@ -36,18 +36,18 @@
     --sh2: 0 20px 45px -10px rgba(37, 99, 235, 0.2), 0 1px 2px 0 rgba(255, 255, 255, 0.9) inset;
     --ring: rgba(59, 130, 246, 0.35);
 
-    /* Degradados y Resplandores Azul Rey y Cian */
+    /* Degradados y Resplandores Azul Brillante y Cian */
     --gold: #2563eb;
     --gold-light: #60a5fa;
     --gold-bright: #bfdbfe;
-    --gold-dark: #1d4ed8;
-    --gold-grad: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
-    --gold-shimmer: linear-gradient(90deg, #1d4ed8 0%, #2563eb 25%, #60a5fa 48%, #ffffff 52%, #2563eb 75%, #1d4ed8 100%);
+    --gold-dark: #3b82f6;
+    --gold-grad: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #38bdf8 100%);
+    --gold-shimmer: linear-gradient(90deg, #2563eb 0%, #3b82f6 25%, #60a5fa 48%, #ffffff 52%, #3b82f6 75%, #2563eb 100%);
     --gold-glow: rgba(37, 99, 235, 0.45);
     --gold-border: rgba(96, 165, 250, 0.6);
 
     /* Degradados y dinámicas */
-    --grad: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+    --grad: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #38bdf8 100%);
     --grad-amb: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
     --glow: rgba(37, 99, 235, 0.45);
     --suave: cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -65,12 +65,13 @@
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
         color-scheme: dark;
-        --bg: #070c18;
-        --card: rgba(15, 23, 42, 0.46);
-        --card-solid: rgba(15, 23, 42, 0.72);
-        --tx: #f8fafc;
-        --mut: #94a3b8;
-        --bd: rgba(255, 255, 255, 0.16);
+        /* Modo oscuro suave y descansable: fondo gris-azulado tenue, sin negros puros */
+        --bg: #131c2e;
+        --card: rgba(30, 41, 59, 0.5);
+        --card-solid: rgba(30, 41, 59, 0.75);
+        --tx: #e2e8f0;
+        --mut: #9aa8bd;
+        --bd: rgba(255, 255, 255, 0.14);
         --bd-subtle: rgba(255, 255, 255, 0.08);
         --ac: #3b82f6;
         --ac2: #60a5fa;
@@ -78,42 +79,44 @@
         --red: #f87171;
 
         --st-sin-bg: rgba(16, 185, 129, 0.2);     --st-sin-tx: #6ee7b7;
-        --st-arr-bg: rgba(37, 99, 235, 0.25);     --st-arr-tx: #93c5fd;
+        --st-arr-bg: rgba(59, 130, 246, 0.25);    --st-arr-tx: #93c5fd;
         --st-ven-bg: rgba(139, 92, 246, 0.25);    --st-ven-tx: #c4b5fd;
         --st-vdd-bg: rgba(100, 116, 139, 0.25);   --st-vdd-tx: #cbd5e1;
         --st-pv-bg: rgba(245, 158, 11, 0.25);     --st-pv-tx: #fde68a;
 
-        --sh: 0 8px 32px 0 rgba(0, 0, 0, 0.45), 0 1px 1px 0 rgba(255, 255, 255, 0.1) inset;
-        --sh2: 0 20px 50px -10px rgba(0, 0, 0, 0.65), 0 0 25px rgba(59, 130, 246, 0.35);
+        --sh: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 0 1px 1px 0 rgba(255, 255, 255, 0.08) inset;
+        --sh2: 0 20px 50px -10px rgba(0, 0, 0, 0.45), 0 0 25px rgba(59, 130, 246, 0.25);
         --ring: rgba(96, 165, 250, 0.45);
 
+        /* Azul brillante y visible en modo oscuro */
         --gold: #3b82f6;
         --gold-light: #60a5fa;
         --gold-bright: #bfdbfe;
-        --gold-dark: #1d4ed8;
-        --gold-grad: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #60a5fa 100%);
-        --gold-shimmer: linear-gradient(90deg, #1e40af 0%, #2563eb 25%, #60a5fa 48%, #ffffff 52%, #2563eb 75%, #1e40af 100%);
-        --gold-glow: rgba(59, 130, 246, 0.6);
+        --gold-dark: #3b82f6;
+        --gold-grad: linear-gradient(135deg, #3b82f6 0%, #38bdf8 50%, #60a5fa 100%);
+        --gold-shimmer: linear-gradient(90deg, #3b82f6 0%, #38bdf8 25%, #93c5fd 48%, #ffffff 52%, #38bdf8 75%, #3b82f6 100%);
+        --gold-glow: rgba(59, 130, 246, 0.5);
         --gold-border: rgba(96, 165, 250, 0.5);
 
-        --grad: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #60a5fa 100%);
-        --glow: rgba(59, 130, 246, 0.6);
+        --grad: linear-gradient(135deg, #3b82f6 0%, #38bdf8 50%, #60a5fa 100%);
+        --glow: rgba(59, 130, 246, 0.5);
 
-        --logo-bg: #0d1527;
+        --logo-bg: #182338;
         --logo-border: rgba(96, 165, 250, 0.65);
         --logo-stroke: #38bdf8;
-        --logo-glow: rgba(59, 130, 246, 0.6);
+        --logo-glow: rgba(59, 130, 246, 0.5);
     }
 }
 
 :root[data-theme="dark"] {
     color-scheme: dark;
-    --bg: #070c18;
-    --card: rgba(15, 23, 42, 0.46);
-    --card-solid: rgba(15, 23, 42, 0.72);
-    --tx: #f8fafc;
-    --mut: #94a3b8;
-    --bd: rgba(255, 255, 255, 0.16);
+    /* Modo oscuro suave y descansable: fondo gris-azulado tenue, sin negros puros */
+    --bg: #131c2e;
+    --card: rgba(30, 41, 59, 0.5);
+    --card-solid: rgba(30, 41, 59, 0.75);
+    --tx: #e2e8f0;
+    --mut: #9aa8bd;
+    --bd: rgba(255, 255, 255, 0.14);
     --bd-subtle: rgba(255, 255, 255, 0.08);
     --ac: #3b82f6;
     --ac2: #60a5fa;
@@ -121,28 +124,29 @@
     --red: #f87171;
 
     --st-sin-bg: rgba(16, 185, 129, 0.2);     --st-sin-tx: #6ee7b7;
-    --st-arr-bg: rgba(37, 99, 235, 0.25);     --st-arr-tx: #93c5fd;
+    --st-arr-bg: rgba(59, 130, 246, 0.25);    --st-arr-tx: #93c5fd;
     --st-ven-bg: rgba(139, 92, 246, 0.25);    --st-ven-tx: #c4b5fd;
     --st-vdd-bg: rgba(100, 116, 139, 0.25);   --st-vdd-tx: #cbd5e1;
     --st-pv-bg: rgba(245, 158, 11, 0.25);     --st-pv-tx: #fde68a;
 
-    --sh: 0 8px 32px 0 rgba(0, 0, 0, 0.45), 0 1px 1px 0 rgba(255, 255, 255, 0.1) inset;
-    --sh2: 0 20px 50px -10px rgba(0, 0, 0, 0.65), 0 0 25px rgba(59, 130, 246, 0.35);
+    --sh: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 0 1px 1px 0 rgba(255, 255, 255, 0.08) inset;
+    --sh2: 0 20px 50px -10px rgba(0, 0, 0, 0.45), 0 0 25px rgba(59, 130, 246, 0.25);
     --ring: rgba(96, 165, 250, 0.45);
 
+    /* Azul brillante y visible en modo oscuro */
     --gold: #3b82f6;
     --gold-light: #60a5fa;
     --gold-bright: #bfdbfe;
-    --gold-dark: #1d4ed8;
-    --gold-grad: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #60a5fa 100%);
-    --gold-shimmer: linear-gradient(90deg, #1e40af 0%, #2563eb 25%, #60a5fa 48%, #ffffff 52%, #2563eb 75%, #1e40af 100%);
-    --gold-glow: rgba(59, 130, 246, 0.6);
+    --gold-dark: #3b82f6;
+    --gold-grad: linear-gradient(135deg, #3b82f6 0%, #38bdf8 50%, #60a5fa 100%);
+    --gold-shimmer: linear-gradient(90deg, #3b82f6 0%, #38bdf8 25%, #93c5fd 48%, #ffffff 52%, #38bdf8 75%, #3b82f6 100%);
+    --gold-glow: rgba(59, 130, 246, 0.5);
     --gold-border: rgba(96, 165, 250, 0.5);
 
-    --grad: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #60a5fa 100%);
-    --glow: rgba(59, 130, 246, 0.6);
+    --grad: linear-gradient(135deg, #3b82f6 0%, #38bdf8 50%, #60a5fa 100%);
+    --glow: rgba(59, 130, 246, 0.5);
 
-    --logo-bg: #0d1527;
+    --logo-bg: #182338;
     --logo-border: rgba(96, 165, 250, 0.65);
     --logo-stroke: #38bdf8;
     --logo-glow: rgba(59, 130, 246, 0.6);
@@ -176,9 +180,9 @@ body {
 
 [data-theme="dark"] body {
     background:
-        radial-gradient(1200px 800px at 85% -5%, rgba(37, 99, 235, 0.32), transparent 60%),
-        radial-gradient(1000px 800px at -5% 15%, rgba(99, 102, 241, 0.26), transparent 55%),
-        radial-gradient(950px 950px at 50% 95%, rgba(14, 165, 233, 0.24), transparent 65%),
+        radial-gradient(1200px 800px at 85% -5%, rgba(59, 130, 246, 0.16), transparent 60%),
+        radial-gradient(1000px 800px at -5% 15%, rgba(99, 102, 241, 0.14), transparent 55%),
+        radial-gradient(950px 950px at 50% 95%, rgba(14, 165, 233, 0.12), transparent 65%),
         var(--bg);
     background-attachment: fixed;
 }
@@ -398,10 +402,10 @@ main {
 }
 
 [data-theme="dark"] .portada {
-    background: rgba(15, 23, 42, 0.46);
+    background: rgba(30, 41, 59, 0.5);
     color: var(--tx);
     border: 1.5px solid var(--bd);
-    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.14);
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.12);
 }
 
 /* Orbes ambientales de luz de fondo dentro de la portada */
@@ -472,9 +476,9 @@ main {
 }
 
 [data-theme="dark"] .glass-cube-floating {
-    background: rgba(15, 23, 42, 0.85);
+    background: rgba(30, 41, 59, 0.8);
     border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.2);
 }
 
 .skyline {
@@ -655,10 +659,10 @@ main {
 }
 
 [data-theme="dark"] .glassy-kpi-card {
-    background: rgba(15, 23, 42, 0.82);
-    color: #f8fafc;
-    border: 1.5px solid rgba(255, 255, 255, 0.16);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    background: rgba(30, 41, 59, 0.75);
+    color: #e2e8f0;
+    border: 1.5px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.12);
 }
 
 [data-theme="dark"] .glassy-kpi-card.is-active {
@@ -700,7 +704,7 @@ main {
 }
 
 .icon-blue {
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
 }
 .icon-purple {
     background: linear-gradient(135deg, #a855f7, #6d28d9);
@@ -1001,11 +1005,11 @@ main {
     position: relative;
     height: 160px;
     overflow: hidden;
-    background: linear-gradient(180deg, #1e3a8a, #2563eb);
+    background: linear-gradient(180deg, #2563eb, #38bdf8);
 }
 
 .thumb.Apartamento {
-    background: linear-gradient(180deg, #0f172a, #1e40af);
+    background: linear-gradient(180deg, #2563eb, #3b82f6);
 }
 
 .thumb svg {
@@ -1465,9 +1469,35 @@ button:disabled {
 }
 
 [data-theme="dark"] .dd-panel {
-    background: rgba(15, 23, 42, 0.97);
-    border-color: rgba(255, 255, 255, 0.18);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    background: rgba(24, 34, 52, 0.97);
+    border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* Buscador dentro del panel del desplegable (filtro de ciudades) */
+.dd-buscador {
+    width: 100%;
+    font: inherit;
+    font-size: 0.95rem;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1.5px solid var(--bd);
+    background: var(--card);
+    color: var(--tx);
+    margin-bottom: 10px;
+}
+
+.dd-buscador:focus {
+    outline: 0;
+    border-color: var(--ac);
+    box-shadow: 0 0 0 3px var(--ring);
+}
+
+.dd-vacio {
+    margin: 6px 0 4px;
+    font-size: 0.88rem;
+    color: var(--mut);
+    text-align: center;
 }
 
 /* En columnas finales, alinear hacia la derecha para que no se desborde fuera de pantalla */
@@ -1672,7 +1702,7 @@ input:focus, textarea:focus, select:focus {
     background:
         radial-gradient(1000px 700px at 15% 10%, rgba(37, 99, 235, 0.25), transparent 60%),
         radial-gradient(900px 600px at 85% 90%, rgba(59, 130, 246, 0.2), transparent 55%),
-        linear-gradient(135deg, #090e1c 0%, #0d1527 50%, #172554 100%);
+        linear-gradient(135deg, #16203a 0%, #1a2745 50%, #1e3a6e 100%);
 }
 
 .login-fondo::before {
@@ -1700,9 +1730,9 @@ input:focus, textarea:focus, select:focus {
 }
 
 [data-theme="dark"] .login-card {
-    background: rgba(15, 23, 42, 0.8);
-    border-color: rgba(255, 255, 255, 0.18);
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 35px rgba(59, 130, 246, 0.35);
+    background: rgba(30, 41, 59, 0.75);
+    border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45), 0 0 35px rgba(59, 130, 246, 0.25);
 }
 
 .login-marca {
@@ -1814,10 +1844,36 @@ input:focus, textarea:focus, select:focus {
     text-transform: uppercase;
 }
 
-.tag-usuario {
-    background: rgba(37, 99, 235, 0.12);
+/* Botón para ver vendidas y arrendadas */
+.btn-ver-cerradas {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: 9999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    background: var(--card-solid);
+    color: var(--tx);
+    border: 1.5px solid var(--bd);
+    box-shadow: var(--sh);
+    transition: all 0.25s ease;
+}
+
+.btn-ver-cerradas:hover {
+    border-color: var(--ac);
     color: var(--ac);
-    border: 1px solid rgba(59, 130, 246, 0.35);
+    transform: translateY(-1px);
+    box-shadow: var(--sh2);
+}
+
+.btn-ver-cerradas.on {
+    background: var(--grad);
+    color: var(--onac);
+    border-color: transparent;
+    box-shadow: 0 4px 16px var(--glow);
 }
 
 /* =====================================================================
@@ -1845,7 +1901,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 [data-theme="dark"] .nuevo-item:hover:not(.estatica) {
-    background: rgba(15, 23, 42, 0.9);
+    background: rgba(30, 41, 59, 0.85);
 }
 
 .nuevo-mas {
@@ -1989,7 +2045,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 [data-theme="dark"] .modal-contrato-header {
-    background: rgba(15, 23, 42, 0.35);
+    background: rgba(30, 41, 59, 0.5);
 }
 
 .modal-contrato-header h3 {
@@ -2085,18 +2141,16 @@ input:focus, textarea:focus, select:focus {
     pointer-events: none;
 }
 
-/* Hoja oficial de contrato (en pantalla: cristal líquido translúcido; en impresión: blanco puro legal) */
+/* Hoja oficial de contrato (siempre papel blanco puro, como un documento real) */
 .hoja {
-    background: rgba(255, 255, 255, 0.52);
-    color: var(--tx);
+    background: #ffffff;
+    color: #1f2937;
     max-width: 660px;
     margin: 0 auto;
     padding: 46px 56px;
-    border-radius: 20px;
-    box-shadow: 0 20px 50px -10px rgba(37, 99, 235, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.9);
-    border: 1.5px solid var(--bd);
-    -webkit-backdrop-filter: blur(28px) saturate(190%);
-    backdrop-filter: blur(28px) saturate(190%);
+    border-radius: 10px;
+    box-shadow: 0 22px 50px -14px rgba(15, 23, 42, 0.4), 0 2px 8px rgba(15, 23, 42, 0.12);
+    border: 1px solid #d8dfe8;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 0.88rem;
     line-height: 1.75;
@@ -2104,11 +2158,12 @@ input:focus, textarea:focus, select:focus {
     min-height: 700px;
 }
 
+/* En modo oscuro la hoja sigue siendo papel blanco: un contrato debe verse como documento impreso */
 [data-theme="dark"] .hoja {
-    background: rgba(15, 23, 42, 0.52);
-    color: #f8fafc;
-    border: 1.5px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    background: #ffffff;
+    color: #1f2937;
+    border: 1px solid #d8dfe8;
+    box-shadow: 0 22px 50px -14px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 .hoja .mem-t {
@@ -2122,7 +2177,7 @@ input:focus, textarea:focus, select:focus {
 
 .hoja hr {
     border: 0;
-    border-top: 1px solid var(--bd);
+    border-top: 1px solid #d8dfe8;
     margin: 12px 0 18px;
 }
 
@@ -2167,30 +2222,31 @@ input:focus, textarea:focus, select:focus {
 }
 
 .hoja .sig .firma-linea-firmante {
-    border-top: 1px solid var(--bd) !important;
+    border-top: 1px solid #94a3b8 !important;
     padding-top: 6px;
     width: 100%;
     min-width: 180px;
     font-size: 0.85rem;
     text-align: center;
+    color: #1f2937;
 }
 
 .hoja .sig .firma-nombre-txt {
     font-weight: 700;
-    color: var(--tx);
+    color: #0f172a;
 }
 
 .hoja .sig .firma-rol-txt {
     font-size: 0.78rem;
-    color: var(--mut);
+    color: #64748b;
 }
 
 .hoja .sig > div:not(.firma-slot-wrapper) {
-    border-top: 1px solid var(--bd);
+    border-top: 1px solid #cbd5e1;
     padding-top: 6px;
     min-width: 150px;
     font-size: 0.85rem;
-    color: var(--tx);
+    color: #1f2937;
 }
 
 /* Enlaces de firmas */
@@ -2459,7 +2515,7 @@ input:focus, textarea:focus, select:focus {
     width: 100vw !important;
     height: 100vh !important;
     z-index: 100000 !important;
-    background: rgba(15, 23, 42, 0.72);
+    background: rgba(10, 16, 28, 0.6);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     display: flex;
@@ -2703,7 +2759,7 @@ input:focus, textarea:focus, select:focus {
     border: 1px solid transparent;
     border-radius: 6px;
     background: transparent;
-    color: #1e3a8a;
+    color: #2563eb;
     font: 700 0.95rem/1.5 Georgia, serif;
     padding: 4px 6px;
     margin: 0 0 6px -6px;
@@ -2721,7 +2777,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 .editor-clausula-pre-texto {
-    color: #1e3a8a;
+    color: #2563eb;
     font-weight: 700;
     font-size: 0.95rem;
     line-height: 1.5;
@@ -2838,3 +2894,72 @@ input:focus, textarea:focus, select:focus {
     .editor-clausula-barra-btns { opacity: 1; }
     .editor-clausulas-footer { padding: 8px 14px; font-size: 0.72rem; }
 }
+
+/* =====================================================================
+   AJUSTES RESPONSIVOS MÓVILES (VISIÓN ORDENADA EN CELULAR)
+   ===================================================================== */
+
+@media (max-width: 700px) {
+    /* Espaciado general y cabecera compacta y sin desbordes */
+    main { padding: 20px 14px 60px; }
+    header { padding: 10px 12px; gap: 10px; }
+    .header-der { gap: 8px; }
+    .usuario-nom { display: none; }
+    .tema-btn { width: 36px; height: 36px; }
+    .tag-admin-toggle { font-size: 0.68rem; padding: 5px 10px; gap: 4px; }
+    .tag-admin-toggle svg { width: 14px; height: 14px; }
+
+    /* Portada y estadísticas más compactas */
+    .portada { padding: 24px 18px 22px; margin-bottom: 20px; }
+    .portada-header-wrap h2 { font-size: 1.35rem; }
+    .stats { gap: 12px 0; }
+    .stats > div { padding: 0 14px; }
+    .stats dd { font-size: 1.7rem; }
+    .stats dt { font-size: 0.76rem; }
+
+    /* Tarjetas y filtros */
+    .card { padding: 18px 16px; border-radius: 16px; margin-bottom: 16px; }
+    .filtros-top { flex-wrap: wrap; gap: 4px; }
+    .ft { font-size: 0.95rem; }
+    .dd-btn { font-size: 0.9rem; padding: 10px 12px; }
+    .chip { font-size: 0.86rem; padding: 8px 13px; }
+    .dd-panel { width: min(340px, calc(100vw - 2.5rem)); max-height: 62vh; overflow-y: auto; }
+    .dd-buscador { font-size: 0.9rem; }
+
+    /* Barra de herramientas con el botón de vendidas/arrendadas */
+    .toolbar { margin: 20px 0 14px; }
+    .toolbar h2 { font-size: 1.2rem; }
+    .btn-ver-cerradas { width: 100%; justify-content: center; padding: 10px 14px; font-size: 0.85rem; }
+
+    /* Catálogo: una columna limpia, tarjetas sin deformarse */
+    .lista { grid-template-columns: 1fr; gap: 14px; }
+    .item { border-radius: 16px; }
+    .thumb { height: 150px; }
+    .info { padding: 14px 14px 16px; }
+    .precio { font-size: 1.12rem; }
+    .tag.grande { font-size: 0.66rem; }
+
+    /* Detalle del inmueble */
+    .ficha-body { padding: 20px 16px 24px; }
+    .titulo { font-size: 1.5rem; }
+    .datos { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .dato { padding: 12px 14px; }
+    .dato b { font-size: 1.05rem; }
+    .precio-dato { grid-column: 1 / -1; }
+    .precio-dato .precio-val { font-size: 1.35rem; }
+
+    /* Formularios y hoja del contrato legible como documento */
+    .grid, .grid-contrato { gap: 16px; }
+    .hoja { padding: 26px 18px; border-radius: 8px; min-height: 0; font-size: 0.84rem; }
+
+    /* Visor de contrato */
+    .modal-contrato-visor-overlay { padding: 10px 10px 40px; }
+    .modal-contrato-toolbar { padding: 10px 12px; flex-wrap: wrap; gap: 8px; }
+    .modal-contrato-toolbar button { font-size: 0.82rem; padding: 8px 12px; }
+    .modal-contrato-header { padding: 12px 14px; flex-wrap: wrap; }
+
+    /* Paginación apilada */
+    .paginacion-pestanas-wrap { flex-direction: column; gap: 10px; text-align: center; }
+    .pag-btn { padding: 8px 14px; }
+}
+

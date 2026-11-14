@@ -11,7 +11,7 @@
   font-weight: 600;
   font-size: .92rem;
   border: 1.5px solid rgba(255, 255, 255, 0.4);
-  background: var(--gold-grad, linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%));
+  background: var(--gold-grad, linear-gradient(135deg, #2563eb 0%, #2563eb 50%, #3b82f6 100%));
   color: #ffffff;
   border-radius: 12px;
   padding: 11px 20px;
@@ -45,7 +45,7 @@
 .fm-tabs button { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; text-align: left; transition: all .2s ease }
 .fm-tabs button small { color: var(--mut); font-weight: 400; font-size: .78rem }
 .fm-tabs button.on {
-  background: var(--gold-grad, linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%));
+  background: var(--gold-grad, linear-gradient(135deg, #2563eb 0%, #2563eb 50%, #3b82f6 100%));
   border-color: rgba(255, 255, 255, 0.5);
   color: #ffffff;
   box-shadow: 0 4px 18px rgba(37, 99, 235, 0.35);

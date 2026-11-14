@@ -18,8 +18,10 @@ const Skyline = () => (
 export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, nuevo, esAdmin }) {
   const POR_PAGINA = 50;
   const [pagina, setPagina] = useState(1);
+  const [verCerradas, setVerCerradas] = useState(false);
 
-  const base = filtrar(data, filtros);
+  // Por defecto la lista muestra solo disponibles; el botón alterna a vendidas y arrendadas
+  const base = filtrar(data, filtros, verCerradas ? 'cerradas' : '');
   const n = (t) => base.filter((i) => i.tipo === t).length;
   const items = tab === 'Todos' ? base : base.filter((i) => i.tipo === tab);
   const idx = tab === 'Todos' ? 0 : tab === 'Casa' ? 1 : 2;
@@ -34,10 +36,10 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
     return Array.from(set).sort((a, b) => a.localeCompare(b, 'es'));
   }, [data]);
 
-  // Al cambiar pestaña de tipo o cualquier filtro, reiniciar a la página 1
+  // Al cambiar pestaña de tipo, filtro o vista de vendidas/arrendadas, reiniciar a la página 1
   useEffect(() => {
     setPagina(1);
-  }, [tab, filtros]);
+  }, [tab, filtros, verCerradas]);
 
   const totalPaginas = Math.max(1, Math.ceil(items.length / POR_PAGINA));
   const paginaActual = Math.min(pagina, totalPaginas);
@@ -132,9 +134,18 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
 
       <div className="toolbar">
         <h2>{tab === 'Todos' ? 'Todos los inmuebles' : tab === 'Casa' ? 'Casas' : 'Apartamentos'}</h2>
+        <button
+          type="button"
+          className={`btn-ver-cerradas ${verCerradas ? 'on' : ''}`}
+          aria-pressed={verCerradas}
+          onClick={() => setVerCerradas(!verCerradas)}
+          title={verCerradas ? 'Volver a la lista de inmuebles disponibles' : 'Ver las casas y apartamentos ya vendidas o arrendadas'}
+        >
+          {verCerradas ? 'Vendidas y arrendadas' : 'Ver vendidas y arrendadas'}
+        </button>
       </div>
 
-      {items.length === 0 && <div className="card vacio">Ningún inmueble coincide con los filtros. Amplía los rangos o cambia de pestaña.</div>}
+      {items.length === 0 && <div className="card vacio">Ningún inmueble coincide con la vista actual. Prueba el botón "Ver vendidas y arrendadas", amplia los rangos de los filtros o cambia de pestaña.</div>}
 
       <div className="lista">
         {itemsPaginados.map((i) => <Tarjeta key={i._id} i={i} esAdmin={esAdmin} abrir={() => abrir(i._id)} />)}

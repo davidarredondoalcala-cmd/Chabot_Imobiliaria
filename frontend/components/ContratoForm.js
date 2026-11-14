@@ -15,6 +15,7 @@ import {
   esNombreValido,
   esEmailValido,
 } from '../lib/validadores';
+import { formatoMiles } from '../lib/utils';
 
 const CLAUSULAS_ARRIENDO_DEF = [
   { pre: 'PRIMERA – Objeto.', resto: 'EL ARRENDADOR entrega a título de arrendamiento el inmueble ubicado en la dirección indicada.' },
@@ -145,8 +146,9 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
         type={t || 'text'}
         placeholder={p}
         maxLength={maxLen}
-        value={S[k] || ''}
+        value={k === 'val' ? formatoMiles(S[k]) : (S[k] || '')}
         onChange={(e) => actualizarCampo(k, e.target.value)}
+        inputMode={k === 'val' ? 'numeric' : undefined}
       />
     </div>
   );
@@ -478,7 +480,7 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
           {campo('bar', 'Barrio', 'text', 'Ej: Piedra Pintada', 50)}
           <label>Linderos</label>
           <textarea rows="3" value={S.lin} maxLength={500} onChange={(e) => actualizarCampo('lin', e.target.value)} />
-          {campo('val', modo === 'arriendo' ? 'Valor mensual ($)' : 'Precio de venta ($)', 'text', 'Ej: 1500000', 12)}
+          {campo('val', modo === 'arriendo' ? 'Valor mensual ($)' : 'Precio de venta ($)', 'text', 'Ej: 1.500.000', 12)}
           {modo === 'arriendo' ? (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', alignItems: 'end' }}>
               <div>{campo('dur', 'Duración (meses)', 'text', 'Ej: 12', 3)}</div>

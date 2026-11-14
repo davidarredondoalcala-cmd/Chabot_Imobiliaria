@@ -17,7 +17,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 55%, #3b82f6 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #38bdf8 100%);
   color: #ffffff;
   border: 1.5px solid rgba(255, 255, 255, 0.45);
   border-radius: 9999px;
@@ -61,10 +61,10 @@
 }
 
 [data-theme="dark"] .hc-chat-window {
-  background: rgba(15, 23, 42, 0.65);
-  color: #f8fafc;
-  border: 1.5px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.6), 0 0 30px rgba(59, 130, 246, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  background: rgba(30, 41, 59, 0.75);
+  color: #e2e8f0;
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.45), 0 0 30px rgba(59, 130, 246, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.12);
 }
 
 @keyframes hc-pop-in {
@@ -80,7 +80,7 @@
 
 /* Encabezado Glassy Azul Real */
 .hc-chat-header {
-  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #38bdf8 100%);
   color: #ffffff;
   padding: 16px 18px;
   display: flex;
@@ -327,9 +327,9 @@
 
 [data-theme="dark"] .hc-msg-bubble.bot {
   background: rgba(30, 41, 59, 0.85);
-  color: #f8fafc;
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 .hc-msg-bubble.user {
@@ -528,7 +528,7 @@
 }
 
 .hc-prop-header {
-  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #38bdf8 100%);
   color: #ffffff;
   padding: 12px 14px;
 }
@@ -663,7 +663,7 @@
 }
 
 [data-theme="dark"] .hc-chips-container {
-  background: rgba(15, 23, 42, 0.65);
+  background: rgba(30, 41, 59, 0.7);
 }
 
 .hc-chip-btn {
@@ -700,7 +700,7 @@
 }
 
 [data-theme="dark"] .hc-chat-input-form {
-  background: rgba(15, 23, 42, 0.75);
+  background: rgba(30, 41, 59, 0.75);
 }
 
 .hc-chat-input {
