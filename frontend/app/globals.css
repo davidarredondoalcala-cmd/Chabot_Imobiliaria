@@ -1123,8 +1123,17 @@ main {
     display: flex;
     align-items: center;
     gap: 8px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     color: var(--tx);
+}
+
+/* El precio puede abreviarse, pero el tag SIEMPRE arriba a la derecha en una sola línea */
+.precio .precio-num {
+    min-width: 0;
+    flex: 0 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .info .caract + .precio,
@@ -1142,6 +1151,8 @@ main {
 
 .precio .tag.grande {
     margin-left: auto;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 /* =====================================================================

@@ -38,7 +38,7 @@ export default function Tarjeta({ i, abrir, esAdmin }) {
         {esAdmin && i.estado !== 'Arrendada' && i.venc && (
           <p className="meta">Contrato vence el {fd(i.venc)} · pago el día {i.diaPago}</p>
         )}
-        <p className="precio">{fmt(i.valor)}<small>{sufijo(i)}</small><span className={`tag grande ${cls(i.estado)}`}>{i.estado}</span></p>
+        <p className="precio"><span className="precio-num">{fmt(i.valor)}<small>{sufijo(i)}</small></span><span className={`tag grande ${cls(i.estado)}`}>{i.estado}</span></p>
       </div>
     </article>
   );
