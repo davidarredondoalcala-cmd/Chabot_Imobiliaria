@@ -961,6 +961,11 @@ main {
     transition: transform 0.35s var(--suave), box-shadow 0.35s var(--suave), border-color 0.3s ease;
 }
 
+.vacio {
+    text-align: center;
+    color: var(--mut);
+}
+
 .lista {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -1185,6 +1190,19 @@ main {
     transform: scale(1.05);
 }
 
+/* Etiqueta pulsante de alerta (Por vencer en tarjetas de contrato) */
+.tag.pulse {
+    background: var(--st-pv-bg);
+    color: var(--st-pv-tx);
+    animation: pulso-alerta 2.4s infinite;
+}
+
+@keyframes pulso-alerta {
+    0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.45); }
+    70% { box-shadow: 0 0 0 9px rgba(245, 158, 11, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
 /* =====================================================================
    BOTONES E INTERACCIONES
    ===================================================================== */
@@ -1271,6 +1289,16 @@ button.l {
 button.l:hover {
     text-decoration: underline;
     transform: translateX(-3px);
+}
+
+/* Botón pequeño (acciones de tarjetas de contrato y visor) */
+button.s {
+    font-size: 0.84rem;
+    padding: 7px 13px;
+    border-radius: 10px;
+    gap: 6px;
+    display: inline-flex;
+    align-items: center;
 }
 
 button:disabled {
@@ -1394,6 +1422,12 @@ button:disabled {
 .chip-num:focus {
     outline: 0;
     box-shadow: 0 0 0 3px var(--ring);
+}
+
+.chips-hint {
+    font-weight: 500;
+    text-transform: none;
+    color: var(--mut);
 }
 
 /* Desplegables con panel de cristal */
@@ -1625,9 +1659,142 @@ button:disabled {
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
+/* Contenido y acciones de las tarjetas de contrato (alineados a la misma altura) */
+.pdf-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.pdf-info b {
+    display: block;
+    color: var(--tx);
+}
+
+.pdf-info .mut {
+    font-size: 0.82rem;
+}
+
+.pdf-acciones {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.pdf-acciones button.s {
+    font-size: 0.82rem;
+    padding: 7px 12px;
+    border-radius: 9px;
+}
+
+.pdf-acciones button.s:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =====================================================================
+   CAJA DE INTERÉS DEL CLIENTE (WHATSAPP + DISPONIBILIDAD)
+   ===================================================================== */
+
+.ficha-cliente-box {
+    margin-top: 24px;
+    padding: 22px 26px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(56, 189, 248, 0.05) 100%);
+    border: 1.5px solid var(--bd);
+    box-shadow: 0 8px 24px -12px var(--gold-glow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ficha-cliente-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.ficha-cliente-icono {
+    font-size: 1.8rem;
+    line-height: 1;
+    display: inline-flex;
+    color: var(--ac);
+}
+
+.ficha-cliente-header h4 {
+    margin: 0 0 4px;
+    font-size: 1.15rem;
+    color: var(--tx);
+    font-weight: 700;
+}
+
+.ficha-cliente-header p {
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--mut);
+}
+
+.ficha-cliente-acciones {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.btn-cliente-wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.92rem;
+    padding: 11px 22px;
+    border-radius: 12px;
+    color: var(--onac) !important;
+}
+
+.btn-cliente-wa:hover {
+    color: var(--onac) !important;
+}
+
+.ficha-cliente-disponibilidad {
+    font-size: 0.88rem;
+    color: var(--mut);
+}
+
+.ficha-cliente-disponibilidad strong {
+    color: var(--tx);
+    font-weight: 700;
+}
+
+/* Ritmo vertical uniforme dentro de la ficha del inmueble */
+.ficha-body > .row {
+    margin: 20px 0 4px;
+}
+
+.ficha-body > h3 {
+    margin: 26px 0 14px;
+}
+
+.ficha-body .pdf {
+    margin-bottom: 12px;
+}
+
 /* =====================================================================
    FORMULARIOS
    ===================================================================== */
+
+.form-t {
+    margin: 0 0 16px;
+    font-size: 1.4rem;
+}
+
+.grid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
 
 label {
     display: block;
@@ -1757,6 +1924,42 @@ input:focus, textarea:focus, select:focus {
     justify-content: center;
     min-height: 44px;
     margin-bottom: 12px;
+}
+
+.login-espera {
+    margin: 0;
+}
+
+.login-error {
+    margin-top: 8px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--st-vdd-bg);
+    color: var(--st-vdd-tx);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.login-pie {
+    display: flex;
+    gap: 10px 22px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--bd);
+    color: var(--mut);
+    font-size: 0.86rem;
+}
+
+.login-pie span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.login-pie svg {
+    color: var(--ac);
 }
 
 /* =====================================================================
@@ -1994,12 +2197,12 @@ input:focus, textarea:focus, select:focus {
     align-items: center;
     gap: 12px;
     padding: 12px 20px;
-    background: var(--card);
-    border: 1.5px solid var(--bd);
-    border-radius: 16px;
-    box-shadow: var(--sh2);
-    -webkit-backdrop-filter: blur(24px) saturate(190%);
-    backdrop-filter: blur(24px) saturate(190%);
+    background: rgba(13, 20, 35, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.55);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
     cursor: default;
 }
 
@@ -2008,6 +2211,82 @@ input:focus, textarea:focus, select:focus {
     width: 100%;
     margin: 0 auto;
     cursor: default;
+}
+
+/* Contenido de la barra del visor: título a la izquierda, botones a la derecha */
+.modal-contrato-toolbar-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.modal-contrato-toolbar-ico {
+    display: flex;
+    align-items: center;
+    color: var(--ac);
+    flex-shrink: 0;
+}
+
+.modal-contrato-toolbar-txt {
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.88);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.modal-contrato-toolbar-txt strong {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.modal-contrato-toolbar-btns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+/* Botón de cerrar del visor (transparente; rojo al pasar el cursor) */
+.btn-cerrar-perspectiva {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+.btn-cerrar-perspectiva:hover {
+    background: rgba(239, 68, 68, 0.85) !important;
+    border-color: rgba(239, 68, 68, 1) !important;
+    color: #ffffff !important;
+}
+
+/* Escenario de lectura: el papel centrado; el exterior cierra el visor */
+.modal-contrato-escenario {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+/* Proporción natural del papel dentro del visor */
+.modal-contrato-papel .hoja {
+    max-width: 630px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 42px 48px;
+}
+
+.modal-contrato-hint-exterior {
+    margin-top: 18px;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.65);
+    text-align: center;
+    pointer-events: none;
+    letter-spacing: 0.2px;
 }
 
 /* =====================================================================
@@ -2139,6 +2418,13 @@ input:focus, textarea:focus, select:focus {
     font-size: 0.7rem;
     font-weight: 600;
     pointer-events: none;
+    opacity: 0.85;
+    transition: opacity 0.2s ease;
+}
+
+.foto-cap.subiendo {
+    opacity: 1;
+    background: rgba(37, 99, 235, 0.85);
 }
 
 /* Hoja oficial de contrato (siempre papel blanco puro, como un documento real) */
@@ -2166,6 +2452,17 @@ input:focus, textarea:focus, select:focus {
     box-shadow: 0 22px 50px -14px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
+.hoja .mem {
+    margin-bottom: 18px;
+}
+
+.hoja .mem-h {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+}
+
 .hoja .mem-t {
     margin: 0;
     font-size: 1.05rem;
@@ -2173,6 +2470,19 @@ input:focus, textarea:focus, select:focus {
     color: var(--ac);
     text-transform: uppercase;
     font-weight: 700;
+}
+
+.hoja .mem-sub {
+    margin: 4px 0 0;
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+.hoja .mem-l {
+    text-align: right;
+    font-size: 0.75rem;
+    color: #64748b;
+    line-height: 1.4;
 }
 
 .hoja hr {
@@ -2183,6 +2493,40 @@ input:focus, textarea:focus, select:focus {
 
 .hoja h3, .hoja h4, .hoja b {
     color: var(--ac);
+}
+
+/* Espacios en blanco rellenables del contrato */
+.hoja .bl {
+    color: #94a3b8;
+    font-weight: 400;
+    border-bottom: 1px solid #94a3b8;
+}
+
+/* Cláusulas con formato enriquecido (lista, subrayados y sangrías limpias) */
+.hoja .hoja-clausula {
+    margin: 0 0 10px;
+}
+
+.hoja .hoja-clausula-cuerpo {
+    display: contents;
+}
+
+.hoja .hoja-clausula-cuerpo ul,
+.hoja .hoja-clausula-cuerpo ol {
+    margin: 6px 0 8px 22px;
+    padding: 0;
+}
+
+.hoja .hoja-clausula-cuerpo li {
+    margin: 2px 0;
+}
+
+.hoja .hoja-clausula-cuerpo p {
+    margin: 0 0 6px;
+}
+
+.hoja .hoja-clausula-cuerpo u {
+    text-decoration: underline;
 }
 
 /* Alineación exacta de firmas */
@@ -2948,15 +3292,30 @@ input:focus, textarea:focus, select:focus {
     .precio-dato { grid-column: 1 / -1; }
     .precio-dato .precio-val { font-size: 1.35rem; }
 
+    /* Caja de interés del cliente: acciones apiladas y sin amontonarse */
+    .ficha-cliente-box { padding: 18px 16px; gap: 14px; }
+    .ficha-cliente-header { gap: 10px; }
+    .ficha-cliente-header h4 { font-size: 1.02rem; }
+    .ficha-cliente-acciones { flex-direction: column; align-items: stretch; gap: 10px; }
+    .btn-cliente-wa { justify-content: center; width: 100%; }
+    .ficha-cliente-disponibilidad { text-align: center; }
+
+    /* Tarjetas de contrato: botones en su propia fila */
+    .pdf { flex-wrap: wrap; padding: 14px; }
+    .pdfico { width: 38px; height: 46px; }
+    .pdf-acciones { width: 100%; justify-content: flex-start; }
+
+    /* Visor de contrato: toolbar en columna y papel proporcionado */
+    .modal-contrato-visor-overlay { padding: 12px 10px 40px; }
+    .modal-contrato-toolbar { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px 14px; border-radius: 12px; }
+    .modal-contrato-toolbar button { font-size: 0.82rem; padding: 8px 12px; }
+    .modal-contrato-toolbar-btns { justify-content: flex-end; }
+    .modal-contrato-papel .hoja { padding: 24px 18px; font-size: 0.82rem; line-height: 1.6; }
+    .modal-contrato-header { padding: 12px 14px; flex-wrap: wrap; }
+
     /* Formularios y hoja del contrato legible como documento */
     .grid, .grid-contrato { gap: 16px; }
     .hoja { padding: 26px 18px; border-radius: 8px; min-height: 0; font-size: 0.84rem; }
-
-    /* Visor de contrato */
-    .modal-contrato-visor-overlay { padding: 10px 10px 40px; }
-    .modal-contrato-toolbar { padding: 10px 12px; flex-wrap: wrap; gap: 8px; }
-    .modal-contrato-toolbar button { font-size: 0.82rem; padding: 8px 12px; }
-    .modal-contrato-header { padding: 12px 14px; flex-wrap: wrap; }
 
     /* Paginación apilada */
     .paginacion-pestanas-wrap { flex-direction: column; gap: 10px; text-align: center; }
