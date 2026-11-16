@@ -2,6 +2,7 @@
    Paleta Glassy Dashboard V2: Reutiliza variables (--ac, --card, --bd, etc.). */
 
 .fm-main { max-width: 980px; margin: 0 auto; padding: 28px 24px 72px }
+@media (max-width: 600px) { .fm-main { padding: 18px 14px 56px } }
 
 .fm-cab { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 20px }
 .fm-cab h2 { margin: 0 }
@@ -97,6 +98,83 @@
 .fm-cond { background: var(--bg); border: 1px solid var(--bd); border-radius: 14px; padding: 14px 18px; margin: 16px 0 }
 .fm-cond label { display: flex; gap: 10px; align-items: flex-start; margin: 0; font-weight: 500; color: var(--tx); font-size: .88rem; line-height: 1.5 }
 .fm-cond input[type="checkbox"] { width: auto; margin-top: 4px }
+
+/* ---------- Tabla de evidencias ---------- */
+.fm-tabla-env {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  margin: 4px 0 10px;
+}
+.fm-tabla { width: 100%; border-collapse: collapse; font-size: .86rem; min-width: 680px }
+.fm-tabla th {
+  background: var(--bg);
+  color: var(--tx);
+  text-align: left;
+  font-weight: 700;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  padding: 10px 14px;
+  border-bottom: 1.5px solid var(--bd);
+  white-space: nowrap;
+}
+.fm-tabla td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--bd);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.fm-tabla tbody tr:last-child td { border-bottom: 0 }
+.fm-hash {
+  font-size: .8rem;
+  background: var(--bg);
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  padding: 2px 8px;
+  word-break: break-all;
+}
+.fm-hash-larga { display: inline-block; max-width: 140px; overflow: hidden; text-overflow: ellipsis; vertical-align: middle }
+
+/* Móvil: cada firmante como tarjeta apilada (el diseño PC queda intacto) */
+@media (max-width: 700px) {
+  .fm-tabla-env { border: 0; border-radius: 0; overflow: visible }
+  .fm-tabla, .fm-tabla tbody, .fm-tabla tr, .fm-tabla td { display: block; width: 100% }
+  .fm-tabla { min-width: 0 }
+  .fm-tabla thead { display: none }
+  .fm-tabla tbody tr {
+    background: var(--card);
+    border: 1px solid var(--bd);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin: 0 0 12px;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, .06);
+  }
+  .fm-tabla tbody tr:last-child { margin-bottom: 0 }
+  .fm-tabla td {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px dashed var(--bd);
+    white-space: normal;
+    text-align: right;
+  }
+  .fm-tabla td:last-child { border-bottom: 0 }
+  .fm-tabla td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    color: var(--mut);
+    text-align: left;
+    flex-shrink: 0;
+  }
+  .fm-hash { max-width: 180px; font-size: .72rem; text-align: left }
+}
 
 /* ---------- Imagen de firma dentro del contrato ---------- */
 .hoja .sig .firma-img { display: inline-block; max-height: 60px; max-width: 180px; object-fit: contain; margin: 0 auto 4px }

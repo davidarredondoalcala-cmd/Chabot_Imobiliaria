@@ -170,6 +170,9 @@ body {
     font-family: var(--f-body), "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
+    /* Red de seguridad: elimina la barra de scroll horizontal si algún elemento decorativo se sale
+       (no altera el diseño en PC; overflow-x: clip no crea contenedor de scroll) */
+    overflow-x: clip;
     background:
         radial-gradient(1200px 800px at 85% -5%, rgba(59, 130, 246, 0.22), transparent 60%),
         radial-gradient(1000px 800px at -5% 15%, rgba(99, 102, 241, 0.18), transparent 55%),
@@ -1079,6 +1082,8 @@ main {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    /* Dos líneas reservadas siempre: los nombres cortos dejan el espacio arriba, no abajo */
+    min-height: 2.5em;
 }
 
 .item:hover .nom {
@@ -1089,12 +1094,19 @@ main {
     margin: 0 0 10px;
     color: var(--mut);
     font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .meta {
     margin: 8px 0 0;
     color: var(--mut);
     font-size: 0.82rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .caract {
@@ -2068,6 +2080,9 @@ input:focus, textarea:focus, select:focus {
     transform: translateY(-1px);
     box-shadow: 0 0 18px rgba(37, 99, 235, 0.35);
 }
+
+/* Textos del toggle admin: largo en PC, corto solo en móvil (ver media 700px) */
+.tag-admin-txt-corto { display: none; }
 
 .tag-rol {
     display: inline-flex;
@@ -3279,12 +3294,16 @@ input:focus, textarea:focus, select:focus {
 @media (max-width: 700px) {
     /* Espaciado general y cabecera compacta y sin desbordes */
     main { padding: 20px 14px 60px; }
-    header { padding: 10px 12px; gap: 10px; }
-    .header-der { gap: 8px; }
+    /* En móvil la marca queda en su fila y los controles bajan a una segunda fila (el PC no cambia) */
+    header { padding: 10px 12px; gap: 8px 10px; flex-wrap: wrap; }
+    .header-der { gap: 8px; flex-wrap: wrap; }
     .usuario-nom { display: none; }
     .tema-btn { width: 36px; height: 36px; }
     .tag-admin-toggle { font-size: 0.68rem; padding: 5px 10px; gap: 4px; }
     .tag-admin-toggle svg { width: 14px; height: 14px; }
+    /* Toggle admin: texto corto en móvil, largo solo visible en PC */
+    .tag-admin-txt-largo { display: none; }
+    .tag-admin-txt-corto { display: inline; }
 
     /* Portada y estadísticas más compactas */
     .portada { padding: 24px 18px 22px; margin-bottom: 20px; }

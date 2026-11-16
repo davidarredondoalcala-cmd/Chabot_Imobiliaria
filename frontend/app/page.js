@@ -163,9 +163,9 @@ export default function Home() {
               title={modoClienteSimulado ? 'Clic para volver a modo Administrador' : 'Clic para probar la vista exacta como cliente'}
             >
               {modoClienteSimulado ? (
-                <><IcoUsuario /> Viendo como Cliente (volver a Admin)</>
+                <><IcoUsuario /> <span className="tag-admin-txt-largo">Viendo como Cliente (volver a Admin)</span><span className="tag-admin-txt-corto">Vista Cliente</span></>
               ) : (
-                <><IcoEscudo /> Administrador (probar vista cliente)</>
+                <><IcoEscudo /> <span className="tag-admin-txt-largo">Administrador (probar vista cliente)</span><span className="tag-admin-txt-corto">Modo Admin</span></>
               )}
             </button>
           ) : null}
