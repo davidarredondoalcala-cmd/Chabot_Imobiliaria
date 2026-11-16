@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { GOOGLE_CLIENT_ID, cargarGoogle, loginGoogle } from '../lib/auth';
 import { Logo, IcoCasa, IcoEdificio } from './Iconos';
-import TemaBtn from './TemaBtn';
 
 
 export default function Login({ onEntrar }) {
@@ -52,7 +51,6 @@ export default function Login({ onEntrar }) {
   return (
     <main className="login-main">
       <div className="login-fondo" aria-hidden="true" />
-      <TemaBtn />
       <div className="card login-card">
         <div className="marca login-marca"><Logo /><h1>Habitat Capital</h1></div>
         <h2 className="login-t">Inicia sesión</h2>

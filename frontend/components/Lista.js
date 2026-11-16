@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { createPortal } from 'react-dom';
 import { filtrar, porVencer } from '../lib/utils';
 import Filtros from './Filtros';
 import Tarjeta from './Tarjeta';
@@ -20,7 +19,6 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
   const POR_PAGINA = 50;
   const [pagina, setPagina] = useState(1);
   const [verCerradas, setVerCerradas] = useState(false);
-  const [flecha, setFlecha] = useState(null); // 'abajo' | 'arriba' | null (oculta al inicio)
 
   // Por defecto la lista muestra solo disponibles; el botón alterna a vendidas y arrendadas
   const base = filtrar(data, filtros, verCerradas ? 'cerradas' : '');
@@ -42,33 +40,6 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
   useEffect(() => {
     setPagina(1);
   }, [tab, filtros, verCerradas]);
-
-  // Flecha flotante: oculta al inicio, aparece al deslizar; cerca del final apunta hacia arriba
-  useEffect(() => {
-    const f = () => {
-      const y = window.scrollY;
-      const alFinal = y + window.innerHeight >= document.documentElement.scrollHeight - 260;
-      if (y < 120) setFlecha(null);
-      else setFlecha(alFinal ? 'arriba' : 'abajo');
-    };
-    addEventListener('scroll', f, { passive: true });
-    addEventListener('resize', f);
-    f();
-    return () => { removeEventListener('scroll', f); removeEventListener('resize', f); };
-  }, []);
-
-  const irConFlecha = () => {
-    if (flecha === 'arriba') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-    const elem = document.getElementById('nuevo-inmueble');
-    if (elem) {
-      elem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    } else {
-      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
-    }
-  };
 
   const totalPaginas = Math.max(1, Math.ceil(items.length / POR_PAGINA));
   const paginaActual = Math.min(pagina, totalPaginas);
@@ -203,23 +174,6 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
           </article>
         )}
       </div>
-
-      {/* Flecha flotante (solo móvil): oculta al inicio, baja al final / sube al inicio según la posición.
-          Se monta por portal en document.body para que quede fuera de .view y position: fixed
-          siempre sea respecto al viewport (mismo motivo por el que el chatbot flota bien). */}
-      {flecha &&
-        createPortal(
-          <button
-            type="button"
-            className={`btn-flotante-agregar noprint ${flecha === 'arriba' ? 'subir' : ''}`}
-            onClick={irConFlecha}
-            aria-label={flecha === 'arriba' ? 'Subir al inicio' : 'Bajar al final'}
-            title={flecha === 'arriba' ? 'Subir al inicio' : 'Bajar al final'}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
-          </button>,
-          document.body
-        )}
 
       {/* Pestañas de paginación (Límite: 50 inmuebles por pestaña) */}
       {totalPaginas > 1 && (
