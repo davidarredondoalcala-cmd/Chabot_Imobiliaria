@@ -2871,6 +2871,33 @@ input:focus, textarea:focus, select:focus {
     margin-left: 0;
 }
 
+/* Tarjeta de confirmación de envío del contrato (mismo aspecto en PC; en móvil cada
+   firmante apila su etiqueta debajo del correo en lugar de comprimirse y desbordarse) */
+.enviado-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.enviado-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: var(--bg);
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--bd);
+}
+.enviado-item-info {
+    min-width: 0;
+    flex: 1 1 240px;
+}
+.enviado-item .tag {
+    flex-shrink: 0;
+}
+
 /* =====================================================================
    EDITOR DE CLÁUSULAS (Modal tipo procesador de texto / Word)
    ===================================================================== */
@@ -3273,8 +3300,19 @@ input:focus, textarea:focus, select:focus {
         border-radius: 0 !important;
         border: 0 !important;
     }
-    .editor-clausulas-header { padding: 12px 14px; }
+    .editor-clausulas-header { padding: 12px 14px; flex-wrap: wrap; }
+    /* En móvil el título ocupa su fila y los botones bajan a la siguiente (PC sin cambios) */
+    .editor-clausulas-title { flex: 1 1 100%; }
+    .editor-clausulas-header-btns { flex-wrap: wrap; }
+    .editor-clausulas-header-btns .s,
+    .editor-clausulas-header-btns .g { font-size: 0.8rem; padding: 8px 12px; }
     .editor-clausulas-title-txt strong { font-size: 0.92rem; }
+    .editor-clausulas-title-txt span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
     .editor-clausulas-toolbar { padding: 8px 10px; }
     .editor-clausulas-tool { padding: 8px; }
     .editor-clausulas-tool span { display: none; }
@@ -3371,6 +3409,14 @@ input:focus, textarea:focus, select:focus {
     /* Formularios y hoja del contrato legible como documento */
     .grid, .grid-contrato { gap: 16px; }
     .hoja { padding: 26px 18px; border-radius: 8px; min-height: 0; font-size: 0.84rem; }
+
+    /* Formulario de contrato: botones de acción a ancho completo, uno por línea */
+    .grid-preview-sticky .row { gap: 10px; }
+    .grid-preview-sticky .row button { flex: 1 1 100%; justify-content: center; }
+    .enviado-head { align-items: flex-start; }
+    .enviado-head b { font-size: 1rem; }
+    .enviado-item { align-items: flex-start; padding: 12px 14px; }
+    .enviado-item .tag { font-size: 0.72rem; }
 
     /* Paginación apilada */
     .paginacion-pestanas-wrap { flex-direction: column; gap: 10px; text-align: center; }
