@@ -174,7 +174,7 @@ export default function Home() {
           <div className="usuario">
             {sesion.usuario?.foto ? <img src={sesion.usuario.foto} alt="" referrerPolicy="no-referrer" /> : null}
             <span className="usuario-nom">{sesion.usuario?.nombre || sesion.usuario?.email}</span>
-            <button className="l" onClick={cerrarSesion}>Salir</button>
+            <button className="btn-salir" onClick={cerrarSesion}>Salir</button>
           </div>
         </div>
       </header>

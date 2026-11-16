@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { filtrar, porVencer } from '../lib/utils';
 import Filtros from './Filtros';
 import Tarjeta from './Tarjeta';
-import { IcoCasa, IcoEdificio, IcoTodos, IcoMas } from './Iconos';
+import { IcoCasa, IcoEdificio, IcoTodos } from './Iconos';
 
 const Skyline = () => (
   <svg className="skyline" viewBox="0 0 400 200" preserveAspectRatio="xMaxYMax meet" aria-hidden="true">
@@ -188,10 +188,11 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
           type="button"
           className="btn-flotante-agregar noprint"
           onClick={irAAgregar}
-          aria-label="Ir a la tarjeta de agregar inmueble"
-          title="Ir a agregar inmueble"
+          aria-label="Bajar hasta la tarjeta de agregar inmueble"
+          title="Bajar hasta Agregar inmueble"
         >
-          <IcoMas /> Agregar inmueble
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
+          Agregar
         </button>
       )}
 
@@ -229,7 +230,7 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
                     aria-current={p === paginaActual ? 'page' : undefined}
                     aria-label={`Ir a pestaña ${p}`}
                   >
-                    Pestaña {p}
+                    {p}
                   </button>
                 )
               )}

@@ -2060,6 +2060,29 @@ input:focus, textarea:focus, select:focus {
     white-space: nowrap;
 }
 
+/* Botón Salir de sesión: botón real con área de toque cómoda (también en móvil) */
+.btn-salir {
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    min-height: 38px;
+    border-radius: 10px;
+    border: 1.5px solid var(--bd);
+    background: var(--card);
+    color: var(--tx);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.btn-salir:hover {
+    border-color: var(--ac);
+    color: var(--ac);
+    background: rgba(59, 130, 246, 0.08);
+}
+
 /* Badge de Modo Cliente / Administrador */
 .tag-admin-toggle {
     display: inline-flex;
@@ -2130,23 +2153,24 @@ input:focus, textarea:focus, select:focus {
     box-shadow: 0 4px 16px var(--glow);
 }
 
-/* Botón flotante (solo móvil) para bajar directo a la tarjeta de agregar inmueble */
+/* Botón flotante (solo móvil) para bajar directo a la tarjeta de agregar inmueble.
+   Va encima del botón del chatbot (right 24 / bottom 24, ~48px de alto): bottom 88px lo deja apilado. */
 .btn-flotante-agregar {
     display: none;
     position: fixed;
-    left: 16px;
-    bottom: 18px;
-    z-index: 900;
+    right: 24px;
+    bottom: 86px;
+    z-index: 950;
     align-items: center;
-    gap: 7px;
-    padding: 11px 18px;
+    gap: 6px;
+    padding: 8px 15px;
     border-radius: 9999px;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: #ffffff;
     background: var(--grad);
     border: 1.5px solid rgba(255, 255, 255, 0.45);
-    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.45);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -2742,7 +2766,7 @@ input:focus, textarea:focus, select:focus {
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 12px;
     width: 100%;
 }
 
@@ -2751,7 +2775,7 @@ input:focus, textarea:focus, select:focus {
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 9px;
 }
 
 .pag-btn {
@@ -2785,18 +2809,24 @@ input:focus, textarea:focus, select:focus {
     color: var(--mut);
 }
 
+/* Pestañas numéricas: píldoras cuadradas con área de toque cómoda y separación uniforme */
 .pag-num {
-    padding: 8px 14px;
-    border-radius: 9999px;
+    min-width: 42px;
+    min-height: 40px;
+    padding: 8px 10px;
+    border-radius: 12px;
     border: 1.5px solid var(--bd);
     background: var(--card);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     color: var(--mut);
-    font-size: 0.88rem;
+    font-size: 0.92rem;
     font-weight: 600;
     cursor: pointer;
     line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     transition: all 0.2s ease;
 }
 
@@ -2817,7 +2847,9 @@ input:focus, textarea:focus, select:focus {
 }
 
 .pag-ellipsis {
-    padding: 0 6px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 4px;
     color: var(--mut);
     font-size: 1rem;
     font-weight: 700;
@@ -2828,12 +2860,14 @@ input:focus, textarea:focus, select:focus {
         padding: 16px 12px;
     }
     .pag-btn {
-        padding: 7px 12px;
+        padding: 8px 12px;
         font-size: 0.85rem;
+        min-height: 38px;
     }
     .pag-num {
-        padding: 7px 10px;
-        font-size: 0.82rem;
+        min-width: 38px;
+        min-height: 38px;
+        font-size: 0.86rem;
     }
 }
 
