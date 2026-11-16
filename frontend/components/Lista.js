@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { filtrar, porVencer } from '../lib/utils';
 import Filtros from './Filtros';
 import Tarjeta from './Tarjeta';
@@ -203,18 +204,22 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
         )}
       </div>
 
-      {/* Flecha flotante (solo móvil): oculta al inicio, baja al final / sube al inicio según la posición */}
-      {flecha && (
-        <button
-          type="button"
-          className={`btn-flotante-agregar noprint ${flecha === 'arriba' ? 'subir' : ''}`}
-          onClick={irConFlecha}
-          aria-label={flecha === 'arriba' ? 'Subir al inicio' : 'Bajar al final'}
-          title={flecha === 'arriba' ? 'Subir al inicio' : 'Bajar al final'}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
-        </button>
-      )}
+      {/* Flecha flotante (solo móvil): oculta al inicio, baja al final / sube al inicio según la posición.
+          Se monta por portal en document.body para que quede fuera de .view y position: fixed
+          siempre sea respecto al viewport (mismo motivo por el que el chatbot flota bien). */}
+      {flecha &&
+        createPortal(
+          <button
+            type="button"
+            className={`btn-flotante-agregar noprint ${flecha === 'arriba' ? 'subir' : ''}`}
+            onClick={irConFlecha}
+            aria-label={flecha === 'arriba' ? 'Subir al inicio' : 'Bajar al final'}
+            title={flecha === 'arriba' ? 'Subir al inicio' : 'Bajar al final'}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
+          </button>,
+          document.body
+        )}
 
       {/* Pestañas de paginación (Límite: 50 inmuebles por pestaña) */}
       {totalPaginas > 1 && (

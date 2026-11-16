@@ -230,6 +230,15 @@ h3 {
     }
 }
 
+/* Entrada solo con opacidad: la opacidad NO crea contenedor de position:fixed,
+   a diferencia de transform/filter. Así ningún hijo fijo de .view (flecha flotante)
+   queda anclado al contenedor ni durante ni después de la animación,
+   aunque el navegador tenga el bug de animaciones rellenas con transform. */
+@keyframes aparecer {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 @keyframes brillo {
     0% { background-position: 0% 50%; }
     100% { background-position: 200% 50%; }
@@ -267,7 +276,7 @@ h3 {
 }
 
 .view {
-    animation: subir 0.6s var(--ease) both;
+    animation: aparecer 0.6s var(--ease) both;
 }
 
 /* =====================================================================
