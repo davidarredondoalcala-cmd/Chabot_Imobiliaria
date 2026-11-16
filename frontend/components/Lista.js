@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { filtrar, porVencer } from '../lib/utils';
 import Filtros from './Filtros';
 import Tarjeta from './Tarjeta';
-import { IcoCasa, IcoEdificio, IcoTodos } from './Iconos';
+import { IcoCasa, IcoEdificio, IcoTodos, IcoMas } from './Iconos';
 
 const Skyline = () => (
   <svg className="skyline" viewBox="0 0 400 200" preserveAspectRatio="xMaxYMax meet" aria-hidden="true">
@@ -94,6 +94,13 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
         ['En venta', data.filter((i) => i.estado === 'Para la venta').length],
       ];
 
+  const irAAgregar = () => {
+    const elem = document.getElementById('nuevo-inmueble');
+    if (elem) {
+      elem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
   return (
     <div className="view">
       <section className="portada noprint">
@@ -160,6 +167,7 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
         {itemsPaginados.map((i) => <Tarjeta key={i._id} i={i} esAdmin={esAdmin} abrir={() => abrir(i._id)} />)}
         {esAdmin && (
           <article
+            id="nuevo-inmueble"
             className="card item nuevo-item"
             role="button"
             tabIndex={0}
@@ -173,6 +181,19 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
           </article>
         )}
       </div>
+
+      {/* Botón flotante (solo móvil) que baja directo a la tarjeta de agregar inmueble */}
+      {esAdmin && (
+        <button
+          type="button"
+          className="btn-flotante-agregar noprint"
+          onClick={irAAgregar}
+          aria-label="Ir a la tarjeta de agregar inmueble"
+          title="Ir a agregar inmueble"
+        >
+          <IcoMas /> Agregar inmueble
+        </button>
+      )}
 
       {/* Pestañas de paginación (Límite: 50 inmuebles por pestaña) */}
       {totalPaginas > 1 && (

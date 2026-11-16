@@ -2130,6 +2130,30 @@ input:focus, textarea:focus, select:focus {
     box-shadow: 0 4px 16px var(--glow);
 }
 
+/* Botón flotante (solo móvil) para bajar directo a la tarjeta de agregar inmueble */
+.btn-flotante-agregar {
+    display: none;
+    position: fixed;
+    left: 16px;
+    bottom: 18px;
+    z-index: 900;
+    align-items: center;
+    gap: 7px;
+    padding: 11px 18px;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: var(--grad);
+    border: 1.5px solid rgba(255, 255, 255, 0.45);
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.45);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-flotante-agregar:active {
+    transform: scale(0.96);
+}
+
 /* =====================================================================
    BOTÓN AGREGAR INMUEBLE (+)
    ===================================================================== */
@@ -3367,6 +3391,9 @@ input:focus, textarea:focus, select:focus {
     .toolbar { margin: 20px 0 14px; }
     .toolbar h2 { font-size: 1.2rem; }
     .btn-ver-cerradas { width: 100%; justify-content: center; padding: 10px 14px; font-size: 0.85rem; }
+
+    /* Botón flotante visible solo en móvil: baja directo a "Agregar inmueble" */
+    .btn-flotante-agregar { display: inline-flex; }
 
     /* Catálogo: una columna limpia, tarjetas sin deformarse */
     .lista { grid-template-columns: 1fr; grid-auto-rows: auto; gap: 14px; }
