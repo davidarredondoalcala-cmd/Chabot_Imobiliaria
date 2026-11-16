@@ -37,6 +37,9 @@
 .fm-error { text-align: center; padding: 48px 24px }
 .fm-nota { font-size: .8rem; margin-top: 24px }
 
+/* Separación entre el contrato y las tarjetas de firma / estados (antes quedaban pegadas) */
+#seccion-firmar > .card { margin-top: 28px }
+
 /* ---------- Identidad del firmante ---------- */
 .fm-id { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px }
 @media (max-width: 700px) { .fm-id { grid-template-columns: 1fr } }
