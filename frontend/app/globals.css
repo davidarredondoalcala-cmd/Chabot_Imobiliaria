@@ -224,7 +224,9 @@ h3 {
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        /* none (no translateY(0)): evita que la animación retenga un transform
+           que convertiría a .view en el contenedor de los position:fixed hijos */
+        transform: none;
     }
 }
 
