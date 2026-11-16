@@ -939,6 +939,9 @@ main {
         width: 15px;
         height: 15px;
     }
+    /* En móvil se ocultan los contadores (n) para que las pestañas no queden amontonadas;
+       quedan solo icono + etiqueta con espacio suficiente (en PC se siguen mostrando) */
+    .tabs.tabs-tres .tab-count { display: none; }
     .tabs.tabs-tres .pill {
         top: 4px;
         bottom: 4px;

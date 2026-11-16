@@ -120,13 +120,13 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
       <div id="catalogo-inmuebles" className="tabs tabs-tres" role="tablist">
         <span className="pill" style={{ transform: `translateX(${idx * 100}%)` }} />
         <button role="tab" aria-selected={tab === 'Todos'} className={tab === 'Todos' ? 'on' : ''} onClick={() => setTab('Todos')}>
-          <IcoTodos /> Todos ({base.length})
+          <IcoTodos /> Todos <span className="tab-count">({base.length})</span>
         </button>
         <button role="tab" aria-selected={tab === 'Casa'} className={tab === 'Casa' ? 'on' : ''} onClick={() => setTab('Casa')}>
-          <IcoCasa /> Casas ({n('Casa')})
+          <IcoCasa /> Casas <span className="tab-count">({n('Casa')})</span>
         </button>
         <button role="tab" aria-selected={tab === 'Apartamento'} className={tab === 'Apartamento' ? 'on' : ''} onClick={() => setTab('Apartamento')}>
-          <IcoEdificio /> Apartamentos ({n('Apartamento')})
+          <IcoEdificio /> Apartamentos <span className="tab-count">({n('Apartamento')})</span>
         </button>
       </div>
 
