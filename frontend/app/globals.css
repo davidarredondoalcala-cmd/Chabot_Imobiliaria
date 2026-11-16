@@ -2153,29 +2153,45 @@ input:focus, textarea:focus, select:focus {
     box-shadow: 0 4px 16px var(--glow);
 }
 
-/* Botón flotante (solo móvil) para bajar directo a la tarjeta de agregar inmueble.
-   Va encima del botón del chatbot (right 24 / bottom 24, ~48px de alto): bottom 88px lo deja apilado. */
+/* Flecha flotante (solo móvil) para bajar al final / subir al inicio.
+   Va encima del botón del chatbot (right 24 / bottom 24, ~48px de alto): bottom 86px la deja apilada. */
 .btn-flotante-agregar {
     display: none;
     position: fixed;
     right: 24px;
     bottom: 86px;
     z-index: 950;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
     align-items: center;
-    gap: 6px;
-    padding: 8px 15px;
-    border-radius: 9999px;
-    font-size: 0.8rem;
-    font-weight: 700;
+    justify-content: center;
     color: #ffffff;
     background: var(--grad);
     border: 1.5px solid rgba(255, 255, 255, 0.45);
     box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+    opacity: 0.95;
+    animation: aparece-flecha 0.25s ease;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.btn-flotante-agregar svg {
+    transition: transform 0.25s ease;
+}
+
+/* Cerca del final la flecha apunta hacia arriba */
+.btn-flotante-agregar.subir svg {
+    transform: rotate(180deg);
+}
+
 .btn-flotante-agregar:active {
-    transform: scale(0.96);
+    transform: scale(0.92);
+}
+
+@keyframes aparece-flecha {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 0.95; transform: none; }
 }
 
 /* =====================================================================

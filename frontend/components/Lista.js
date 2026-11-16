@@ -19,6 +19,7 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
   const POR_PAGINA = 50;
   const [pagina, setPagina] = useState(1);
   const [verCerradas, setVerCerradas] = useState(false);
+  const [flecha, setFlecha] = useState(null); // 'abajo' | 'arriba' | null (oculta al inicio)
 
   // Por defecto la lista muestra solo disponibles; el botón alterna a vendidas y arrendadas
   const base = filtrar(data, filtros, verCerradas ? 'cerradas' : '');
@@ -40,6 +41,33 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
   useEffect(() => {
     setPagina(1);
   }, [tab, filtros, verCerradas]);
+
+  // Flecha flotante: oculta al inicio, aparece al deslizar; cerca del final apunta hacia arriba
+  useEffect(() => {
+    const f = () => {
+      const y = window.scrollY;
+      const alFinal = y + window.innerHeight >= document.documentElement.scrollHeight - 260;
+      if (y < 120) setFlecha(null);
+      else setFlecha(alFinal ? 'arriba' : 'abajo');
+    };
+    addEventListener('scroll', f, { passive: true });
+    addEventListener('resize', f);
+    f();
+    return () => { removeEventListener('scroll', f); removeEventListener('resize', f); };
+  }, []);
+
+  const irConFlecha = () => {
+    if (flecha === 'arriba') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    const elem = document.getElementById('nuevo-inmueble');
+    if (elem) {
+      elem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+    }
+  };
 
   const totalPaginas = Math.max(1, Math.ceil(items.length / POR_PAGINA));
   const paginaActual = Math.min(pagina, totalPaginas);
@@ -93,13 +121,6 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
         ['En arriendo', data.filter((i) => i.estado === 'Sin arrendar' || i.estado === 'Arrendada').length],
         ['En venta', data.filter((i) => i.estado === 'Para la venta').length],
       ];
-
-  const irAAgregar = () => {
-    const elem = document.getElementById('nuevo-inmueble');
-    if (elem) {
-      elem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  };
 
   return (
     <div className="view">
@@ -182,17 +203,16 @@ export default function Lista({ data, tab, setTab, abrir, filtros, setFiltros, n
         )}
       </div>
 
-      {/* Botón flotante (solo móvil) que baja directo a la tarjeta de agregar inmueble */}
-      {esAdmin && (
+      {/* Flecha flotante (solo móvil): oculta al inicio, baja al final / sube al inicio según la posición */}
+      {flecha && (
         <button
           type="button"
-          className="btn-flotante-agregar noprint"
-          onClick={irAAgregar}
-          aria-label="Bajar hasta la tarjeta de agregar inmueble"
-          title="Bajar hasta Agregar inmueble"
+          className={`btn-flotante-agregar noprint ${flecha === 'arriba' ? 'subir' : ''}`}
+          onClick={irConFlecha}
+          aria-label={flecha === 'arriba' ? 'Subir al inicio' : 'Bajar al final'}
+          title={flecha === 'arriba' ? 'Subir al inicio' : 'Bajar al final'}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
-          Agregar
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
         </button>
       )}
 
