@@ -6,7 +6,8 @@ import { IcoBuscar } from './Iconos';
 
 const MIN = [['', 'Cualquiera'], ['1', '1+'], ['2', '2+'], ['3', '3+'], ['4', '4+'], ['5', '5+']];
 
-const ESTADOS = [['', 'Todos'], ['Arrendada', 'Arrendada'], ['Por vencer', 'Por vencer'], ['Sin arrendar', 'Sin arrendar'], ['Para la venta', 'Para la venta'], ['Vendida', 'Vendida']];
+// Estados del filtro: solo los disponibles en catálogo (el admin ve Sin arrendar y Para la venta)
+const ESTADOS = [['', 'Todos'], ['Sin arrendar', 'Sin arrendar'], ['Para la venta', 'Para la venta']];
 
 const TIEMPOS_ARRIENDO = [
   ['', 'Cualquiera'],
@@ -16,13 +17,24 @@ const TIEMPOS_ARRIENDO = [
   ['24', 'Más de 2 años'],
 ];
 
+// Normaliza texto para buscar sin importar acentos ni mayúsculas
+const normalizarTxt = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
 // Selector desplegable: un botón que, al pulsarlo, despliega las opciones como píldoras.
-function Desplegable({ valor, opciones, onChange, etiqueta, otro = false, abierto, setAbierto }) {
+// Con conBuscador=true muestra un campo que filtra las opciones mientras se escribe (usado en ciudades).
+// Con maxSinBusqueda=N solo se muestran las primeras N píldoras hasta que el usuario busque (el resto se encuentra con el buscador).
+function Desplegable({ valor, opciones, onChange, etiqueta, otro = false, conBuscador = false, maxSinBusqueda = 0, abierto, setAbierto }) {
   const ref = useRef(null);
+  const [busqueda, setBusqueda] = useState('');
   // Con "Otro…" el valor puede ser un número libre que no está en la lista
   const esOtro = otro && valor !== '' && !opciones.some(([v]) => v === valor);
   const actual = opciones.find(([v]) => v === valor);
   const texto = esOtro ? `${valor}+` : (actual ? actual[1] : opciones[0][1]);
+
+  // La búsqueda se reinicia cada vez que se abre o cierra el panel
+  useEffect(() => {
+    if (!abierto) setBusqueda('');
+  }, [abierto]);
 
   // Se cierra al hacer clic fuera o al pulsar Escape
   useEffect(() => {
@@ -33,6 +45,10 @@ function Desplegable({ valor, opciones, onChange, etiqueta, otro = false, abiert
     document.addEventListener('keydown', tecla);
     return () => { document.removeEventListener('mousedown', fuera); document.removeEventListener('keydown', tecla); };
   }, [abierto, setAbierto]);
+
+  const opcionesFiltradas = conBuscador && busqueda.trim()
+    ? opciones.filter(([, t]) => normalizarTxt(t).includes(normalizarTxt(busqueda.trim())))
+    : (conBuscador && maxSinBusqueda > 0 ? opciones.slice(0, maxSinBusqueda) : opciones);
 
   // Flechas para moverse entre las opciones
   const mover = (e) => {
@@ -53,30 +69,45 @@ function Desplegable({ valor, opciones, onChange, etiqueta, otro = false, abiert
       </button>
       {abierto && (
         <div className="dd-panel" role="group" aria-label={etiqueta}>
-          <div className="chips">
-            {opciones.map(([v, t], n) => (
-              <button key={v} type="button" style={{ '--n': n }} className={`chip ${valor === v ? 'on' : ''}`} aria-pressed={valor === v} onClick={() => { onChange(v); setAbierto(false); }}>{t}</button>
-            ))}
-            {otro && (
-              <button type="button" style={{ '--n': opciones.length }} className={`chip ${esOtro ? 'on' : ''}`} aria-pressed={esOtro} onClick={() => onChange(esOtro ? '' : '6')}>Otro…</button>
-            )}
-            {esOtro && (
-              <input
-                type="number" min="0" autoFocus
-                className="chip-num" value={valor}
-                onChange={(e) => onChange(e.target.value)}
-                aria-label={`${etiqueta}: número exacto o más`}
-                placeholder="N°"
-              />
-            )}
-          </div>
+          {conBuscador && (
+            <input
+              type="text"
+              className="dd-buscador"
+              placeholder="Buscar ciudad…"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              aria-label={`Buscar en ${etiqueta.toLowerCase()}`}
+              autoFocus
+            />
+          )}
+          {opcionesFiltradas.length === 0 ? (
+            <p className="dd-vacio">No se encontró ninguna ciudad</p>
+          ) : (
+            <div className="chips">
+              {opcionesFiltradas.map(([v, t], n) => (
+                <button key={v} type="button" style={{ '--n': n }} className={`chip ${valor === v ? 'on' : ''}`} aria-pressed={valor === v} onClick={() => { onChange(v); setAbierto(false); }}>{t}</button>
+              ))}
+              {otro && (
+                <button type="button" style={{ '--n': opcionesFiltradas.length }} className={`chip ${esOtro ? 'on' : ''}`} aria-pressed={esOtro} onClick={() => onChange(esOtro ? '' : '6')}>Otro…</button>
+              )}
+              {esOtro && (
+                <input
+                  type="number" min="0" autoFocus
+                  className="chip-num" value={valor}
+                  onChange={(e) => onChange(e.target.value)}
+                  aria-label={`${etiqueta}: número exacto o más`}
+                  placeholder="N°"
+                />
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 }
 
-export default function Filtros({ f, setF, total, mostrados, ciudades = [] }) {
+export default function Filtros({ f, setF, total, mostrados, ciudades = [], esAdmin = false }) {
   const [abiertoKey, setAbiertoKey] = useState(null);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const rango = (a, b, u) => (
@@ -86,36 +117,34 @@ export default function Filtros({ f, setF, total, mostrados, ciudades = [] }) {
     </div>
   );
 
+  // Ciudades principales visibles como píldoras; las demás se encuentran con el buscador
+  const CIUDADES_PRINCIPALES = ['Ibagué', 'Bogotá', 'Medellín', 'Cali', 'Barranquilla'];
+  const ordenarCiudades = (a, b) => {
+    const ia = CIUDADES_PRINCIPALES.indexOf(a), ib = CIUDADES_PRINCIPALES.indexOf(b);
+    if (ia !== -1 && ib !== -1) return ia - ib;
+    if (ia !== -1) return -1;
+    if (ib !== -1) return 1;
+    return a.localeCompare(b, 'es');
+  };
+  const listaCiudades = (ciudades && ciudades.length > 0
+    ? ciudades
+    : CIUDADES_PRINCIPALES
+  ).slice().sort(ordenarCiudades);
+
   const opcionesCiudades = [
     ['', 'Todas las ciudades'],
-    ...(ciudades && ciudades.length > 0
-      ? ciudades.map((c) => [c, c])
-      : [
-          ['Bogotá', 'Bogotá'],
-          ['Medellín', 'Medellín'],
-          ['Cali', 'Cali'],
-          ['Barranquilla', 'Barranquilla'],
-          ['Bucaramanga', 'Bucaramanga'],
-          ['Manizales', 'Manizales'],
-          ['Pereira', 'Pereira'],
-          ['Ibagué', 'Ibagué'],
-          ['Cartagena', 'Cartagena'],
-          ['Santa Marta', 'Santa Marta'],
-          ['Cúcuta', 'Cúcuta'],
-          ['Envigado', 'Envigado'],
-          ['Popayán', 'Popayán'],
-          ['Armenia', 'Armenia'],
-          ['Chía', 'Chía'],
-        ]),
+    ...listaCiudades.map((c) => [c, c]),
   ];
 
   // Desplegables: al hacer clic se abren las opciones como píldoras.
-  const lista = (k, opciones, etiqueta, otro = false) => (
+  const lista = (k, opciones, etiqueta, otro = false, conBuscador = false, maxSinBusqueda = 0) => (
     <Desplegable
       valor={f[k]}
       opciones={opciones}
       etiqueta={etiqueta}
       otro={otro}
+      conBuscador={conBuscador}
+      maxSinBusqueda={maxSinBusqueda}
       abierto={abiertoKey === k}
       setAbierto={(v) => setAbiertoKey(v ? k : null)}
       onChange={(v) => setF({ ...f, [k]: v })}
@@ -125,8 +154,8 @@ export default function Filtros({ f, setF, total, mostrados, ciudades = [] }) {
     <div className={`card filtros noprint ${abiertoKey ? 'dd-activo' : ''}`}>
       <div className="filtros-top"><b className="ft"><IcoBuscar /> Filtrar inmuebles</b><span className="mut">Mostrando {mostrados} de {total}</span></div>
       <div className="filtros-grid">
-        <div><label className="filtro-lbl">Ciudad</label>{lista('ciudad', opcionesCiudades, 'Ciudad')}</div>
-        <div><label className="filtro-lbl">Estado</label>{lista('estado', ESTADOS, 'Estado')}</div>
+        <div><label className="filtro-lbl">Ciudad</label>{lista('ciudad', opcionesCiudades, 'Ciudad', false, true, CIUDADES_PRINCIPALES.length + 1)}</div>
+        {esAdmin && <div><label className="filtro-lbl">Estado</label>{lista('estado', ESTADOS, 'Estado')}</div>}
         <div><label className="filtro-lbl">Habitaciones<span className="chips-hint"> (o más)</span></label>{lista('hab', MIN, 'Habitaciones', true)}</div>
         <div><label className="filtro-lbl">Baños<span className="chips-hint"> (o más)</span></label>{lista('ban', MIN, 'Baños', true)}</div>
         <div><label className="filtro-lbl">Tamaño (m²)</label>{rango('areaMin', 'areaMax', 'Área')}</div>

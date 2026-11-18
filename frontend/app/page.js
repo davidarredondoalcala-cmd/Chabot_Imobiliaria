@@ -163,20 +163,18 @@ export default function Home() {
               title={modoClienteSimulado ? 'Clic para volver a modo Administrador' : 'Clic para probar la vista exacta como cliente'}
             >
               {modoClienteSimulado ? (
-                <><IcoUsuario /> Viendo como Cliente (volver a Admin)</>
+                <><IcoUsuario /> <span className="tag-admin-txt-largo">Viendo como Cliente (volver a Admin)</span><span className="tag-admin-txt-corto">Vista Cliente</span></>
               ) : (
-                <><IcoEscudo /> Administrador (probar vista cliente)</>
+                <><IcoEscudo /> <span className="tag-admin-txt-largo">Administrador (probar vista cliente)</span><span className="tag-admin-txt-corto">Modo Admin</span></>
               )}
             </button>
-          ) : (
-            <span className="tag-rol tag-usuario">Modo Cliente</span>
-          )}
+          ) : null}
           <p>Gestión de inmuebles y contratos</p>
           <TemaBtn />
           <div className="usuario">
             {sesion.usuario?.foto ? <img src={sesion.usuario.foto} alt="" referrerPolicy="no-referrer" /> : null}
             <span className="usuario-nom">{sesion.usuario?.nombre || sesion.usuario?.email}</span>
-            <button className="l" onClick={cerrarSesion}>Salir</button>
+            <button className="btn-salir" onClick={cerrarSesion}>Salir</button>
           </div>
         </div>
       </header>

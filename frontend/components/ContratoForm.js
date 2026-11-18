@@ -15,6 +15,7 @@ import {
   esNombreValido,
   esEmailValido,
 } from '../lib/validadores';
+import { formatoMiles } from '../lib/utils';
 
 const CLAUSULAS_ARRIENDO_DEF = [
   { pre: 'PRIMERA – Objeto.', resto: 'EL ARRENDADOR entrega a título de arrendamiento el inmueble ubicado en la dirección indicada.' },
@@ -145,8 +146,9 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
         type={t || 'text'}
         placeholder={p}
         maxLength={maxLen}
-        value={S[k] || ''}
+        value={k === 'val' ? formatoMiles(S[k]) : (S[k] || '')}
         onChange={(e) => actualizarCampo(k, e.target.value)}
+        inputMode={k === 'val' ? 'numeric' : undefined}
       />
     </div>
   );
@@ -478,7 +480,7 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
           {campo('bar', 'Barrio', 'text', 'Ej: Piedra Pintada', 50)}
           <label>Linderos</label>
           <textarea rows="3" value={S.lin} maxLength={500} onChange={(e) => actualizarCampo('lin', e.target.value)} />
-          {campo('val', modo === 'arriendo' ? 'Valor mensual ($)' : 'Precio de venta ($)', 'text', 'Ej: 1500000', 12)}
+          {campo('val', modo === 'arriendo' ? 'Valor mensual ($)' : 'Precio de venta ($)', 'text', 'Ej: 1.500.000', 12)}
           {modo === 'arriendo' ? (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', alignItems: 'end' }}>
               <div>{campo('dur', 'Duración (meses)', 'text', 'Ej: 12', 3)}</div>
@@ -531,7 +533,7 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
 
           {enviados.length > 0 && (
             <div className="card view noprint" style={{ marginTop: 24, padding: '24px 28px', border: '1.5px solid var(--bd)', borderRadius: 16 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <div className="enviado-head" style={{ marginBottom: 10 }}>
                 <span className="tag Arrendada" style={{ padding: '6px 12px', fontSize: '0.85rem' }}>
                   <IcoCheck /> Contrato despachado por correo
                 </span>
@@ -544,15 +546,15 @@ export default function ContratoForm({ inm, modo0, volver, terminado, avisar }) 
                 {enviados.map((f, k) => {
                   const esInm = f.rol === 'arrendador' || f.rol === 'vendedor';
                   return (
-                    <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg)', padding: '12px 16px', borderRadius: 12, border: '1px solid var(--bd)' }}>
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div key={k} className="enviado-item">
+                      <div className="enviado-item-info">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                           <span style={{ fontWeight: 700, fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--ac)' }}>
                             {f.rol}:
                           </span>
                           <strong style={{ fontSize: '0.95rem' }}>{f.nombre || 'Sin nombre'}</strong>
                         </div>
-                        <div className="mut" style={{ fontSize: '0.82rem', marginTop: 3, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <div className="mut" style={{ fontSize: '0.82rem', marginTop: 3, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                           <IcoMail /> {f.email || 'Sin correo especificado'} {f.cedula ? ` · C.C./NIT ${f.cedula}` : ''}
                         </div>
                       </div>

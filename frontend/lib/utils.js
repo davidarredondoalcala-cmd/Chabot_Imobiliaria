@@ -1,4 +1,9 @@
 export const fmt = (n) => '$ ' + Number(n || 0).toLocaleString('es-CO');
+// Formatea con puntos de miles lo que el usuario escribe en un input (solo visual, guarda dígitos)
+export const formatoMiles = (t) => {
+  const digitos = String(t ?? '').replace(/\D/g, '').slice(0, 12);
+  return digitos ? Number(digitos).toLocaleString('es-CO') : '';
+};
 export const fd = (s) => (s ? new Date(s + 'T00:00:00').toLocaleDateString('es-CO') : '—');
 // Clase CSS según el estado (colores de la etiqueta)
 export const cls = (e) => (e === 'Arrendada' ? 'Arrendada' : e === 'Para la venta' ? 'Venta' : e === 'Vendida' ? 'Vendida' : e === 'Por vencer' ? 'PorVencer' : 'Sin');
@@ -43,7 +48,8 @@ export const hayFiltros = (f) => Object.values(f).some((v) => v !== '');
 const num = (v) => (v === '' || v == null ? null : Number(v));
 
 // Habitaciones y baños: "mínimo" (3 = 3 o más). Área y precio: rango mín-máx. Ciudad: coincidencia exacta.
-export function filtrar(lista, f) {
+// modoLista: '' (solo disponibles), 'cerradas' (solo vendidas y arrendadas)
+export function filtrar(lista, f, modoLista = '') {
   const aMin = num(f.areaMin), aMax = num(f.areaMax), pMin = num(f.pMin), pMax = num(f.pMax);
   return lista.filter((i) => {
     if (f.ciudad && (i.ciudad || '').trim().toLowerCase() !== f.ciudad.trim().toLowerCase()) return false;
@@ -55,7 +61,9 @@ export function filtrar(lista, f) {
     if (pMax != null && !(i.valor <= pMax)) return false;
     if (f.estado === 'Por vencer') { if (!estaPorVencer(i)) return false; }
     else if (f.estado === 'En arriendo') { if (i.estado !== 'Sin arrendar' && i.estado !== 'Arrendada') return false; }
-    else if (f.estado && i.estado !== f.estado) return false;
+    else if (f.estado) { if (i.estado !== f.estado) return false; }
+    else if (modoLista === 'cerradas') { if (i.estado !== 'Vendida' && i.estado !== 'Arrendada') return false; }
+    else { if (i.estado === 'Vendida' || i.estado === 'Arrendada') return false; }
 
     // Filtro por tiempo arrendada (para gestión de historiales de arrendamiento)
     if (f.tiempoArriendo) {

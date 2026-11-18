@@ -11,6 +11,7 @@ import {
   limpiarTexto,
   esNombreValido,
 } from '../lib/validadores';
+import { formatoMiles } from '../lib/utils';
 
 export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
   const [S, setS] = useState({ tipo: tipo0 || 'Casa', nombre: '', descripcion: '', estado: 'Sin arrendar', dir: '', barrio: '', ciudad: 'Ibagué', lind: '', habitaciones: '', banos: '', area: '', valor: '', venc: '', dia: 5, foto: '' });
@@ -58,8 +59,9 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
         type={t || 'text'}
         placeholder={p}
         maxLength={maxLen}
-        value={S[k] || ''}
+        value={k === 'valor' ? formatoMiles(S[k]) : (S[k] || '')}
         onChange={(e) => actualizarCampo(k, e.target.value)}
+        inputMode={k === 'valor' ? 'numeric' : undefined}
       />
     </div>
   );
@@ -189,7 +191,7 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
             {campo('banos', 'Baños', 'text', '0', 2)}
             {campo('area', 'Área (m²)', 'text', '0', 5)}
           </div>
-          {campo('valor', S.estado === 'Para la venta' ? 'Precio de venta *' : 'Valor mensual *', 'text', 'Ej: 1500000', 12)}
+          {campo('valor', S.estado === 'Para la venta' ? 'Precio de venta *' : 'Valor mensual *', 'text', 'Ej: 1.500.000', 12)}
           {arrendada && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', alignItems: 'end' }}>
               {campo('venc', 'Vencimiento del contrato', 'date')}

@@ -1,9 +1,22 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { IcoChatPin, IcoChatBed, IcoChatBath, IcoChatArea, IcoChatWhatsApp, IcoChatExternal } from './IconosChat';
 import { waUrl, abrirWhatsApp } from '../../lib/contacto';
 
 export default function PropertyCard({ property, whatsappUrl }) {
+  const [verFoto, setVerFoto] = useState(false);
+  const [montado, setMontado] = useState(false);
+
+  useEffect(() => { setMontado(true); }, []);
+
+  useEffect(() => {
+    if (!verFoto) return;
+    const onTecla = (e) => { if (e.key === 'Escape') setVerFoto(false); };
+    window.addEventListener('keydown', onTecla);
+    return () => window.removeEventListener('keydown', onTecla);
+  }, [verFoto]);
+
   if (!property) return null;
 
   const formattedPrice = new Intl.NumberFormat('es-CO', {
@@ -30,8 +43,16 @@ export default function PropertyCard({ property, whatsappUrl }) {
   return (
     <div className="hc-prop-card">
       {property.foto && (
-        <div className="hc-prop-img-wrap">
+        <div
+          className="hc-prop-img-wrap hc-prop-img-clicable"
+          role="button"
+          tabIndex={0}
+          aria-label={`Ver foto del inmueble ${property.titulo} en grande`}
+          onClick={(e) => { e.stopPropagation(); setVerFoto(true); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setVerFoto(true); } }}
+        >
           <img src={property.foto} alt={property.titulo} className="hc-prop-thumb" loading="lazy" />
+          <span className="hc-prop-zoom-hint">Ver foto</span>
         </div>
       )}
       <div className="hc-prop-header">
@@ -109,6 +130,25 @@ export default function PropertyCard({ property, whatsappUrl }) {
           </a>
         </div>
       </div>
+
+      {/* Vista previa de la foto: solo lectura, se cierra con clic fuera, el botón o Esc */}
+      {property.foto && verFoto && montado && createPortal(
+        <div className="hc-foto-lightbox" onClick={() => setVerFoto(false)}>
+          <div className="hc-foto-lightbox-inner" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="hc-foto-lightbox-close"
+              aria-label="Cerrar vista previa"
+              onClick={() => setVerFoto(false)}
+            >
+              ✕
+            </button>
+            <img src={property.foto} alt={property.titulo} className="hc-foto-lightbox-img" />
+            <span className="hc-foto-lightbox-cap">{property.titulo} ({property.codigo})</span>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

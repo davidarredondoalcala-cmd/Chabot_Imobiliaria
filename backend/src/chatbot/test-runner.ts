@@ -496,6 +496,62 @@ async function runTests() {
     `props=${r40.properties.length} reply=${r40.reply.slice(0, 120)}`
   );
 
+  // Test 41: Seguimiento elíptico de zona ("y en villa del prado")
+  // Mantiene compra + casa + presupuesto del turno anterior y cambia solo la zona
+  await processUserMessage('test-41-villaprado', 'compra de casa con presupuesto de 260 millones');
+  const r41 = await processUserMessage('test-41-villaprado', 'y en villa del prado');
+  const esVillaDelPrado = (p: any) =>
+    [p.barrio, p.titulo, p.direccion_aproximada, p.descripcion]
+      .join(' ')
+      .toLowerCase()
+      .includes('villa del prado');
+  assert(
+    r41.properties.length > 0 &&
+      r41.properties.every(esVillaDelPrado) &&
+      r41.properties.every(p => p.operacion === 'venta' && p.tipo === 'casa'),
+    'Seguimiento "y en villa del prado" muestra casas en venta en Villa del Prado (no lo rechaza ni ignora la zona)',
+    `props=${r41.properties.length} reply=${r41.reply.slice(0, 120)}`
+  );
+
+  // Test 42: Seguimiento elíptico de precio ("y más baratas?")
+  // Mantiene compra de apartamentos y ordena los resultados de menor a mayor precio
+  await processUserMessage('test-42-baratas', 'compra de apartamento con presupuesto de 150 millones');
+  const r42 = await processUserMessage('test-42-baratas', 'y más baratas?');
+  const preciosAsc = r42.properties.map(p => p.precio);
+  const estaOrdenado = preciosAsc.every((v, i) => i === 0 || preciosAsc[i - 1] <= v);
+  assert(
+    r42.properties.length > 0 &&
+      r42.properties.every(p => p.operacion === 'venta' && p.tipo === 'apartamento') &&
+      estaOrdenado,
+    'Seguimiento "y más baratas?" ordena ascendentemente manteniendo compra de apartamentos',
+    `props=${r42.properties.length} precios=${preciosAsc.slice(0, 5).join(',')}`
+  );
+
+  // Test 43: Seguimiento elíptico de habitaciones ("¿y con 3 habitaciones?")
+  // Mantiene arriendo de apartamento y filtra por 3+ habitaciones
+  await processUserMessage('test-43-hab', 'busco apartamento en arriendo con presupuesto de 2.5 millones');
+  const r43 = await processUserMessage('test-43-hab', 'y con 3 habitaciones?');
+  assert(
+    r43.properties.length > 0 &&
+      r43.properties.every(p => p.habitaciones >= 3) &&
+      r43.properties.every(p => p.operacion === 'arriendo' && p.tipo === 'apartamento'),
+    'Seguimiento "y con 3 habitaciones?" filtra apartamentos en arriendo con 3+ habitaciones',
+    `props=${r43.properties.length} reply=${r43.reply.slice(0, 120)}`
+  );
+
+  // Test 44: Reclamo del usuario con reintento del último pedido
+  // Disculpa formal + resultados con los criterios corregidos, sin volver a lo rechazado
+  await processUserMessage('test-44-reclamo', 'busco casa en arriendo en Manizales con presupuesto de 300 mil');
+  const r44 = await processUserMessage('test-44-reclamo', 'no, eso es un error, yo pedi casas en Cali en venta con presupuesto de 200 millones');
+  assert(
+    /disculpa/i.test(r44.reply) &&
+      r44.properties.length > 0 &&
+      r44.properties.every(p => p.operacion === 'venta' && p.tipo === 'casa') &&
+      !/manizales/i.test(r44.reply),
+    'Reclamo genera disculpa formal y reintenta con los criterios corregidos (casas en venta en Cali, no arriendo en Manizales)',
+    `props=${r44.properties.length} reply=${r44.reply.slice(0, 160)}`
+  );
+
   console.log(`\n=== Resultado de pruebas: ${passed}/${total} superadas (${Math.round((passed/total)*100)}%) ===\n`);
   if (passed !== total) {
     process.exit(1);

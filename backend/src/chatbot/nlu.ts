@@ -33,6 +33,8 @@ Reglas obligatorias:
 6. "codigo_inmueble_mencionado": si menciona un código como "IBG-0001" o "HC-0001", extráelo aquí.
 7. "tipo_no_soportado": si el usuario pide local, lote, oficina, bodega, finca, etc.
 8. "presupuesto_invalido": boolean. true SOLO cuando el usuario habla de un presupuesto/valor de vivienda pero con algo que NO es una cifra válida en pesos colombianos: objetos o animales como unidad ("presupuesto de una mandarina", "tengo tres delfines"), o unidades no monetarias ("presupuesto de 50 kilos", "presupuesto de dos horas"). NO lo marques si hay una cifra monetaria interpretable ("presupuesto de 2.5 millones") o si simplemente pide precio de un inmueble.
+9. Seguimientos elípticos: mensajes cortos que empiezan con "y"/"e" y retoman el turno anterior cambiando SOLO la zona o un criterio (ej. "y en Villa del Prado", "¿y más baratas?", "¿y con 3 habitaciones?", "y en Cadiz"). Estos mensajes: (a) NUNCA son "fuera_de_tema" ni "saludo_o_otro": usa el historial para heredar la operación y el tipo de inmueble, y (b) la "zona" que mencionan va en "criterios_duros.barrios" (aunque suene a barrio desconocido) o actualiza el criterio que cambia (precio => refleja el orden/criterio en presupuesto o deja null si no hay cifra). Si el historial no aclara nada y el mensaje es demasiado ambiguo, es preferible null a inventar.
+10. "es_reclamo": boolean. true SOLO cuando el usuario está molesto o se queja por una respuesta incorrecta o mal servicio del asistente (ej. "no me entendiste", "te equivocaste", "me mostraste otra zona", "mal servicio", "eso es un error") y mantiene continuidad de la conversación. Un reclamo NO es "fuera_de_tema".
 
 Devuelve estrictamente un objeto JSON con el siguiente esquema:
 {
@@ -56,7 +58,8 @@ Devuelve estrictamente un objeto JSON con el siguiente esquema:
   "codigo_inmueble_mencionado": string | null,
   "solicita_asesor": boolean,
   "tipo_no_soportado": string | null,
-  "presupuesto_invalido": boolean
+  "presupuesto_invalido": boolean,
+  "es_reclamo": boolean
 }
 `;
 
@@ -218,6 +221,60 @@ export function esSaludoOCortesia(userMessage: string): boolean {
 }
 
 /**
+ * Detecta seguimientos elípticos del tipo "y en Villa del Prado", "¿y más baratas?",
+ * "¿y con 3 habitaciones?", que heredan la operación/tipo del turno anterior y solo
+ * cambian la zona o un criterio. Nunca deben tratarse como fuera de tema.
+ */
+export function esSeguimientoEliptico(userMessage: string): boolean {
+  const texto = (userMessage || '').trim().replace(/\?|!|¿|¡/g, '');
+  if (!/^(?:y|e)\s/i.test(texto)) return false;
+  const palabras = texto.split(/\s+/).filter(Boolean);
+  if (palabras.length === 0 || palabras.length > 8) return false;
+  return !detectarFueraDeTema(userMessage);
+}
+
+/**
+ * Detecta reclamos con continuidad de la conversación (usuario molesto por una
+ * respuesta incorrecta del asistente). Solo aplica a mensajes cortos de queja.
+ */
+export function esReclamoUsuario(userMessage: string, esReclamoLLM?: boolean): boolean {
+  if (esReclamoLLM) return true;
+  const texto = (userMessage || '').trim().replace(/\?|!|¿|¡/g, '');
+  if (texto.length > 160) return false;
+  return /(mal\s+servicio|mal\s+atenci|queja|reclam|no\s+(?:me\s+)?(?:sirve|respondiste|escuchaste|entendiste|gusto)|entendiste\s+mal|me\s+entendiste\s+mal|me\s+mostraste\s+(?:otra|otras)|no\s+era\s+eso\s+(?:lo\s+)?(?:que\s+)?pedi|otra\s+zona|otro\s+(?:barrio|sector|lugar|mente)|error\s+del\s+(?:bot|chatbot|sistema)|te\s+equivocaste|cometiste\s+un\s+error|no\s+prestaste\s+atencion|no\s+escuchas|no\s+atiendes|estoy\s+molest|(?:esto|eso)\s+es\s+un\s+error)/i.test(texto);
+}
+
+/**
+ * Barrios y sectores conocidos mencionables por el usuario (usado por las
+ * heurísticas de seguimiento y por el orquestador para desambiguar ciudad vs barrio)
+ */
+export const KNOWN_BARRIOS = [
+  'Ciudad Jardín', 'El Poblado', 'Poblado', 'Laureles', 'Chapinero', 'Zona Chapinero',
+  'Valle del Lili', 'Lili', 'Pance', 'El Ingenio', 'El Prado', 'El Limonar', 'San Fernando',
+  'Caney', 'La América', 'Robledo', 'Castilla', 'Guayabal', 'Usaquén', 'Suba', 'Cedritos',
+  'Teusaquillo', 'Chicó', 'Rosales', 'Salitre', 'Cabecera', 'Cañaveral',
+  'El Vergel', 'Cádiz', 'La Macarena', 'Piedra Pintada', 'Jordán',
+  'Calambeo', 'Interlaken', 'Prados del Norte', 'El Salado', 'Santa Helena',
+  'La Pola', 'Campestre', 'Santa Ana', 'Picaleña', 'Centro', 'Arkacentro',
+  'El Totumo', 'Mirolindo', 'Ambalá', 'Belén', 'Topacio', 'Varsovia',
+  'Valparaíso', 'La Floresta', 'Santa Bárbara', 'Ibagué 2000',
+  'Villa del Prado', 'Villa del Pardo', 'Villa Rancho Nuevo', 'Villa Aurora'
+];
+
+/**
+ * Indica si el mensaje menciona explícitamente un barrio o sector del catálogo.
+ */
+export function esBarrioConocido(texto: string): boolean {
+  const clean = stripAccents(texto || '');
+  if (!clean) return false;
+  return KNOWN_BARRIOS.some(b => {
+    const cleanB = stripAccents(b);
+    if (!cleanB) return false;
+    return new RegExp(`(^|\\W)${cleanB.replace(/\s+/g, '\\s+')}($|\\W)`, 'i').test(clean);
+  });
+}
+
+/**
  * Extractor heurístico / regex para modo offline, testing y fallback determinista
  */
 export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnderstanding {
@@ -235,17 +292,7 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     : undefined;
 
   // Barrios y sectores conocidos a nivel nacional y local
-  const knownBarrios = [
-    'Ciudad Jardín', 'El Poblado', 'Poblado', 'Laureles', 'Chapinero', 'Zona Chapinero',
-    'Valle del Lili', 'Lili', 'Pance', 'El Ingenio', 'El Prado', 'El Limonar', 'San Fernando',
-    'Caney', 'La América', 'Robledo', 'Castilla', 'Guayabal', 'Usaquén', 'Suba', 'Cedritos',
-    'Teusaquillo', 'Chicó', 'Rosales', 'Salitre', 'Cabecera', 'Cañaveral',
-    'El Vergel', 'Cádiz', 'La Macarena', 'Piedra Pintada', 'Jordán',
-    'Calambeo', 'Interlaken', 'Prados del Norte', 'El Salado', 'Santa Helena',
-    'La Pola', 'Campestre', 'Santa Ana', 'Picaleña', 'Centro', 'Arkacentro',
-    'El Totumo', 'Mirolindo', 'Ambalá', 'Belén', 'Topacio', 'Varsovia',
-    'Valparaíso', 'La Floresta', 'Santa Bárbara', 'Ibagué 2000'
-  ];
+  const knownBarrios = KNOWN_BARRIOS;
 
   const detectedBarrios: string[] = [];
   const cleanUserMessage = stripAccents(userMessage);
@@ -272,13 +319,28 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     }
   }
 
-  // Coincidencia difusa para barrios si no se detectó ninguno exacto
+  // Coincidencia difusa para barrios si no se detectó ninguno exacto.
+  // Si ya se detectó una ciudad real (exacta o por typo), NO se hace fuzzy de barrios:
+  // tokens cortos de ciudad (ej. "cali") chocan con barrios lejanos (ej. "Valle del Lili")
   let correccionBarrio: { original: string; corregida: string } | undefined;
-  if (detectedBarrios.length === 0) {
+  if (detectedBarrios.length === 0 && !ciudadDetectada) {
     const fuzzyB = buscarBarrioFuzzy(userMessage, knownBarrios);
     if (fuzzyB) {
       detectedBarrios.push(fuzzyB.match);
       correccionBarrio = { original: fuzzyB.original, corregida: fuzzyB.match };
+    }
+  }
+
+  // Seguimiento elíptico del tipo "y en Villa del Prado": hereda operación y tipo del
+  // turno anterior y solo cambia la zona. Capturamos la zona nueva como barrio.
+  const continuationZone = (userMessage || '').trim().match(/^(?:y|e)\s+(?:en|del|de la|de los|de las|para|por)\s+([a-zñáéíóúüA-Z0-9][a-zñáéíóúüA-Z0-9\s]{1,40})$/i);
+  if (continuationZone && detectedBarrios.length === 0) {
+    const tail = continuationZone[1].replace(/\s+$/g, '').trim();
+    if (/^[a-zA-ZñáéíóúÑÁÉÍÓÚü0-9\s]{2,40}$/.test(tail) &&
+        !/^(?:arriend|alquil|compr|vent|barat|car[oó]|habitaci|ba[ñn]o|presupuesto|precio|millon|mill[oó]n|millones|zona|barrio|sector|ciudad|vale|cuesta|pued|hay|tambien|también|nada|mas|más)/i.test(tail)) {
+      const formatted = tail.split(/\s+/).filter(Boolean)
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+      detectedBarrios.push(formatted);
     }
   }
 
@@ -464,9 +526,14 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
   });
 
   const saludoOCortesia = esSaludoOCortesia(userMessage);
-  const esFueraDeTema = detectarFueraDeTema(userMessage) || (!hayContextoInmobiliario && !saludoOCortesia);
+  const esFueraDeTema =
+    detectarFueraDeTema(userMessage) ||
+    (!hayContextoInmobiliario && !saludoOCortesia && !esSeguimientoEliptico(userMessage));
   if (esFueraDeTema) {
     intencion = 'fuera_de_tema';
+  } else if (esSeguimientoEliptico(userMessage)) {
+    // Un seguimiento "y ..." sin criterios propios aún es búsqueda sobre el turno anterior
+    intencion = 'buscar';
   }
 
   return {
@@ -495,6 +562,7 @@ export function extractHeuristicUnderstanding(userMessage: string): ExtractedUnd
     tipo_no_soportado,
     fuera_de_tema: esFueraDeTema,
     presupuesto_invalido: presupuestoInvalido,
+    es_reclamo: esReclamoUsuario(userMessage),
     correccion,
   };
 }
@@ -561,6 +629,42 @@ export async function understandUserMessage(
     if (heuristic.fuera_de_tema || llmResult.fuera_de_tema) {
       llmResult.fuera_de_tema = true;
       llmResult.intencion = 'fuera_de_tema';
+    }
+
+    // Seguimientos elípticos ("y en Villa del Prado", "¿y más baratas?"): nunca son
+    // fuera de tema; el heurístico captura la zona/criterio y hereda lo demás del historial
+    if (esSeguimientoEliptico(userMessage) && !esReclamoUsuario(userMessage)) {
+      if (llmResult.fuera_de_tema || llmResult.intencion === 'fuera_de_tema') {
+        llmResult.fuera_de_tema = false;
+        llmResult.intencion = heuristic.intencion === 'hablar_con_asesor' ? 'hablar_con_asesor' : 'buscar';
+      }
+      if (!llmResult.criterios_duros.barrios && heuristic.criterios_duros.barrios) {
+        llmResult.criterios_duros.barrios = heuristic.criterios_duros.barrios;
+      }
+      if (!llmResult.criterios_duros.tipo && heuristic.criterios_duros.tipo) {
+        llmResult.criterios_duros.tipo = heuristic.criterios_duros.tipo;
+      }
+      if (!llmResult.operacion && heuristic.operacion) {
+        llmResult.operacion = heuristic.operacion;
+      }
+      if (
+        !llmResult.criterios_duros.precio_min &&
+        !llmResult.criterios_duros.precio_max &&
+        heuristic.criterios_duros.precio_min != null &&
+        heuristic.criterios_duros.precio_max != null
+      ) {
+        llmResult.criterios_duros.precio_min = heuristic.criterios_duros.precio_min;
+        llmResult.criterios_duros.precio_max = heuristic.criterios_duros.precio_max;
+      }
+    }
+
+    // Reclamos con continuidad: prevalecen sobre cualquier marca de fuera de tema
+    if (esReclamoUsuario(userMessage, llmResult.es_reclamo || heuristic.es_reclamo)) {
+      llmResult.es_reclamo = true;
+      if (llmResult.fuera_de_tema || llmResult.intencion === 'fuera_de_tema') {
+        llmResult.fuera_de_tema = false;
+        llmResult.intencion = 'buscar';
+      }
     }
     // Presupuesto inválido: el heurístico (menciona "presupuesto" + dinero no parseable)
     // prevalece sobre el LLM; si el LLM trajo un monto real, el heurístico no lo marca

@@ -55,6 +55,42 @@ Dime algo como: "**arriendo con 2.5 millones**", "**comprar con 150 millones**" 
 }
 
 /**
+ * Disculpa formal cuando el usuario reclama por una respuesta incorrecta.
+ * Reintenta con los criterios del último pedido registrado.
+ */
+export function respuestaDisculpaFormal(criterios?: Record<string, any> | null): string {
+  const detalles: string[] = [];
+  if (criterios) {
+    if (criterios.operacion === 'arriendo') detalles.push('en arriendo');
+    else if (criterios.operacion === 'venta') detalles.push('en venta');
+    if (Array.isArray(criterios.barrios) && criterios.barrios.length > 0) {
+      detalles.push(`en la zona de **${criterios.barrios.join(', ')}**`);
+    }
+    if (criterios.precio_min != null && criterios.precio_max != null) {
+      detalles.push(`con presupuesto entre **${formatCOP(criterios.precio_min)}** y **${formatCOP(criterios.precio_max)}**`);
+    } else if (criterios.precio_max != null) {
+      detalles.push(`con presupuesto hasta **${formatCOP(criterios.precio_max)}**`);
+    }
+  }
+  const reiteracion = detalles.length > 0
+    ? `De inmediato retomo tu solicitud de un inmueble ${detalles.join(', ')}.`
+    : 'De inmediato retomo tu solicitud con los criterios que me indicaste anteriormente.';
+  return `Le ofrezco una sincera disculpa: cometí un error al no atenderle bien y no es la experiencia que usted merece de **Habitat Capital**.
+
+${reiteracion} ¿Desea que le muestre ahora mismo las opciones disponibles con esos criterios?`;
+}
+
+/**
+ * Reclamo del usuario sin un pedido anterior registrado: disculpa formal y
+ * solicitud amable de los criterios para atender correctamente.
+ */
+export function respuestaReclamoSinRegistro(): string {
+  return `Le ofrezco una sincera disculpa: cometí un error al no atenderle bien y no es la experiencia que usted merece de **Habitat Capital**.
+
+Para atenderle correctamente, ¿me confirma qué busca? Por ejemplo: casa o apartamento, en arriendo o en venta, la zona de su interés y su presupuesto aproximado.`;
+}
+
+/**
  * Genera una respuesta determinista anclada sin riesgo de alucinación (plantilla nativa)
  */
 export function generateDeterministicSearchReply(

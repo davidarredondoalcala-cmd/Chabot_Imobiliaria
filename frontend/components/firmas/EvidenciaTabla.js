@@ -20,12 +20,12 @@ export default function EvidenciaTabla({ firmantes, contratoHash }) {
           <tbody>
             {conEv.map((f) => (
               <tr key={f.orden}>
-                <td>{f.evidencia.usuario?.nombre || f.nombre}</td>
-                <td>{f.rol}</td>
-                <td>{METODOS[f.evidencia.metodo] || f.evidencia.metodo}</td>
-                <td>{hora(f.evidencia.fecha)}</td>
-                <td>{f.evidencia.ip}</td>
-                <td><code className="fm-hash" title={f.evidencia.hashCadena}>{f.evidencia.hashCadena.slice(0, 16)}…</code></td>
+                <td data-label="Firmante">{f.evidencia.usuario?.nombre || f.nombre}</td>
+                <td data-label="Rol">{f.rol}</td>
+                <td data-label="Método">{METODOS[f.evidencia.metodo] || f.evidencia.metodo}</td>
+                <td data-label="Fecha y hora (Bogotá)">{hora(f.evidencia.fecha)}</td>
+                <td data-label="IP">{f.evidencia.ip}</td>
+                <td data-label="Hash de cadena"><code className="fm-hash" title={f.evidencia.hashCadena}>{f.evidencia.hashCadena.slice(0, 16)}…</code></td>
               </tr>
             ))}
           </tbody>
