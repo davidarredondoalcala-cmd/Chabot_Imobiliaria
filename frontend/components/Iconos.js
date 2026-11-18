@@ -35,18 +35,36 @@ export const IcoMail = () => (<svg {...base}><path d="M4 4h16c1.1 0 2 .9 2 2v12c
 export const IcoWhatsApp = () => (<svg {...base}><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" /></svg>);
 export const IcoSparkle = () => (<svg {...base}><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z" /></svg>);
 
-// Isotipo: casas modernas con techos a dos aguas enmarcadas en un cuadrado.
-// Tono adaptable automáticamente según el tema activo (claro u oscuro).
+// Isotipo Hábitat: Árbol minimalista y orgánico (Copa Verde Esmeralda, Tronco y Raíces Café Roble, Acentos Blancos).
+// Representa la naturaleza del concepto Hábitat: solidez, crecimiento y sostenibilidad.
 export const Logo = () => (
   <svg className="logo-svg" width="36" height="36" viewBox="0 0 36 36" role="img" aria-label="Habitat Capital">
-    <rect className="logo-bg" width="36" height="36" rx="9" fill="var(--logo-bg, #eff6ff)" />
-    <rect className="logo-border" x="1.4" y="1.4" width="33.2" height="33.2" rx="7.8" fill="none" stroke="var(--logo-border, rgba(59, 130, 246, 0.65))" strokeWidth="1.4" />
-    <g className="logo-casas" fill="none" stroke="var(--logo-stroke, #2563eb)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M7.5 16.6 13.8 11l6.3 5.6V26h-12.6z" />
-      <path d="M11.6 26v-5.2h4.4V26" />
-      <path d="M20.4 17.4 25 13.6l4.6 3.8V26H20.4z" />
-      <path d="M22.9 26v-3.6h4.2V26" />
-      <path d="M6 26.4h24" />
+    <defs>
+      <linearGradient id="hc-tree-canopy" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#22c55e" />
+        <stop offset="100%" stopColor="#15803d" />
+      </linearGradient>
+    </defs>
+    <rect className="logo-bg" width="36" height="36" rx="9" fill="var(--logo-bg, #f0fdf4)" />
+    <rect className="logo-border" x="1.4" y="1.4" width="33.2" height="33.2" rx="7.8" fill="none" stroke="var(--logo-border, rgba(34, 197, 94, 0.45))" strokeWidth="1.4" />
+    <g className="logo-arbol">
+      {/* Base / Tierra / Raíces en café */}
+      <path d="M11 27.5h14" stroke="var(--logo-trunk, #78350f)" strokeWidth="1.8" strokeLinecap="round" opacity="0.9" />
+      {/* Tronco central y ramificaciones en café */}
+      <path d="M18 27.5v-8.5" stroke="var(--logo-trunk, #78350f)" strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M18 22l-2.8-2.6M18 20.2l2.8-2.6" stroke="var(--logo-trunk, #78350f)" strokeWidth="1.8" strokeLinecap="round" />
+      {/* Copa del árbol / Follaje exuberante en verde esmeralda */}
+      <path
+        d="M18 6.5c-4.2 0-7.2 2.8-6.8 6.8-1.8.6-3 2.2-3 4.2 0 2.6 2.1 4.5 4.8 4.5h10c2.7 0 4.8-1.9 4.8-4.5 0-2-1.2-3.6-3-4.2.4-4-2.6-6.8-6.8-6.8z"
+        fill="url(#hc-tree-canopy)"
+        stroke="var(--logo-leaf-stroke, #16a34a)"
+        strokeWidth="1.1"
+        strokeLinejoin="round"
+      />
+      {/* Acentos de luz especular en blanco limpio */}
+      <circle cx="15" cy="13" r="1.3" fill="#ffffff" opacity="0.8" />
+      <circle cx="21" cy="13" r="1.3" fill="#ffffff" opacity="0.8" />
+      <path d="M18 10.5v3" stroke="#ffffff" strokeWidth="1.2" strokeLinecap="round" opacity="0.75" />
     </g>
   </svg>
 );

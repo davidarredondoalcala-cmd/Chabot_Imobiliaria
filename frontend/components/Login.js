@@ -34,7 +34,7 @@ export default function Login({ onEntrar }) {
           },
         });
         window.google.accounts.id.renderButton(div.current, {
-          theme: 'filled_blue',
+          theme: 'outline',
           size: 'large',
           shape: 'pill',
           text: 'signin_with',
