@@ -1,7 +1,6 @@
-/* ===== Habitat Capital — Chatbot Conversacional Jarvis (Estilo Hábitat Natural & Glassmorphism) =====
-   Inspirado en la estética minimalista y orgánica de Hábitat:
+/* ===== Habitat Capital — Chatbot Conversacional Jarvis (Estilo Dorado Mate & Glassmorphism Relajado) =====
    - Cristal líquido translúcido con refracción y desenfoque (backdrop-filter)
-   - Paleta de color Verde Esmeralda, Café Tierra y Blanco Cristalino
+   - Paleta Dorado Cálido Sutil / Champagne Mate y Modo Oscuro descansado para los ojos
    - Microanimaciones suaves de entrada y elevación */
 
 .hc-chat-widget {
@@ -17,12 +16,12 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: linear-gradient(135deg, #14532d 0%, #15803d 50%, #78350f 100%);
+  background: linear-gradient(135deg, #705524 0%, #8f6d2f 50%, #aa863c 100%);
   color: #ffffff;
-  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
   border-radius: 9999px;
   padding: 12px 20px;
-  box-shadow: 0 10px 28px rgba(21, 128, 61, 0.4), 0 0 20px rgba(134, 239, 172, 0.25);
+  box-shadow: 0 8px 24px rgba(112, 85, 36, 0.32), 0 0 15px rgba(223, 202, 160, 0.18);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   cursor: pointer;
@@ -31,7 +30,7 @@
 
 .hc-chat-trigger-btn:hover {
   transform: translateY(-3px) scale(1.03);
-  box-shadow: 0 14px 34px rgba(21, 128, 61, 0.55), 0 0 25px rgba(134, 239, 172, 0.4);
+  box-shadow: 0 12px 30px rgba(112, 85, 36, 0.42), 0 0 20px rgba(223, 202, 160, 0.28);
   border-color: rgba(255, 255, 255, 0.85);
 }
 
@@ -47,13 +46,13 @@
   max-width: calc(100vw - 32px);
   height: 600px;
   max-height: calc(100vh - 48px);
-  background: rgba(255, 255, 255, 0.68);
+  background: rgba(255, 255, 255, 0.72);
   -webkit-backdrop-filter: blur(28px) saturate(190%);
   backdrop-filter: blur(28px) saturate(190%);
-  color: #0f172a;
+  color: var(--tx, #1c1a17);
   border-radius: 24px;
   border: 1.5px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 25px 65px rgba(20, 83, 45, 0.16), 0 0 25px rgba(21, 128, 61, 0.12), inset 0 1px 2px rgba(255, 255, 255, 0.85);
+  box-shadow: 0 20px 55px rgba(102, 80, 42, 0.14), 0 0 20px rgba(172, 135, 61, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.85);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -61,10 +60,10 @@
 }
 
 [data-theme="dark"] .hc-chat-window {
-  background: rgba(13, 26, 17, 0.65);
-  color: #f2faf4;
-  border: 1.5px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.6), 0 0 30px rgba(34, 197, 94, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  background: rgba(22, 22, 26, 0.78);
+  color: #e1e1e4;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 20px rgba(197, 160, 89, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.08);
 }
 
 @keyframes hc-pop-in {
@@ -80,16 +79,16 @@
 
 /* Encabezado Glassy Verde & Café Hábitat */
 .hc-chat-header {
-  background: linear-gradient(135deg, #14532d 0%, #15803d 50%, #78350f 100%);
+  background: linear-gradient(135deg, #705524 0%, #8f6d2f 50%, #aa863c 100%);
   color: #ffffff;
   padding: 16px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
   user-select: none;
-  box-shadow: 0 4px 18px rgba(21, 128, 61, 0.25);
+  box-shadow: 0 4px 18px rgba(112, 85, 36, 0.25);
 }
 
 .hc-header-brand {
@@ -107,8 +106,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #86efac;
-  box-shadow: 0 0 12px rgba(74, 222, 128, 0.45);
+  color: #ebd29f;
+  box-shadow: 0 0 10px rgba(197, 160, 89, 0.35);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
@@ -132,10 +131,10 @@
 .hc-status-dot {
   width: 7px;
   height: 7px;
-  background: #22c55e;
+  background: #c5a059;
   border-radius: 50%;
   display: inline-block;
-  box-shadow: 0 0 10px #22c55e;
+  box-shadow: 0 0 8px #c5a059;
 }
 
 .hc-header-actions {
@@ -185,12 +184,12 @@
 /* Tarjeta para Retomar Conversación */
 .hc-resume-card {
   background: var(--card, rgba(255, 255, 255, 0.88));
-  border: 1px solid var(--bd, rgba(220, 242, 226, 0.8));
-  border-left: 4px solid var(--ac, #15803d);
+  border: 1px solid var(--bd, rgba(206, 184, 140, 0.8));
+  border-left: 4px solid var(--ac, #967432);
   border-radius: 14px;
   padding: 14px 16px;
   margin-top: 10px;
-  box-shadow: 0 4px 16px rgba(21, 128, 61, 0.1);
+  box-shadow: 0 4px 16px rgba(112, 85, 36, 0.1);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -201,7 +200,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--ac, #15803d);
+  color: var(--ac, #967432);
 }
 
 .hc-resume-btn-primary {
@@ -216,13 +215,13 @@
   cursor: pointer;
   text-align: left;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(21, 128, 61, 0.3);
+  box-shadow: 0 4px 14px rgba(112, 85, 36, 0.3);
   width: 100%;
 }
 
 .hc-resume-btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(21, 128, 61, 0.45);
+  box-shadow: 0 6px 18px rgba(112, 85, 36, 0.45);
 }
 
 .hc-resume-btn-secondary {
@@ -231,7 +230,7 @@
   gap: 10px;
   background: var(--card, #ffffff);
   color: var(--tx, #0f172a);
-  border: 1px solid var(--bd, rgba(220, 242, 226, 0.8));
+  border: 1px solid var(--bd, rgba(206, 184, 140, 0.8));
   border-radius: 12px;
   padding: 10px 14px;
   cursor: pointer;
@@ -286,11 +285,11 @@
 .hc-avatar.bot {
   background: var(--gold-grad);
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(21, 128, 61, 0.35);
+  box-shadow: 0 2px 8px rgba(112, 85, 36, 0.3);
 }
 
 .hc-avatar.user {
-  background: rgba(21, 128, 61, 0.15);
+  background: rgba(150, 116, 50, 0.15);
   color: var(--ac);
 }
 
@@ -322,21 +321,21 @@
   color: #0f172a;
   border: 1px solid rgba(255, 255, 255, 0.95);
   border-top-left-radius: 4px;
-  box-shadow: 0 4px 16px rgba(21, 128, 61, 0.06);
+  box-shadow: 0 4px 16px rgba(112, 85, 36, 0.06);
 }
 
 [data-theme="dark"] .hc-msg-bubble.bot {
-  background: rgba(18, 36, 24, 0.85);
-  color: #f2faf4;
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  background: rgba(30, 30, 35, 0.88);
+  color: #e1e1e4;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 .hc-msg-bubble.user {
   background: var(--gold-grad);
   color: #ffffff;
   border-top-right-radius: 4px;
-  box-shadow: 0 4px 18px rgba(21, 128, 61, 0.35);
+  box-shadow: 0 4px 16px rgba(112, 85, 36, 0.28);
 }
 
 /* Indicador de escribiendo */
@@ -350,7 +349,7 @@
 .hc-dot {
   width: 6px;
   height: 6px;
-  background: var(--ac, #15803d);
+  background: var(--ac, #967432);
   border-radius: 50%;
   animation: hc-bounce 1.4s infinite ease-in-out both;
 }
@@ -368,20 +367,20 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #16a34a, #15803d);
+  background: linear-gradient(135deg, #128C7E, #25D366);
   color: #ffffff;
   font-size: 0.82rem;
   font-weight: 600;
   padding: 9px 16px;
   border-radius: 12px;
   text-decoration: none;
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 4px 12px rgba(18, 140, 126, 0.3);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .hc-direct-wa-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(22, 163, 74, 0.4);
+  box-shadow: 0 6px 18px rgba(18, 140, 126, 0.4);
 }
 
 /* Tarjeta de propiedad en el chat */
@@ -397,19 +396,19 @@
   border: 1.5px solid var(--bd, rgba(219, 234, 254, 0.8));
   border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(21, 128, 61, 0.08);
+  box-shadow: 0 8px 24px rgba(112, 85, 36, 0.08);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .hc-prop-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(21, 128, 61, 0.16);
+  box-shadow: 0 12px 30px rgba(112, 85, 36, 0.16);
   border-color: var(--ac);
 }
 
 [data-theme="dark"] .hc-prop-card {
-  background: rgba(18, 36, 24, 0.9);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(30, 30, 35, 0.92);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .hc-prop-img-wrap {
@@ -431,7 +430,7 @@
 }
 
 .hc-prop-header {
-  background: linear-gradient(135deg, #14532d 0%, #15803d 50%, #78350f 100%);
+  background: linear-gradient(135deg, #705524 0%, #8f6d2f 50%, #aa863c 100%);
   color: #ffffff;
   padding: 12px 14px;
 }
@@ -472,7 +471,7 @@
 .hc-prop-price {
   font-size: 1.05rem;
   font-weight: 800;
-  color: #86efac;
+  color: #ebd29f;
   margin-top: 3px;
 }
 
@@ -525,12 +524,12 @@
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(21, 128, 61, 0.3);
+  box-shadow: 0 4px 14px rgba(112, 85, 36, 0.3);
 }
 
 .hc-prop-btn-view:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(21, 128, 61, 0.45);
+  box-shadow: 0 6px 18px rgba(112, 85, 36, 0.45);
 }
 
 .hc-prop-btn-wa {
@@ -538,7 +537,7 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background: linear-gradient(135deg, #16a34a, #15803d);
+  background: linear-gradient(135deg, #128C7E, #25D366);
   color: #ffffff;
   padding: 8px 12px;
   border-radius: 10px;
@@ -550,7 +549,7 @@
 
 .hc-prop-btn-wa:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 4px 14px rgba(18, 140, 126, 0.3);
 }
 
 /* Sugerencias rápidas (Chips) */
@@ -566,7 +565,7 @@
 }
 
 [data-theme="dark"] .hc-chips-container {
-  background: rgba(13, 26, 17, 0.65);
+  background: rgba(22, 22, 26, 0.72);
 }
 
 .hc-chip-btn {
@@ -587,7 +586,7 @@
   color: #ffffff;
   border-color: transparent;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(21, 128, 61, 0.35);
+  box-shadow: 0 4px 12px rgba(112, 85, 36, 0.35);
 }
 
 /* Formulario de entrada */
@@ -603,7 +602,7 @@
 }
 
 [data-theme="dark"] .hc-chat-input-form {
-  background: rgba(13, 26, 17, 0.75);
+  background: rgba(22, 22, 26, 0.82);
 }
 
 .hc-chat-input {
@@ -636,12 +635,12 @@
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(21, 128, 61, 0.35);
+  box-shadow: 0 4px 12px rgba(112, 85, 36, 0.3);
 }
 
 .hc-chat-send-btn:hover:not(:disabled) {
   transform: scale(1.08);
-  box-shadow: 0 6px 16px rgba(21, 128, 61, 0.5);
+  box-shadow: 0 6px 16px rgba(112, 85, 36, 0.45);
 }
 
 .hc-chat-send-btn:disabled {
