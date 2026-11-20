@@ -1,9 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#0a0a1a"/>
-  <rect x="242" y="360" width="28" height="120" fill="#c8961e" rx="4"/>
-  <rect x="180" y="480" width="152" height="12" fill="#c8961e" rx="6"/>
-  <path d="M200 340 Q200 260 256 250 Q312 260 312 340 Q312 400 256 400 Q200 400 200 340 Z" fill="#c8961e"/>
-  <circle cx="240" cy="330" r="6" fill="#fff"/>
-  <circle cx="256" cy="320" r="8" fill="#fff"/>
-  <circle cx="272" cy="330" r="6" fill="#fff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Fondo oscuro con esquinas redondeadas -->
+  <rect width="512" height="512" rx="96" fill="#141414" />
+  
+  <!-- Silueta dorada del árbol/nube -->
+  <path fill="#D4A638" d="M256 105c-55 0-100 41-106 94-36 12-62 46-62 86 0 50 41 91 91 91h62v48h-104v28h238v-28h-104v-48h62c50 0 91-41 91-91 0-40-26-74-62-86-6-53-51-94-106-94z" />
+  
+  <!-- Tres puntos blancos centrales -->
+  <rect x="208" y="218" width="22" height="44" rx="11" fill="#FFFFFF" />
+  <rect x="245" y="195" width="22" height="67" rx="11" fill="#FFFFFF" />
+  <rect x="282" y="218" width="22" height="44" rx="11" fill="#FFFFFF" />
 </svg>
