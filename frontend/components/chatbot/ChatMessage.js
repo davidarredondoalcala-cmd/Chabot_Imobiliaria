@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { forwardRef } from 'react';
 import PropertyCard from './PropertyCard';
 import { IcoChatBot, IcoChatUser, IcoChatWhatsApp } from './IconosChat';
 import { abrirWhatsApp } from '../../lib/contacto';
@@ -27,11 +27,15 @@ function renderizarContenido(texto) {
   });
 }
 
-export default function ChatMessage({ message, onRetomar, onNueva }) {
+const ChatMessage = forwardRef(function ChatMessage({ message, onRetomar, onNueva }, ref) {
   const isUser = message.role === 'user';
 
   return (
-    <div className={`hc-chat-msg-row ${isUser ? 'user' : 'bot'}`}>
+    <div
+      ref={ref}
+      id={`hc-msg-${message.id}`}
+      className={`hc-chat-msg-row ${isUser ? 'user' : 'bot'}`}
+    >
       {!isUser && (
         <div className="hc-avatar bot">
           <IcoChatBot size={18} />
@@ -107,4 +111,6 @@ export default function ChatMessage({ message, onRetomar, onNueva }) {
       )}
     </div>
   );
-}
+});
+
+export default ChatMessage;

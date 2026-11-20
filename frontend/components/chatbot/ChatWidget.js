@@ -15,8 +15,12 @@ export default function ChatWidget() {
   const [conversationId, setConversationId] = useState('');
   const [showResumePrompt, setShowResumePrompt] = useState(false);
 
+  const messagesContainerRef = useRef(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const lastBotMsgRef = useRef(null);
+  const prevMessagesLengthRef = useRef(0);
+  const prevIsOpenRef = useRef(false);
 
   const getSaludo = () => {
     const hora = new Date().getHours();
@@ -59,16 +63,95 @@ export default function ChatWidget() {
     }
   }, []);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  /**
+   * Desplaza el contenedor al inicio del mensaje del bot más reciente
+   * para que el usuario comience a leer desde la primera línea sin tener que subir.
+   */
+  const scrollToLastBotMessage = (targetId) => {
+    const container = messagesContainerRef.current;
+    const target =
+      lastBotMsgRef.current ||
+      (targetId && typeof document !== 'undefined'
+        ? document.getElementById(`hc-msg-${targetId}`)
+        : null);
+
+    if (container && target) {
+      const containerRect = container.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      const relativeTop = targetRect.top - containerRect.top + container.scrollTop;
+
+      container.scrollTo({
+        top: Math.max(0, relativeTop - 12),
+        behavior: 'smooth',
+      });
+    }
   };
 
-  useEffect(() => {
-    if (isOpen) {
-      scrollToBottom();
-      setTimeout(() => inputRef.current?.focus(), 250);
+  /**
+   * Desplaza el contenedor al final de la conversación (para mensajes de usuario y loader).
+   */
+  const scrollToBottom = (behavior = 'smooth') => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior,
+      });
+    } else {
+      messagesEndRef.current?.scrollIntoView({ behavior });
     }
-  }, [isOpen, messages, isLoading]);
+  };
+
+  // Manejar apertura inicial del chat
+  useEffect(() => {
+    if (isOpen && !prevIsOpenRef.current) {
+      setTimeout(() => {
+        scrollToBottom('auto');
+        inputRef.current?.focus();
+      }, 150);
+    }
+    prevIsOpenRef.current = isOpen;
+  }, [isOpen]);
+
+  // Manejar el desplazamiento inteligente al enviar o recibir mensajes
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const prevLen = prevMessagesLengthRef.current;
+    const currentLen = messages.length;
+    prevMessagesLengthRef.current = currentLen;
+
+    // Carga inicial o reseteo a bienvenida
+    if (prevLen === 0 || (currentLen === 1 && messages[0]?.id === 'welcome')) {
+      const container = messagesContainerRef.current;
+      if (container) container.scrollTo({ top: 0, behavior: 'auto' });
+      return;
+    }
+
+    if (currentLen > prevLen) {
+      const lastMsg = messages[currentLen - 1];
+      if (lastMsg.role === 'assistant' && lastMsg.id !== 'welcome') {
+        // Cuando llega un mensaje del bot, scroll suave al INICIO de este mensaje
+        // para que el usuario empiece a leer desde arriba sin tener que subir
+        const t1 = setTimeout(() => {
+          scrollToLastBotMessage(lastMsg.id);
+        }, 40);
+        const t2 = setTimeout(() => {
+          scrollToLastBotMessage(lastMsg.id);
+        }, 220);
+        return () => {
+          clearTimeout(t1);
+          clearTimeout(t2);
+        };
+      } else {
+        // Si el usuario envió un mensaje, scroll al fondo para ver su texto y el indicador de carga
+        scrollToBottom('smooth');
+      }
+    } else if (isLoading) {
+      // Mientras el bot procesa la consulta, mantener visible el indicador de escritura
+      scrollToBottom('smooth');
+    }
+  }, [messages, isLoading, isOpen]);
 
   useEffect(() => {
     const onAbrir = () => {
@@ -282,13 +365,13 @@ export default function ChatWidget() {
       {/* Ventana de chat */}
       {isOpen && (
         <div className="hc-chat-window">
-          {/* Encabezado dorado interactivo: cierra al hacer clic en cualquier parte de la barra */}
+          {/* Encabezado interactivo: cierra al hacer clic en cualquier parte de la barra */}
           <div
             className="hc-chat-header"
             onClick={handleCloseChat}
             role="button"
             tabIndex={0}
-            title="Haz clic en la barra dorada para cerrar el chat"
+            title="Haz clic en la barra para cerrar el chat"
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -321,15 +404,21 @@ export default function ChatWidget() {
           </div>
 
           {/* Lista de mensajes */}
-          <div className="hc-chat-messages">
-            {messages.map((m) => (
-              <ChatMessage
-                key={m.id}
-                message={m}
-                onRetomar={handleRetomarConversacion}
-                onNueva={handleEmpezarNueva}
-              />
-            ))}
+          <div className="hc-chat-messages" ref={messagesContainerRef}>
+            {messages.map((m, index) => {
+              const isLatestBotMessage =
+                m.role === 'assistant' && index === messages.length - 1;
+
+              return (
+                <ChatMessage
+                  key={m.id}
+                  ref={isLatestBotMessage ? lastBotMsgRef : null}
+                  message={m}
+                  onRetomar={handleRetomarConversacion}
+                  onNueva={handleEmpezarNueva}
+                />
+              );
+            })}
 
             {isLoading && (
               <div className="hc-chat-msg-row bot">
