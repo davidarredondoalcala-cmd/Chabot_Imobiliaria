@@ -151,6 +151,10 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
   };
   const arrendada = S.estado === 'Arrendada';
 
+  const opcionesEstado = S.tipo === 'Casa' && S.estado === 'Para la venta'
+    ? ['Sin arrendar', 'Para la venta']
+    : ['Sin arrendar', 'Para la venta', 'Arrendada'];
+
   return (
     <div className="view">
       <button className="l" onClick={volver}>← Volver a la lista</button>
@@ -172,9 +176,7 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
           />
           <label>Estado</label>
           <select value={S.estado} onChange={(e) => setS({ ...S, estado: e.target.value })}>
-            <option>Sin arrendar</option>
-            <option>Para la venta</option>
-            <option>Arrendada</option>
+            {opcionesEstado.map((o) => <option key={o}>{o}</option>)}
           </select>
           {campo('dir', 'Dirección *', 'text', 'Ej: Cll 10 # 5 - 20', 80)}
           {campo('barrio', 'Barrio', 'text', 'Ej: Piedra Pintada', 50)}
@@ -224,15 +226,13 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
               <button type="button" className="g" onClick={subirFotoAhora} disabled={subiendoFoto}>
                 <IcoCheck /> {subiendoFoto ? 'Subiendo…' : 'Confirmar y subir ahora'}
               </button>
-            </div>
-          )}
-
-          <div className="row" style={{ marginTop: 22, gap: 12, alignItems: 'center' }}>
-            {fotoPreviewLocal && (
               <button type="button" className="l" onClick={quitarFoto}>
                 <IcoCerrar /> Quitar
               </button>
-            )}
+            </div>
+          )}
+
+          <div className="row" style={{ marginTop: 22 }}>
             <button className="g" disabled={env || subiendoFoto} onClick={guardar}>
               {env ? 'Guardando…' : 'Guardar inmueble'}
             </button>

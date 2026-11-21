@@ -137,7 +137,7 @@ export default function Home() {
 
   return (
     <>
-      <header className={oculto ? 'oculto' : ''}>
+      <header>
         <button
           type="button"
           className="marca"
