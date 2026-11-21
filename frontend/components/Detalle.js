@@ -9,7 +9,7 @@ import { subirImagen, urlImagen } from '../lib/apiImagenes';
 import { setFotoInmueble } from '../lib/api';
 import { INMOBILIARIA_INFO } from '../lib/firmaInmobiliaria';
 import { descargarPdfBorrador, descargarPdfFinal, obtenerAcuerdo, obtenerAcuerdoPorInmueble, actualizarClausulas } from '../lib/apiFirmas';
-import { IcoOjo, IcoDescargar, IcoImprimir, IcoCerrar, IcoDocumento, IcoSparkle, IcoWhatsApp, IcoCamara, IcoCheck, IcoEditar } from './Iconos';
+import { IcoOjo, IcoDescargar, IcoImprimir, IcoCerrar, IcoDocumento, IcoWhatsApp, IcoCamara, IcoCheck, IcoEditar } from './Iconos';
 import { waUrl, abrirWhatsApp } from '../lib/contacto';
 import EditorClausulas from './EditorClausulas';
 
@@ -352,9 +352,14 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
             {esAdmin && i.venc && <div className="dato"><span>Vencimiento del contrato</span><b>{fd(i.venc)}</b></div>}
             {esAdmin && i.venc && <div className="dato"><span>Día de pago</span><b>El {i.diaPago} de cada mes</b></div>}
           </div>
-          {esAdmin && (i.estado === 'Disponible' || i.estado === 'Para la venta') && (
+          {esAdmin && i.estado === 'Para la venta' && (
             <div className="row">
-              <button className="g" onClick={() => crear(i.estado === 'Para la venta' ? 'venta' : 'arriendo')}>Crear contrato</button>
+              <button className="g" onClick={() => crear('venta')}>Crear contrato de compraventa</button>
+            </div>
+          )}
+          {esAdmin && i.estado === 'Sin arrendar' && (
+            <div className="row">
+              <button className="g" onClick={() => crear('arriendo')}>Crear contrato de arriendo</button>
             </div>
           )}
           {esAdmin ? (
@@ -392,7 +397,6 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
           ) : (
             <div className="ficha-cliente-box">
               <div className="ficha-cliente-header">
-                <span className="ficha-cliente-icono"><IcoSparkle /></span>
                 <div>
                   <h4>¿Te interesa este inmueble?</h4>
                   <p>Consulta especificaciones, disponibilidad y agenda tu cita con un asesor de Habitat Capital.</p>
