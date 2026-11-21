@@ -219,21 +219,20 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
           </div>
           <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" style={{ display: 'none' }} onChange={elegirFoto} />
 
-          <div className="row" style={{ marginTop: 22, gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-            {fotoPreviewLocal && (
-              <>
-                <span className="tag pulse"><IcoCamara style={{ marginRight: 10 }} /> Previsualización activa</span>
-                <button type="button" className="g" onClick={subirFotoAhora} disabled={subiendoFoto}>
-                  <IcoCheck /> {subiendoFoto ? 'Subiendo…' : 'Confirmar y subir ahora'}
-                </button>
-                <button type="button" className="l" onClick={quitarFoto}>
-                  <IcoCerrar /> Quitar
-                </button>
-              </>
-            )}
-          </div>
+          {fotoPreviewLocal && (
+            <div className="row" style={{ marginTop: 10, gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+              <button type="button" className="g" onClick={subirFotoAhora} disabled={subiendoFoto}>
+                <IcoCheck /> {subiendoFoto ? 'Subiendo…' : 'Confirmar y subir ahora'}
+              </button>
+            </div>
+          )}
 
-          <div className="row" style={{ marginTop: 22 }}>
+          <div className="row" style={{ marginTop: 22, gap: 12, alignItems: 'center' }}>
+            {fotoPreviewLocal && (
+              <button type="button" className="l" onClick={quitarFoto}>
+                <IcoCerrar /> Quitar
+              </button>
+            )}
             <button className="g" disabled={env || subiendoFoto} onClick={guardar}>
               {env ? 'Guardando…' : 'Guardar inmueble'}
             </button>
