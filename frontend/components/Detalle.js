@@ -520,7 +520,7 @@ export default function Detalle({ inm: i, volver, crear, actualizar, avisar, esA
                 onClick={() => setContratoVer(null)}
                 title="Salir de la perspectiva (Esc)"
               >
-                <IcoCerrar /> Cerrar
+                <IcoCerrar style={{ marginRight: 8 }} /> Cerrar
               </button>
             </div>
           </div>
