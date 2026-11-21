@@ -2530,6 +2530,27 @@ input:focus, textarea:focus, select:focus {
     background: rgba(37, 99, 235, 0.85);
 }
 
+/* Contenedor de previsualización de foto en el formulario de agregar inmueble */
+.foto-picker {
+    position: relative;
+    width: 100%;
+    height: 260px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #f1f5f9;
+    border: 1.5px solid var(--bd);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.foto-picker img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 /* Hoja oficial de contrato (siempre papel blanco puro, como un documento real) */
 .hoja {
     background: #ffffff;
