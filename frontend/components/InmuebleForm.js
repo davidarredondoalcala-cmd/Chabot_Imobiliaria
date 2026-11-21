@@ -222,7 +222,7 @@ export default function InmuebleForm({ tipo0, volver, creado, avisar }) {
           <div className="row" style={{ marginTop: 22, gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
             {fotoPreviewLocal && (
               <>
-                <span className="tag pulse"><IcoCamara style={{ marginRight: 6 }} /> Previsualización activa</span>
+                <span className="tag pulse"><IcoCamara style={{ marginRight: 10 }} /> Previsualización activa</span>
                 <button type="button" className="g" onClick={subirFotoAhora} disabled={subiendoFoto}>
                   <IcoCheck /> {subiendoFoto ? 'Subiendo…' : 'Confirmar y subir ahora'}
                 </button>
