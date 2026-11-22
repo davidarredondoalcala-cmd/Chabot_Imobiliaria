@@ -47,7 +47,7 @@ export default function FirmaTipografica({ nombre, onFirma }) {
         tam -= 4;
         ctx.font = `600 ${tam}px ${fuente.css}`;
       }
-      ctx.fillStyle = '#14201d';
+      ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(texto, 450, 180);
